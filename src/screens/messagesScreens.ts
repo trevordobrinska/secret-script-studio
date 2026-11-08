@@ -3,6 +3,7 @@ import "./messages.css";
 import type { Message } from "../core/message";
 import { messageView } from "../render/messageView";
 import { playTap } from "../sound/sound";
+import { openPrintChoice } from "./printChoice";
 import { el, type RenderScreen } from "./screen";
 import { secretToggle } from "./secretToggle";
 
@@ -138,13 +139,21 @@ export const messageScreen: RenderScreen<{ name: "message"; messageId: string }>
       playTap();
       go({ name: "share", scriptId: script!.id, text: message!.text, returnTo: here });
     });
+    const print = button("Print", "wr-print");
+    print.addEventListener("click", () => {
+      playTap();
+      openPrintChoice((options) => {
+        const result = core.printLayout(script!.id, message!.text, options);
+        return result.ok ? result.layout : undefined;
+      }, playTap);
+    });
     const remove = button("Delete", "ms-danger");
     remove.addEventListener("click", () => {
       playTap();
       asking = true;
       drawActions();
     });
-    actions.replaceChildren(all, secretToggle(core, drawMessage), edit, share, remove);
+    actions.replaceChildren(all, secretToggle(core, drawMessage), edit, share, print, remove);
   }
 
   drawActions();

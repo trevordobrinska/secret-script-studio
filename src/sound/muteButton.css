@@ -34,3 +34,24 @@
   transform: translateY(4px);
   box-shadow: 0 0 0 var(--ink);
 }
+/* A muted World Character tap: one soft wiggle in place (rotate only, so the button never moves). */
+#mute-button.wiggle {
+  animation: mute-wiggle 420ms ease-in-out;
+}
+@keyframes mute-wiggle {
+  0%,
+  100% {
+    rotate: 0deg;
+  }
+  25% {
+    rotate: -8deg;
+  }
+  75% {
+    rotate: 8deg;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  #mute-button.wiggle {
+    animation-duration: 1ms;
+  }
+}

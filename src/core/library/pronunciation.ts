@@ -12,10 +12,10 @@ export interface Speech {
 
 /**
  * What a tap on a World Character does. The card always glows; `speak`
- * says `speech` while it glows. (Ticket 03 adds a muted variant: glow and
- * wiggle the mute button, no speech.)
+ * says `speech` while it glows; `muted` says nothing and gives the mute
+ * button one soft wiggle, so the kid can tell the sound is off.
  */
-export type WorldCharacterTap = { readonly kind: "speak"; readonly speech: Speech };
+export type WorldCharacterTap = { readonly kind: "speak"; readonly speech: Speech } | { readonly kind: "muted" };
 
 /**
  * The pronunciation rule. The script's own voice reads the character

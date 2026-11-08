@@ -61,6 +61,11 @@ export interface NumberExplorerView {
   readonly canCountUp: boolean;
   /** Whether − works (false at 0: the button is simply disabled). */
   readonly canCountDown: boolean;
+  /**
+   * Whether to show the one-time hint "Try fewer digits!". Only on his very
+   * first visit (remembered in the Settings), until he changes the Digit Count.
+   */
+  readonly hint: boolean;
 }
 
 /** The Number Explorer part of the Studio core's interface. */
@@ -77,6 +82,12 @@ export interface NumberExplorerCommands {
    * anything else.
    */
   setDigitCount(count: number): boolean;
+  /**
+   * Makes a regular number he typed on the 0–9 keypad the current number
+   * (no odometer roll). False (and nothing changes) unless it's a whole
+   * number from 0 to NUMBER_MAX.
+   */
+  enterNumber(number: number): boolean;
   /** Counts in another My Script's digits (the number stays). False for an unknown id. */
   chooseNumberScript(scriptId: string): boolean;
 }
@@ -102,6 +113,10 @@ interface NumberExplorerDeps {
   clock: Clock;
   /** Every My Script, oldest first (the My Script book's `myScripts`). */
   myScripts(): readonly MyScript[];
+  /** Whether the "Try fewer digits!" hint was ever shown (the Settings' numberHintSeen). */
+  hintSeen(): boolean;
+  /** Remembers in the Settings that the hint has been shown. */
+  markHintSeen(): void;
 }
 
 /**
@@ -116,10 +131,12 @@ interface NumberExplorerDeps {
  * My Script.
  *
  * `start()` is a fresh start (Digit Count 10, number 0, re-choose the
- * My Script). The core calls it when he comes in from home, so coming back
+ * My Script, and the first-time hint if he's never seen it). The core calls it when he comes in from home, so coming back
  * from the Glyph canvas (after tapping a Missing digit) keeps his place.
  */
-export function createNumberExplorer({ clock, myScripts }: NumberExplorerDeps) {
+export function createNumberExplorer({ clock, myScripts, hintSeen, markHintSeen }: NumberExplorerDeps) {
+  /** The hint is up on this visit (until he changes the Digit Count). */
+  let hint = false;
   let digitCount = DIGIT_COUNT_START;
   let number = 0;
   let chosenId: string | undefined;
@@ -185,6 +202,7 @@ export function createNumberExplorer({ clock, myScripts }: NumberExplorerDeps) {
       lastStep: lastStep?.direction,
       canCountUp: number < NUMBER_MAX,
       canCountDown: number > 0,
+      hint,
     };
   }
 
@@ -195,6 +213,13 @@ export function createNumberExplorer({ clock, myScripts }: NumberExplorerDeps) {
     setDigitCount(count) {
       if (!Number.isInteger(count) || count < DIGIT_COUNT_MIN || count > DIGIT_COUNT_MAX) return false;
       digitCount = count;
+      lastStep = undefined;
+      hint = false;
+      return true;
+    },
+    enterNumber(typed) {
+      if (!Number.isInteger(typed) || typed < 0 || typed > NUMBER_MAX) return false;
+      number = typed;
       lastStep = undefined;
       return true;
     },
@@ -214,6 +239,9 @@ export function createNumberExplorer({ clock, myScripts }: NumberExplorerDeps) {
       number = 0;
       lastStep = undefined;
       chosenId = mostRecentlyUsed(myScripts())?.id;
+      // The hint shows on his first visit only: it counts as seen as soon as it's shown.
+      hint = !hintSeen();
+      if (hint) markHintSeen();
     },
   };
 }

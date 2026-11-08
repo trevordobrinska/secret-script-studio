@@ -109,7 +109,15 @@ export function createStudioCore({ storage, clock }: StudioCoreDeps): StudioCore
 
   const writing = createWriting({ myScript: myScriptBook.commands.myScript });
 
-  const numberExplorer = createNumberExplorer({ clock, myScripts: myScriptBook.commands.myScripts });
+  const numberExplorer = createNumberExplorer({
+    clock,
+    myScripts: myScriptBook.commands.myScripts,
+    hintSeen: () => settings.numberHintSeen,
+    markHintSeen: () => {
+      settings = { ...settings, numberHintSeen: true };
+      saveSettings();
+    },
+  });
 
   return {
     ...myScriptBook.commands,

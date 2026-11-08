@@ -1,0 +1,178 @@
+/* The Number Explorer's "How many digits?" row and type-a-number keypad. Classes prefixed dc-. */
+
+.dc-row {
+  flex: none;
+  width: 100%;
+  max-width: 1200px;
+  box-sizing: border-box;
+  padding: 4px calc(var(--gap) * 2) 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.dc-top {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  height: 44px;
+}
+.dc-label {
+  font-size: 24px;
+  font-weight: bold;
+}
+/* The only place the word "base" appears: small and quiet, for the curious. */
+.dc-caption {
+  font-size: 16px;
+  color: var(--soft-ink);
+}
+.dc-hint {
+  padding: 4px 14px;
+  border-radius: 16px;
+  background: var(--my-scripts);
+  font-size: 18px;
+}
+.dc-spacer {
+  flex: 1;
+}
+.dc-type {
+  height: 44px;
+  padding: 0 18px;
+  border: 3px solid var(--ink);
+  border-radius: 22px;
+  background: var(--card);
+  font-size: 20px;
+}
+
+.dc-line {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 56px;
+}
+.dc-step {
+  flex: none;
+  height: 52px;
+  padding: 0 16px;
+  border: 3px solid var(--ink);
+  border-radius: 16px;
+  background: var(--number-explorer);
+  font-size: 20px;
+  white-space: nowrap;
+}
+.dc-step:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+/* His digits, 0 up to the top one; they shrink to fit all 16. */
+.dc-tiles {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+}
+.dc-tile {
+  flex: 0 1 48px;
+  min-width: 0;
+  aspect-ratio: 1;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 2px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  overflow: hidden;
+}
+.dc-tile canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+.dc-tile.missing {
+  border: 2px dashed var(--soft-ink);
+  background: transparent;
+  color: var(--soft-ink);
+  font-size: 16px;
+}
+.dc-tile.missing:disabled {
+  cursor: default;
+}
+
+/* The keypad: a calm dialog over the screen (below the home and mute buttons). */
+.dc-keypad-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(47, 58, 86, 0.35);
+}
+.dc-keypad {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 14px;
+  padding: 20px;
+  border: 4px solid var(--ink);
+  border-radius: 28px;
+  background: var(--card);
+}
+.dc-display {
+  height: 72px;
+  line-height: 72px;
+  border: 3px solid var(--line);
+  border-radius: 14px;
+  background: #fff;
+  font-size: 52px;
+  text-align: center;
+  white-space: pre;
+}
+.dc-keys {
+  display: grid;
+  grid-template-columns: repeat(3, 96px);
+  grid-auto-rows: 80px;
+  gap: 12px;
+}
+.dc-key {
+  border: 3px solid var(--ink);
+  border-radius: 18px;
+  background: var(--paper);
+  font-size: 40px;
+}
+.dc-key:active:not(:disabled) {
+  background: var(--number-explorer);
+}
+.dc-key:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.dc-ok {
+  background: var(--number-explorer);
+  font-size: 22px;
+  font-weight: bold;
+}
+.dc-cancel {
+  height: 52px;
+  border: 3px solid var(--ink);
+  border-radius: 16px;
+  background: var(--card);
+  font-size: 20px;
+}
+
+/* Portrait has height to spare: the tiles keep their size and wrap onto a
+   second line. The room for two lines is always kept, so nothing below moves. */
+@media (orientation: portrait) {
+  .dc-line {
+    height: 104px;
+  }
+  .dc-tiles {
+    flex-wrap: wrap;
+    align-content: center;
+  }
+  .dc-tile {
+    flex: 0 0 48px;
+  }
+}

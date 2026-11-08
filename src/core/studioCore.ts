@@ -1,11 +1,11 @@
 import type { Clock } from "./deps";
 import { LIBRARY } from "./library/catalog";
 import type { WorldCharacter, WorldNumeral, WorldScript } from "./library/worldScript";
-import { pronounce, type WorldCharacterTap } from "./library/pronunciation";
+import { pronounce, type SpeakOrMuted, type Speech } from "./library/pronunciation";
 import { SETTINGS_SCHEMA_VERSION, type SettingsRecord, type StudioStorage } from "./studioStorage";
 import { createMyScriptBook, type MyScriptCommands } from "./myScriptBook";
 import { canHaveSound, type GlyphSlot } from "./myScript";
-import { glyphSpeech, messageSpeech, type GlyphTap } from "./glyphSound";
+import { glyphSpeech, messageSpeech } from "./glyphSound";
 import type { GlyphSet } from "./messageLayout";
 import { createNumberExplorer, type NumberExplorerCommands } from "./numberExplorer";
 import { createWriting, type WritingCommands } from "./writing";
@@ -72,9 +72,8 @@ export type { MessageCell, MessageLayout } from "./messageLayout";
 export type { ScriptLook } from "./myScript";
 export type { CipherKeyEntry, PrintLayout, PrintOptions } from "./printing";
 export type { WorldCharacter, WorldNumeral, WorldScript } from "./library/worldScript";
-export type { Speech, WorldCharacterTap } from "./library/pronunciation";
+export type { SpeakOrMuted, Speech } from "./library/pronunciation";
 export { primaryLanguage } from "./library/pronunciation";
-export type { GlyphTap } from "./glyphSound";
 export { SOUND_MAX_LENGTH, canHaveSound } from "./myScript";
 
 /** The Settings as the screens see them. */
@@ -125,7 +124,7 @@ export interface StudioCore
     scriptId: string,
     entry: WorldCharacter | WorldNumeral,
     voiceLangs: readonly string[],
-  ): WorldCharacterTap | undefined;
+  ): SpeakOrMuted | undefined;
   /**
    * What tapping one of his Glyphs does: the English voice says its Sound,
    * or its plain letter or digit when it has none. `trying` is the Sound
@@ -134,7 +133,7 @@ export interface StudioCore
    * slot needn't be drawn yet. While muted it says nothing. Undefined for
    * an unknown My Script, or space and punctuation (they have no Sound).
    */
-  glyphTap(scriptId: string, slot: GlyphSlot, trying?: string): GlyphTap | undefined;
+  glyphTap(scriptId: string, slot: GlyphSlot, trying?: string): SpeakOrMuted | undefined;
   /**
    * What Read it to me does for Message `text` written in `glyphs` (a My
    * Script's `glyphs`, or a SharedMessage's): the English voice says the
@@ -142,9 +141,10 @@ export interface StudioCore
    * word, with a pause at each space and punctuation mark. A letter or
    * digit with no Sound, or a Missing Glyph, adds its plain lowercase
    * letter or digit. While muted it says nothing. Undefined when the
-   * Message has nothing to say (empty, or only spaces).
+   * Message has nothing to say (no letter or digit: empty, or only spaces
+   * and punctuation).
    */
-  readItToMe(text: string, glyphs: GlyphSet): GlyphTap | undefined;
+  readItToMe(text: string, glyphs: GlyphSet): SpeakOrMuted | undefined;
   /** Turns the sounds off (true) or on (false). Remembered across reloads. */
   setMuted(muted: boolean): void;
   /** Resolves once every save started so far has finished (or failed and been logged). */
@@ -194,6 +194,8 @@ export function createStudioCore({ storage, clock }: StudioCoreDeps): StudioCore
   });
 
   const worldScript = (id: string) => LIBRARY.find((script) => script.id === id);
+  /** Says `speech`, or nothing while muted (the mute button wiggles instead). */
+  const speakUnlessMuted = (speech: Speech): SpeakOrMuted => (settings.muted ? { kind: "muted" } : { kind: "speak", speech });
 
   return {
     ...myScriptBook.commands,
@@ -239,20 +241,16 @@ export function createStudioCore({ storage, clock }: StudioCoreDeps): StudioCore
         "value" in entry ? script?.numerals : script?.characters;
       const own = entries?.find((e) => e.text === entry.text);
       if (!script || !own) return undefined;
-      if (settings.muted) return { kind: "muted" };
-      return { kind: "speak", speech: pronounce(script, own, voiceLangs) };
+      return speakUnlessMuted(pronounce(script, own, voiceLangs));
     },
     glyphTap(scriptId, slot, trying) {
       const script = myScriptBook.commands.myScript(scriptId);
       if (!script || !canHaveSound(slot)) return undefined;
-      if (settings.muted) return { kind: "muted" };
-      return { kind: "speak", speech: glyphSpeech(slot, trying ?? script.glyphs[slot]?.sound) };
+      return speakUnlessMuted(glyphSpeech(slot, trying ?? script.glyphs[slot]?.sound));
     },
     readItToMe(text, glyphs) {
       const speech = messageSpeech(text, glyphs);
-      if (!speech) return undefined;
-      if (settings.muted) return { kind: "muted" };
-      return { kind: "speak", speech };
+      return speech && speakUnlessMuted(speech);
     },
     setMuted(muted) {
       settings = { ...settings, muted };

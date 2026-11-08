@@ -70,4 +70,11 @@ describe("Read it to me", () => {
     expect(studio.readItToMe("", script.glyphs)).toBeUndefined();
     expect(studio.readItToMe("   ", script.glyphs)).toBeUndefined();
   });
+
+  it("has nothing to say for a Message of only punctuation and spaces", async () => {
+    const { studio, script } = await studioWithMyScript({ drawn: [".", "?", "!"] });
+    expect(studio.readItToMe(".", script.glyphs)).toBeUndefined();
+    expect(studio.readItToMe("?!", script.glyphs)).toBeUndefined();
+    expect(studio.readItToMe(" . ? ", script.glyphs)).toBeUndefined();
+  });
 });

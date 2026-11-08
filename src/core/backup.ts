@@ -4,9 +4,8 @@ import {
   INK_COLORS,
   MY_SCRIPT_SCHEMA_VERSION,
   STROKE_WIDTHS,
-  canHaveSound,
-  cleanSound,
   isGlyphSlot,
+  keptGlyph,
   type Glyph,
   type GlyphSlot,
   type MyScript,
@@ -136,8 +135,7 @@ function readGlyph(slot: GlyphSlot, glyph: unknown): Glyph {
   });
   // A Sound is optional (files from before Sounds have none) and cleaned as when saved.
   check(glyph.sound === undefined || typeof glyph.sound === "string");
-  const sound = canHaveSound(slot) ? cleanSound(glyph.sound as string | undefined) : undefined;
-  return sound ? { strokes, sound, updatedAt: glyph.updatedAt } : { strokes, updatedAt: glyph.updatedAt };
+  return keptGlyph(slot, strokes, glyph.sound as string | undefined, glyph.updatedAt);
 }
 
 function readPoint(point: unknown): Point {

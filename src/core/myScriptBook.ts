@@ -5,9 +5,7 @@ import {
   MY_SCRIPT_SCHEMA_VERSION,
   NAME_MAX_LENGTH,
   STROKE_WIDTHS,
-  canHaveSound,
-  cleanSound,
-  type Glyph,
+  keptGlyph,
   type GlyphSlot,
   type MyScript,
   type MyScriptRecord,
@@ -122,9 +120,7 @@ export function createMyScriptBook({ clock, save, remove }: MyScriptBookDeps) {
       const kept = strokes.filter((s) => s.length > 0).map((s) => s.map(clampPoint));
       if (kept.length === 0) return "empty";
       const now = clock.now();
-      const keptSound = canHaveSound(slot) ? cleanSound(sound) : undefined;
-      const glyph: Glyph = keptSound ? { strokes: kept, sound: keptSound, updatedAt: now } : { strokes: kept, updatedAt: now };
-      put({ ...script, updatedAt: now, glyphs: { ...script.glyphs, [slot]: glyph } });
+      put({ ...script, updatedAt: now, glyphs: { ...script.glyphs, [slot]: keptGlyph(slot, kept, sound, now) } });
       return "saved";
     },
     renameMyScript(id, name) {

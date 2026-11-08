@@ -66,6 +66,16 @@ export function cleanSound(sound: string | undefined): string | undefined {
   return cut === "" ? undefined : cut;
 }
 
+/**
+ * A Glyph for `slot` as kept (saved, read from a backup, or opened from a
+ * share link): its Sound cleaned (cleanSound), and left out when blank or
+ * when the slot can't have one (space and punctuation).
+ */
+export function keptGlyph(slot: GlyphSlot, strokes: readonly Stroke[], sound: string | undefined, updatedAt: number): Glyph {
+  const kept = canHaveSound(slot) ? cleanSound(sound) : undefined;
+  return kept ? { strokes, sound: kept, updatedAt } : { strokes, updatedAt };
+}
+
 /** The shape he drew for one Glyph slot, and how it sounds. */
 export interface Glyph {
   readonly strokes: readonly Stroke[];

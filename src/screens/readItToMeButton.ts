@@ -1,6 +1,6 @@
 import "./messages.css";
 import "./myScripts.css";
-import type { GlyphTap } from "../core/studioCore";
+import type { SpeakOrMuted } from "../core/studioCore";
 import { tapToHear } from "../sound/tapToHear";
 import { el } from "./screen";
 
@@ -11,7 +11,7 @@ import { el } from "./screen";
  * it is now. It glows while speaking; tapping again cuts it off and starts
  * over; while muted it glows and wiggles the mute button.
  */
-export function readItToMeButton(read: () => GlyphTap | undefined): HTMLButtonElement {
+export function readItToMeButton(read: () => SpeakOrMuted | undefined): HTMLButtonElement {
   const button = el("button", "ms-button msg-read-aloud", "🔊 Read it to me");
   button.type = "button";
   const hear = tapToHear(button);

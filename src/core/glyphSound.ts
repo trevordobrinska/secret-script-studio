@@ -3,14 +3,6 @@ import { canHaveSound, cleanSound, slotLabel, type GlyphSlot } from "./myScript"
 import { layoutMessage, type GlyphSet, type MessageCell } from "./messageLayout";
 
 /**
- * What tapping one of his Glyphs does (the grid's 🔊 or the canvas's "try
- * it" 🔊). The same shape as a World Character tap: `speak` says `speech`
- * while the button glows; `muted` says nothing, glows, and gives the mute
- * button one soft wiggle.
- */
-export type GlyphTap = { readonly kind: "speak"; readonly speech: Speech } | { readonly kind: "muted" };
-
-/**
  * How one Glyph is said alone, always in English at SPEECH_RATE: its
  * Sound (cleaned as when saved), or, with none, its plain letter or digit
  * ("B" is read "bee", the "ten" slot "10").
@@ -26,11 +18,20 @@ export function glyphSpeech(slot: GlyphSlot, sound: string | undefined): Speech 
  * adding its Sound or, with none (or for a Missing Glyph), its plain
  * lowercase letter or digit ("kla" + B + "zo" is "klabzo"). Words are
  * joined by one space and each punctuation mark stays after its word, so
- * the voice pauses there. Undefined when there's nothing to say.
+ * the voice pauses there. Undefined when there's nothing to say: no
+ * letter or digit at all (spaces and punctuation marks alone are silence).
  */
 export function messageSpeech(text: string, glyphs: GlyphSet): Speech | undefined {
-  const said = layoutMessage(text, glyphs).cells.map(saidAs).join("").replace(/ +/g, " ").trim();
-  return said === "" ? undefined : { text: said, lang: "en", rate: SPEECH_RATE };
+  const cells = layoutMessage(text, glyphs).cells;
+  if (!cells.some(isSaid)) return undefined;
+  const said = cells.map(saidAs).join("").replace(/ +/g, " ").trim();
+  return { text: said, lang: "en", rate: SPEECH_RATE };
+}
+
+/** Whether a cell is a letter or digit: its slot can have a Sound, or it's one typed on Dad's keyboard. */
+function isSaid(cell: MessageCell): boolean {
+  if (cell.kind === "glyph" || cell.kind === "missingGlyph") return canHaveSound(cell.slot);
+  return /[\p{L}\p{N}]/u.test(cell.char);
 }
 
 /**

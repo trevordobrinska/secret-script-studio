@@ -3,7 +3,7 @@
  * a tap (World Character cards, a Glyph's 🔊). The core decides what a tap
  * says; this says it, and glows the element (class "speaking") meanwhile.
  */
-import type { GlyphTap, WorldCharacterTap } from "../core/studioCore";
+import type { SpeakOrMuted } from "../core/studioCore";
 import { wiggleMuteButton } from "./muteButton";
 import { speak } from "./speech";
 
@@ -23,7 +23,7 @@ let unlightCurrent: (() => void) | undefined;
  * muted it glows briefly and wiggles the mute button once. An undefined
  * tap does nothing.
  */
-export function tapToHear(glowing: HTMLElement): (tap: GlyphTap | WorldCharacterTap | undefined) => void {
+export function tapToHear(glowing: HTMLElement): (tap: SpeakOrMuted | undefined) => void {
   let glowTimer: number | undefined;
   const unlight = () => {
     window.clearTimeout(glowTimer);

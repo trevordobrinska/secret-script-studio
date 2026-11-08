@@ -22,7 +22,7 @@
  * Strokes are made compact first: snapped to the GRID, repeated points
  * dropped, then simplified (Ramer-Douglas-Peucker, SIMPLIFY_TOLERANCE).
  */
-import { GLYPH_SLOTS, canHaveSound, cleanSound, type Glyph, type GlyphSlot, type Point, type ScriptLook, type Stroke } from "./myScript";
+import { GLYPH_SLOTS, keptGlyph, type Glyph, type GlyphSlot, type Point, type ScriptLook, type Stroke } from "./myScript";
 import { foldMessageText, slotForChar, type GlyphSet } from "./messageLayout";
 
 /**
@@ -32,6 +32,8 @@ import { foldMessageText, slotForChar, type GlyphSet } from "./messageLayout";
 export const SHARE_LINK_VERSION = 2;
 /** The oldest version that still opens: version 1 links were made before Sounds. */
 const OLDEST_OPENABLE_VERSION = 1;
+/** The first version whose Glyphs carry their Sounds. */
+const FIRST_VERSION_WITH_SOUNDS = 2;
 
 /**
  * The longest whole link (in characters, all ASCII) that still fits a QR
@@ -256,10 +258,8 @@ function decodePayload(bytes: Uint8Array, version: number): SharedMessage | unde
       }
       strokes.push(points);
     }
-    // Kept by the same rules as a backup: cleaned, and dropped on a space or punctuation mark.
-    const read = version >= 2 ? cleanSound(string()) : undefined;
-    const sound = canHaveSound(slot) ? read : undefined;
-    glyphs[slot] = sound ? { strokes, sound, updatedAt: 0 } : { strokes, updatedAt: 0 };
+    const sound = version >= FIRST_VERSION_WITH_SOUNDS ? string() : undefined;
+    glyphs[slot] = keptGlyph(slot, strokes, sound, 0);
   }
   if (at !== bytes.length || strokeWidth <= 0) return undefined;
   return { name, ink, strokeWidth, text, glyphs };

@@ -95,3 +95,15 @@
   font-size: 32px;
   color: var(--ink);
 }
+
+.world-note {
+  margin: 0 0 var(--gap);
+  font-size: 22px;
+  color: var(--soft-ink);
+}
+
+/* Right-to-left scripts: the cards flow from the right, but the English name and sound stay left to right. */
+.world-grid[dir="rtl"] .world-name,
+.world-grid[dir="rtl"] .world-sound {
+  direction: ltr;
+}

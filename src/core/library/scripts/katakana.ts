@@ -1,0 +1,62 @@
+import type { WorldScript } from "../worldScript";
+
+/**
+ * The basic Japanese katakana (the 46 of the gojūon table). Same sounds as hiragana, used mostly
+ * for words from other languages.
+ */
+const katakana: WorldScript = {
+  id: "katakana",
+  name: "Katakana (Japanese)",
+  kind: "writing",
+  characters: [
+    { text: "ア", name: "a", sound: "AH" },
+    { text: "イ", name: "i", sound: "EE" },
+    { text: "ウ", name: "u", sound: "OO" },
+    { text: "エ", name: "e", sound: "EH" },
+    { text: "オ", name: "o", sound: "OH" },
+    { text: "カ", name: "ka", sound: "KAH" },
+    { text: "キ", name: "ki", sound: "KEE" },
+    { text: "ク", name: "ku", sound: "KOO" },
+    { text: "ケ", name: "ke", sound: "KEH" },
+    { text: "コ", name: "ko", sound: "KOH" },
+    { text: "サ", name: "sa", sound: "SAH" },
+    { text: "シ", name: "shi", sound: "SHEE" },
+    { text: "ス", name: "su", sound: "SOO" },
+    { text: "セ", name: "se", sound: "SEH" },
+    { text: "ソ", name: "so", sound: "SOH" },
+    { text: "タ", name: "ta", sound: "TAH" },
+    { text: "チ", name: "chi", sound: "CHEE" },
+    { text: "ツ", name: "tsu", sound: "TSOO" },
+    { text: "テ", name: "te", sound: "TEH" },
+    { text: "ト", name: "to", sound: "TOH" },
+    { text: "ナ", name: "na", sound: "NAH" },
+    { text: "ニ", name: "ni", sound: "NEE" },
+    { text: "ヌ", name: "nu", sound: "NOO" },
+    { text: "ネ", name: "ne", sound: "NEH" },
+    { text: "ノ", name: "no", sound: "NOH" },
+    { text: "ハ", name: "ha", sound: "HAH" },
+    { text: "ヒ", name: "hi", sound: "HEE" },
+    { text: "フ", name: "fu", sound: "FOO (soft, between F and H)" },
+    { text: "ヘ", name: "he", sound: "HEH" },
+    { text: "ホ", name: "ho", sound: "HOH" },
+    { text: "マ", name: "ma", sound: "MAH" },
+    { text: "ミ", name: "mi", sound: "MEE" },
+    { text: "ム", name: "mu", sound: "MOO" },
+    { text: "メ", name: "me", sound: "MEH" },
+    { text: "モ", name: "mo", sound: "MOH" },
+    { text: "ヤ", name: "ya", sound: "YAH" },
+    { text: "ユ", name: "yu", sound: "YOO" },
+    { text: "ヨ", name: "yo", sound: "YOH" },
+    { text: "ラ", name: "ra", sound: "RAH (R tapped, close to L)" },
+    { text: "リ", name: "ri", sound: "REE" },
+    { text: "ル", name: "ru", sound: "ROO" },
+    { text: "レ", name: "re", sound: "REH" },
+    { text: "ロ", name: "ro", sound: "ROH" },
+    { text: "ワ", name: "wa", sound: "WAH" },
+    { text: "ヲ", name: "wo", sound: "OH" },
+    { text: "ン", name: "n", sound: "N" },
+  ],
+  numerals: [],
+};
+
+export default katakana;

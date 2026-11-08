@@ -56,6 +56,91 @@ describe("the Library", () => {
     expect(greek?.characters).toContainEqual(expect.objectContaining({ text: "Λ λ", name: "lambda", sound: "L" }));
   });
 
+  it("holds every World Script and numeral system from the spec, and not the enchanting-table alphabet", () => {
+    const ids = newStudio()
+      .library()
+      .map((script) => script.id);
+    expect([...ids].sort()).toEqual(
+      [
+        ...["greek", "cyrillic", "hangul", "hebrew", "arabic", "devanagari", "georgian", "armenian"],
+        ...["hiragana", "katakana", "elder-futhark", "ogham", "thai", "ethiopic", "cherokee", "tifinagh"],
+        ...["roman", "mayan", "babylonian", "chinese-numerals", "eastern-arabic"],
+      ].sort(),
+    );
+    expect(ids.join(" ")).not.toMatch(/enchant|galactic/i);
+  });
+
+  // Catches look-alike typos (a Latin "A" in Greek, a Cyrillic letter in Armenian…): every character
+  // must come from that script's own Unicode letters.
+  const OWN_LETTERS: Record<string, RegExp> = {
+    greek: /^[\p{Script=Greek}\s]+$/u,
+    cyrillic: /^[\p{Script=Cyrillic}\s]+$/u,
+    hangul: /^[\p{Script=Hangul}\s]+$/u,
+    hebrew: /^[\p{Script=Hebrew}\s]+$/u,
+    arabic: /^[\p{Script=Arabic}\s]+$/u,
+    devanagari: /^[\p{Script=Devanagari}\s]+$/u,
+    georgian: /^[\p{Script=Georgian}\s]+$/u,
+    armenian: /^[\p{Script=Armenian}\s]+$/u,
+    hiragana: /^[\p{Script=Hiragana}\s]+$/u,
+    katakana: /^[\p{Script=Katakana}\s]+$/u,
+    "elder-futhark": /^[\p{Script=Runic}\s]+$/u,
+    ogham: /^[\p{Script=Ogham}\s]+$/u,
+    thai: /^[\p{Script=Thai}\s]+$/u,
+    ethiopic: /^[\p{Script=Ethiopic}\s]+$/u,
+    cherokee: /^[\p{Script=Cherokee}\s]+$/u,
+    tifinagh: /^[\p{Script=Tifinagh}\s]+$/u,
+    roman: /^[IVXLCDM]+$/,
+    mayan: /^[\u{1D2E0}-\u{1D2F3}]$/u,
+    babylonian: /^\p{Script=Cuneiform}+$/u,
+    "chinese-numerals": /^\p{Script=Han}+$/u,
+    "eastern-arabic": /^[٠-٩]+$/u,
+  };
+
+  it("writes every character and numeral in its own script's letters", () => {
+    for (const script of newStudio().library()) {
+      const own = OWN_LETTERS[script.id];
+      expect(own, `no check for ${script.id}`).toBeDefined();
+      for (const { text } of [...script.characters, ...script.numerals]) {
+        expect(text, script.id).toMatch(own!);
+      }
+    }
+  });
+
+  it("never shows the same character twice in one World Script", () => {
+    for (const script of newStudio().library()) {
+      const texts = script.characters.map((character) => character.text);
+      expect(new Set(texts).size, script.id).toBe(texts.length);
+      const numerals = script.numerals.map((numeral) => numeral.text);
+      expect(new Set(numerals).size, script.id).toBe(numerals.length);
+    }
+  });
+
+  it("gives the numerals their real values", () => {
+    const studio = newStudio();
+    const numeral = (id: string, text: string) => studio.worldScript(id)?.numerals.find((n) => n.text === text)?.value;
+    expect(numeral("mayan", "\u{1D2E0}")).toBe(0);
+    expect(numeral("mayan", "\u{1D2F3}")).toBe(19);
+    expect(numeral("babylonian", "\u{12079}")).toBe(1);
+    expect(numeral("babylonian", "\u{1230B}")).toBe(10);
+    expect(numeral("chinese-numerals", "七")).toBe(7);
+    expect(numeral("chinese-numerals", "千")).toBe(1000);
+    expect(numeral("eastern-arabic", "٧")).toBe(7);
+    expect(numeral("arabic", "٤")).toBe(4);
+    expect(numeral("devanagari", "५")).toBe(5);
+    expect(numeral("thai", "๓")).toBe(3);
+    expect(numeral("ethiopic", "፲")).toBe(10);
+    expect(numeral("hebrew", "י")).toBe(10);
+    expect(numeral("hebrew", "ת")).toBe(400);
+  });
+
+  it("marks Hebrew and Arabic as written right to left, and the rest left to right", () => {
+    const studio = newStudio();
+    expect(studio.worldScript("hebrew")?.direction).toBe("rtl");
+    expect(studio.worldScript("arabic")?.direction).toBe("rtl");
+    expect(studio.worldScript("greek")?.direction).toBeUndefined();
+    expect(studio.worldScript("hangul")?.direction).toBeUndefined();
+  });
+
   it("finds nothing for an unknown World Script", () => {
     expect(newStudio().worldScript("klingon")).toBeUndefined();
   });

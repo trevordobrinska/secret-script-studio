@@ -32,7 +32,9 @@ export const worldScriptScreen: RenderScreen<{ name: "worldScript"; scriptId: st
   page.append(back);
 
   if (script.characters.length > 0) {
+    if (script.direction === "rtl") page.append(el("p", "world-note", "Written right to left, so the letters start on the right."));
     const grid = el("div", "world-grid");
+    if (script.direction === "rtl") grid.dir = "rtl";
     for (const character of script.characters) {
       const card = el("div", "world-card");
       card.append(

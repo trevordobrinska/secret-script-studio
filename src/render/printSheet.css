@@ -119,3 +119,14 @@
 .pr-key-word {
   font-size: 14pt;
 }
+/* A Glyph's Sound, small under its letter. */
+.pr-key-words {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.pr-key-sound {
+  font-size: 10pt;
+  color: #6b5f48;
+  overflow-wrap: anywhere;
+}

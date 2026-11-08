@@ -16,7 +16,7 @@ Calm by default: no timers, scores, fail states, randomness or gates. He doesn't
 ## The Arcade (suite-wide, its own project)
 - One home page, `Projects\arcade\` → repo `trevordobrinska.github.io`, with one big tile per game. Each game stays its own project and repo and links in at its own path.
 - **One shared menu** for both kids, with no per-kid setup. Approve the domain once in the Parent Dashboard.
-- **Suite rule:** every game shares one browser origin and so one storage area. **Each game prefixes its saved data with its own name** (e.g. IndexedDB database `secret-script-studio`). Check that Doodle Monsters already does this.
+- **Suite rule:** every game shares one browser origin and so one storage area. **Each game prefixes its saved data with its own name** (e.g. IndexedDB database `secret-script-studio`). Doodle Monsters already does (database `doodle-monsters`).
 
 ## Home screen
 Three big tiles, always in the same place: **My Scripts**, **Library**, **Number Explorer**. Everything is one tap from home.

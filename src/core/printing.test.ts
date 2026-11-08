@@ -121,3 +121,31 @@ describe("printing from the Reply page (a shared Message)", () => {
     expect(dad.sharedPrintLayout(message, " ", { cipherKey: false })).toEqual({ ok: false, reason: "empty" });
   });
 });
+
+describe("Sounds on the printed Cipher Key", () => {
+  const stroke = [[{ x: 0.2, y: 0.2 }, { x: 0.8, y: 0.8 }]];
+
+  it("an entry carries its Glyph's Sound, and one without a Sound has none", async () => {
+    const { studio, script } = await studioWithMyScript();
+    studio.saveGlyph(script.id, "A", stroke, "kla");
+    studio.saveGlyph(script.id, "B", stroke);
+    const print = studio.printLayout(script.id, "AB", { cipherKey: true });
+    if (!print.ok) throw new Error(print.reason);
+    const [a, b] = print.layout.cipherKey!;
+    expect(a).toMatchObject({ label: "A", sound: "kla" });
+    expect(b.label).toBe("B");
+    expect(b).not.toHaveProperty("sound");
+  });
+
+  it("a shared Message's Glyphs print their Sounds, and those without print as today", async () => {
+    const dad = await newStudio();
+    const glyphs = { A: { strokes: stroke, sound: "kla" }, B: { strokes: stroke } };
+    const shared = { name: "Sky Runes", ink: "#3b6fd1", strokeWidth: 0.07, text: "AB", glyphs };
+    const print = dad.sharedPrintLayout(shared as never, "AB", { cipherKey: true });
+    if (!print.ok) throw new Error(print.reason);
+    expect(print.layout.cipherKey).toEqual([
+      { slot: "A", label: "A", glyph: glyphs.A, sound: "kla" },
+      { slot: "B", label: "B", glyph: glyphs.B },
+    ]);
+  });
+});

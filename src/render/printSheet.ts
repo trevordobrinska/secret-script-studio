@@ -51,7 +51,14 @@ function cipherKeyPage(layout: PrintLayout): HTMLElement {
     const row = div("pr-key-entry");
     const glyph = div("pr-key-glyph");
     glyph.append(glyphSvg(entry.glyph.strokes, layout));
-    row.append(glyph, div(`pr-key-label${entry.label.length > 2 ? " pr-key-word" : ""}`, `= ${entry.label}`));
+    const label = div(`pr-key-label${entry.label.length > 2 ? " pr-key-word" : ""}`, `= ${entry.label}`);
+    if (entry.sound) {
+      const words = div("pr-key-words");
+      words.append(label, div("pr-key-sound", `says "${entry.sound}"`));
+      row.append(glyph, words);
+    } else {
+      row.append(glyph, label);
+    }
     grid.append(row);
   }
   if (!layout.cipherKey?.length) grid.append(div("pr-caption", "No Glyphs drawn yet."));

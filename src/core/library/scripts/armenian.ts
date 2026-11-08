@@ -8,6 +8,7 @@ const armenian: WorldScript = {
   id: "armenian",
   name: "Armenian",
   kind: "writing",
+  voice: "hy",
   characters: [
     { text: "Ա ա", name: "ayb", sound: "AH" },
     { text: "Բ բ", name: "ben", sound: "B" },

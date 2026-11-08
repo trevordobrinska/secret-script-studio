@@ -8,6 +8,7 @@ const arabic: WorldScript = {
   id: "arabic",
   name: "Arabic",
   kind: "writing",
+  voice: "ar",
   direction: "rtl",
   characters: [
     { text: "ا", name: "alif", sound: "A (as in father)" },

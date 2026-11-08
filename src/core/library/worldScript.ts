@@ -5,6 +5,11 @@ export interface WorldCharacter {
   readonly name: string;
   /** Roughly how it sounds, written the way a kid reading English would say it. */
   readonly sound: string;
+  /**
+   * What the script's own voice reads aloud when tapped. Without it, the first
+   * space-separated form of `text` ("Λ λ" reads "Λ"). Only for a lone character that reads badly.
+   */
+  readonly say?: string;
 }
 
 /** One numeral and the whole number it stands for. */
@@ -24,6 +29,11 @@ export interface WorldScript {
   readonly kind: "writing" | "numerals";
   /** "rtl" for scripts written right to left (Hebrew, Arabic); absent means left to right. */
   readonly direction?: "rtl";
+  /**
+   * BCP 47 language tag of the script's spoken language ("el", "ko", "ja"…), for tap to hear.
+   * Absent when no living language is likely to have a device voice (runes, Roman…): English then.
+   */
+  readonly voice?: string;
   readonly characters: readonly WorldCharacter[];
   readonly numerals: readonly WorldNumeral[];
 }

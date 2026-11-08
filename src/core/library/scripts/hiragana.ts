@@ -5,6 +5,7 @@ const hiragana: WorldScript = {
   id: "hiragana",
   name: "Hiragana (Japanese)",
   kind: "writing",
+  voice: "ja",
   characters: [
     { text: "あ", name: "a", sound: "AH" },
     { text: "い", name: "i", sound: "EE" },

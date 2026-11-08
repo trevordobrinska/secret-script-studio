@@ -9,6 +9,7 @@ const devanagari: WorldScript = {
   id: "devanagari",
   name: "Devanagari (Hindi)",
   kind: "writing",
+  voice: "hi",
   characters: [
     { text: "अ", name: "a", sound: "UH (as in sun)" },
     { text: "आ", name: "aa", sound: "AH (as in father)" },

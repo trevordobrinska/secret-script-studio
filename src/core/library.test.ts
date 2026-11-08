@@ -141,6 +141,20 @@ describe("the Library", () => {
     expect(studio.worldScript("hangul")?.direction).toBeUndefined();
   });
 
+  it("gives every voice a well-formed language tag (el, ko, or el-GR style)", () => {
+    for (const script of newStudio().library()) {
+      if (script.voice !== undefined) expect(script.voice, script.id).toMatch(/^[a-z]{2,3}(-[A-Z]{2})?$/);
+    }
+  });
+
+  it("gives any `say` some text to read", () => {
+    for (const script of newStudio().library()) {
+      for (const character of script.characters) {
+        if (character.say !== undefined) expect(character.say.trim(), `${script.id} ${character.text}`).not.toBe("");
+      }
+    }
+  });
+
   it("finds nothing for an unknown World Script", () => {
     expect(newStudio().worldScript("klingon")).toBeUndefined();
   });

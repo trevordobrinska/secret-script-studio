@@ -5,6 +5,7 @@ const easternArabic: WorldScript = {
   id: "eastern-arabic",
   name: "Eastern Arabic numerals",
   kind: "numerals",
+  voice: "ar",
   characters: [],
   numerals: [
     { text: "٠", value: 0 },

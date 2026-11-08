@@ -9,6 +9,7 @@ const ethiopic: WorldScript = {
   id: "ethiopic",
   name: "Ethiopic (Ge'ez)",
   kind: "writing",
+  voice: "am",
   characters: [
     { text: "ሀ", name: "hä", sound: "HUH" },
     { text: "ለ", name: "lä", sound: "LUH" },

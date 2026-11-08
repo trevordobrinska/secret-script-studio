@@ -7,6 +7,7 @@ import { startRouter } from "./screens/router";
 import { indexedDbStudioStorage } from "./storage/indexedDbStudioStorage";
 import { startMuteButton } from "./sound/muteButton";
 import { startSound } from "./sound/sound";
+import { startSpeech } from "./sound/speech";
 
 const root = document.querySelector<HTMLElement>("#screen")!;
 const homeButton = document.querySelector<HTMLElement>("#home-button")!;
@@ -24,6 +25,7 @@ registerServiceWorker();
 function startStudio(): void {
   const core = createStudioCore({ storage: indexedDbStudioStorage(), clock: systemClock });
   startSound(() => core.settings().muted);
+  startSpeech();
   // Draw once saved data is in (My Scripts are), so no screen shows half-loaded.
   // `core.load()` never rejects and IndexedDB is quick, so this is near-instant.
   void core.load().then(() => {

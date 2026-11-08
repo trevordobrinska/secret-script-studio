@@ -5,6 +5,7 @@ const chineseNumerals: WorldScript = {
   id: "chinese-numerals",
   name: "Chinese numerals",
   kind: "numerals",
+  voice: "zh",
   characters: [],
   numerals: [
     { text: "〇", value: 0 },

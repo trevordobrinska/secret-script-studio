@@ -1,6 +1,7 @@
 import type { Clock } from "./deps";
 import { LIBRARY } from "./library/catalog";
-import type { WorldScript } from "./library/worldScript";
+import type { WorldCharacter, WorldNumeral, WorldScript } from "./library/worldScript";
+import { pronounce, type WorldCharacterTap } from "./library/pronunciation";
 import { SETTINGS_SCHEMA_VERSION, type SettingsRecord, type StudioStorage } from "./studioStorage";
 import { createMyScriptBook, type MyScriptCommands } from "./myScriptBook";
 import type { GlyphSlot } from "./myScript";
@@ -69,6 +70,7 @@ export type { MessageCell, MessageLayout } from "./messageLayout";
 export type { ScriptLook } from "./myScript";
 export type { CipherKeyEntry, PrintLayout, PrintOptions } from "./printing";
 export type { WorldCharacter, WorldNumeral, WorldScript } from "./library/worldScript";
+export type { Speech, WorldCharacterTap } from "./library/pronunciation";
 
 /** The Settings as the screens see them. */
 export interface SettingsView {
@@ -108,6 +110,16 @@ export interface StudioCore
   library(): readonly WorldScript[];
   /** One World Script by id, or undefined if there is none. */
   worldScript(id: string): WorldScript | undefined;
+  /**
+   * What tapping one of a World Script's characters or numerals does, given
+   * the languages of the device's voices (the speech adapter lists them).
+   * Undefined for an unknown script, or an entry that isn't on its page.
+   */
+  worldCharacterTap(
+    scriptId: string,
+    entry: WorldCharacter | WorldNumeral,
+    voiceLangs: readonly string[],
+  ): WorldCharacterTap | undefined;
   /** Turns the sounds off (true) or on (false). Remembered across reloads. */
   setMuted(muted: boolean): void;
   /** Resolves once every save started so far has finished (or failed and been logged). */
@@ -194,6 +206,14 @@ export function createStudioCore({ storage, clock }: StudioCoreDeps): StudioCore
     settings: () => settings,
     library: () => LIBRARY,
     worldScript: (id) => LIBRARY.find((script) => script.id === id),
+    worldCharacterTap(scriptId, entry, voiceLangs) {
+      const script = LIBRARY.find((s) => s.id === scriptId);
+      const entries: readonly (WorldCharacter | WorldNumeral)[] | undefined =
+        "value" in entry ? script?.numerals : script?.characters;
+      const own = entries?.find((e) => e.text === entry.text);
+      if (!script || !own) return undefined;
+      return { kind: "speak", speech: pronounce(script, own, voiceLangs) };
+    },
     setMuted(muted) {
       settings = { ...settings, muted };
       saveSettings();

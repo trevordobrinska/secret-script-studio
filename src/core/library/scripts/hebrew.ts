@@ -9,6 +9,7 @@ const hebrew: WorldScript = {
   id: "hebrew",
   name: "Hebrew",
   kind: "writing",
+  voice: "he",
   direction: "rtl",
   characters: [
     { text: "א", name: "alef", sound: "no sound (holds a vowel)" },

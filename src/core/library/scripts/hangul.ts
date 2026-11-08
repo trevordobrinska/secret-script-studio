@@ -8,6 +8,7 @@ const hangul: WorldScript = {
   id: "hangul",
   name: "Hangul (Korean)",
   kind: "writing",
+  voice: "ko",
   characters: [
     { text: "ㄱ", name: "giyeok", sound: "G or K" },
     { text: "ㄴ", name: "nieun", sound: "N" },

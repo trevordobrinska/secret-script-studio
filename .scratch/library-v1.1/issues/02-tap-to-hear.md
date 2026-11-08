@@ -6,11 +6,17 @@
 
 **Status:** ready-for-agent
 
-- [ ] Data: `WorldScript.voice?` (BCP 47 tag) and `WorldCharacter.say?` added; voice tags filled in for the existing scripts per the spec's mapping
-- [ ] Core: pronunciation rule (tested): native voice when a matching language is available (primary-subtag match); English fallback says the name, never the sound text; numerals say their text natively or their value in English; numeral-only systems always use English; `say` overrides; first form split off multi-form text; rate 0.8
-- [ ] Content check: `voice` tags are well-formed (tested)
-- [ ] `src/sound/speech.ts`: voice list (handles late `voiceschanged`), speak with cancel-before-speak, start/end callbacks, silent no-op without speech synthesis
-- [ ] Character and numeral cards become buttons; the card glows while speaking (about 600 ms when there's no speech)
+- [x] Data: `WorldScript.voice?` (BCP 47 tag) and `WorldCharacter.say?` added; voice tags filled in for the existing scripts per the spec's mapping
+- [x] Core: pronunciation rule (tested): native voice when a matching language is available (primary-subtag match); English fallback says the name, never the sound text; numerals say their text natively or their value in English; numeral-only systems always use English; `say` overrides; first form split off multi-form text; rate 0.8
+- [x] Content check: `voice` tags are well-formed (tested)
+- [x] `src/sound/speech.ts`: voice list (handles late `voiceschanged`), speak with cancel-before-speak, start/end callbacks, silent no-op without speech synthesis
+- [x] Character and numeral cards become buttons; the card glows while speaking (about 600 ms when there's no speech)
 - [ ] Checked by ear in Edge: Greek, Hangul, kana and Hindi speak natively if Windows has those voices; runes and Roman fall back to English; 0.8× sounds right
 
 ## Comments
+
+- 2026-11-07 (agent): Built test-first through the core: `core.worldCharacterTap(scriptId, entry, voiceLangs)` returns `{ kind: "speak", speech: { text, lang, rate } }` (rule in `src/core/library/pronunciation.ts`; ticket 03 adds a muted variant to the `WorldCharacterTap` union). Adapter in `src/sound/speech.ts` (`startSpeech`, `voiceLangs`, `speak`, `stopSpeaking`); the page stops speaking when it is left.
+- `say` added only for the eight Thai vowel letters (ะ า ำ เ แ โ ใ ไ), which read as nothing on their own; each says its Thai name (สระอะ…). Nothing else needed it without an ear check.
+- Flag (spec vs itself): "numeral-only systems always use English" conflicts with the mapping giving Chinese numerals `zh` and Eastern Arabic `ar`. Built it voice-based: those two speak natively when the voice is there; Roman, Mayan and Babylonian have no voice so always say their value in English (matches DESIGN: "Roman, Mayan, Babylonian…").
+- Flag (DESIGN wording): DESIGN says a Greek voice says "λάμδα"; the spec hands the voice the letter itself ("Λ"), trusting the voice to read a lone letter by its name. Worth listening for in the ear check; a `say` fixes any that read badly.
+- Ear check in Edge not done: the agent cannot listen. Left unchecked for Dad.

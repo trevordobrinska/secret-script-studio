@@ -8,6 +8,7 @@ const katakana: WorldScript = {
   id: "katakana",
   name: "Katakana (Japanese)",
   kind: "writing",
+  voice: "ja",
   characters: [
     { text: "ア", name: "a", sound: "AH" },
     { text: "イ", name: "i", sound: "EE" },

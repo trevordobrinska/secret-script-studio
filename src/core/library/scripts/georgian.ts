@@ -8,6 +8,7 @@ const georgian: WorldScript = {
   id: "georgian",
   name: "Georgian",
   kind: "writing",
+  voice: "ka",
   characters: [
     { text: "ა", name: "ani", sound: "AH" },
     { text: "ბ", name: "bani", sound: "B" },

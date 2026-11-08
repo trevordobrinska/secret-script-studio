@@ -5,6 +5,7 @@ const cyrillic: WorldScript = {
   id: "cyrillic",
   name: "Cyrillic (Russian)",
   kind: "writing",
+  voice: "ru",
   characters: [
     { text: "А а", name: "a", sound: "A" },
     { text: "Б б", name: "be", sound: "B" },

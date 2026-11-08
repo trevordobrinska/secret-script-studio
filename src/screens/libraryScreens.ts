@@ -1,3 +1,5 @@
+import type { StudioCore, WorldCharacter, WorldNumeral } from "../core/studioCore";
+import { speak, stopSpeaking, voiceLangs } from "../sound/speech";
 import { el, type RenderScreen } from "./screen";
 import { SECTION_NAMES } from "./sectionNames";
 import "./library.css";
@@ -37,13 +39,13 @@ export const worldScriptScreen: RenderScreen<{ name: "worldScript"; scriptId: st
     const grid = el("div", "world-grid");
     if (script.direction === "rtl") grid.dir = "rtl";
     for (const character of script.characters) {
-      const card = el("div", "world-card");
-      card.append(
-        el("span", "world-char", character.text),
-        el("span", "world-name", character.name),
-        el("span", "world-sound", character.sound),
+      grid.append(
+        worldCard(core, script.id, character, [
+          el("span", "world-char", character.text),
+          el("span", "world-name", character.name),
+          el("span", "world-sound", character.sound),
+        ]),
       );
-      grid.append(card);
     }
     page.append(grid);
   }
@@ -52,11 +54,33 @@ export const worldScriptScreen: RenderScreen<{ name: "worldScript"; scriptId: st
     if (script.characters.length > 0) page.append(el("h2", "world-heading", "Numbers"));
     const grid = el("div", "world-grid");
     for (const numeral of script.numerals) {
-      const card = el("div", "world-card");
-      card.append(el("span", "world-char", numeral.text), el("span", "world-value", String(numeral.value)));
-      grid.append(card);
+      grid.append(
+        worldCard(core, script.id, numeral, [el("span", "world-char", numeral.text), el("span", "world-value", String(numeral.value))]),
+      );
     }
     page.append(grid);
   }
   root.append(page);
+  return stopSpeaking;
 };
+
+/** How long a card glows when nothing is spoken (no speech synthesis on this device). */
+const GLOW_MS = 600;
+
+/** A World Character card: a button that says it aloud (the core decides what), glowing while it speaks. */
+function worldCard(core: StudioCore, scriptId: string, entry: WorldCharacter | WorldNumeral, parts: HTMLElement[]): HTMLButtonElement {
+  const card = el("button", "world-card");
+  card.type = "button";
+  card.append(...parts);
+  let glowTimer: number | undefined;
+  const glow = (on: boolean) => card.classList.toggle("speaking", on);
+  card.addEventListener("click", () => {
+    const tap = core.worldCharacterTap(scriptId, entry, voiceLangs());
+    if (!tap) return;
+    window.clearTimeout(glowTimer);
+    glow(true);
+    const spoken = speak(tap.speech, { onStart: () => glow(true), onEnd: () => glow(false) });
+    if (!spoken) glowTimer = window.setTimeout(() => glow(false), GLOW_MS);
+  });
+  return card;
+}

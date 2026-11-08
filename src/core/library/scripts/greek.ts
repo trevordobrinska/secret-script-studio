@@ -4,6 +4,7 @@ const greek: WorldScript = {
   id: "greek",
   name: "Greek",
   kind: "writing",
+  voice: "el",
   characters: [
     { text: "Α α", name: "alpha", sound: "A" },
     { text: "Β β", name: "beta", sound: "B" },

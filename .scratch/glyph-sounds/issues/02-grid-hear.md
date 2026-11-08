@@ -4,7 +4,7 @@
 
 **Blocked by:** 01 (Give a Glyph a Sound and try it on the canvas)
 
-**Status:** ready-for-human
+**Status:** resolved
 
 - [x] Each drawn letter or digit cell shows a 🔊 corner button in the same fixed spot
 - [x] 🔊 speaks through the Glyph-tap command from 01: its Sound, or the plain letter ("bee") when it has none
@@ -16,3 +16,5 @@
 
 - 2026-11-08 (agent): The 🔊 is a sibling of the cell button (not nested inside it), in the top-right corner. It calls `core.glyphTap(id, slot)` and glows the cell via `tapToHear`. Code-review fix: leaving the grid stops speech. No new core tests (01's cover the tap rules); the DOM wiring is untested.
 - Left for Dad: check by eye that 🔊 sits in the same spot on every cell, tapping the cell still opens the canvas, and Missing Glyphs, space and punctuation have no 🔊.
+
+Resolved 2026-11-08: Dad play-tested it and approved.

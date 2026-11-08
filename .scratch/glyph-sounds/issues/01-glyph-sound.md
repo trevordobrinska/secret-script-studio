@@ -4,7 +4,7 @@
 
 **Blocked by:** None (can start immediately)
 
-**Status:** ready-for-human
+**Status:** resolved
 
 - [x] A Glyph can carry an optional Sound; stored My Scripts and existing backup files without Sounds load unchanged (no schema version bump)
 - [x] Saving a Glyph takes its Sound: trimmed, cut to 12 characters, and a blank box means no Sound
@@ -19,3 +19,5 @@
 
 - 2026-11-08 (agent): Built test-first through StudioCore (`src/core/glyphSounds.test.ts`). Core: `saveGlyph(id, slot, strokes, sound?)` and `glyphTap(id, slot, trying?)` returning `SpeakOrMuted`. The keep-a-Sound rule is one helper, `keptGlyph` in `myScript.ts`, shared by save, backup restore and share-link opening. The Library's glow/mute-wiggle is now the shared `tapToHear(element)` in `src/sound/tapToHear.ts`. Code-review fix: the canvas reserves the Sound row on every slot, so it no longer changes size between letters and punctuation.
 - Left for Dad: play-test the Sound box and its 🔊 on the tablet (layout, glow, mute wiggle, how made-up spellings sound at 0.8×).
+
+Resolved 2026-11-08: Dad play-tested it and approved.

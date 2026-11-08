@@ -4,7 +4,7 @@
 
 **Blocked by:** 01 (Give a Glyph a Sound and try it on the canvas)
 
-**Status:** ready-for-human
+**Status:** resolved
 
 - [x] Each Cipher Key entry carries the Glyph's optional Sound
 - [x] The printed key shows the Sound under the letter, small and in the same layout; entries without one are unchanged
@@ -15,3 +15,5 @@
 
 - 2026-11-08 (agent): The printed key shows `says "kla"` small under `= A`; entries without a Sound are unchanged. `printSheet` reads `entry.glyph.sound`. Tests cover printing from the tablet and from a real share link with Sounds. The 'says' wording is the agent's choice (one string in `src/render/printSheet.ts`).
 - Left for Dad: check the print preview by eye.
+
+Resolved 2026-11-08: Dad play-tested it and approved.

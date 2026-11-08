@@ -4,7 +4,7 @@
 
 **Blocked by:** 01 (Give a Glyph a Sound and try it on the canvas), 03 (Read it to me for his own Messages)
 
-**Status:** ready-for-human
+**Status:** resolved
 
 - [x] The share link version becomes 2: v1's payload plus each packed Glyph's Sound (varint length, then UTF-8, where 0 means none) after its strokes
 - [x] Opening accepts both `m1.` links (Glyphs come back with no Sounds) and `m2.` links; any other version is still "couldn't open"
@@ -18,3 +18,5 @@
 
 - 2026-11-08 (agent): Links are now `m2.`, with each Glyph's Sound after its strokes (`FIRST_VERSION_WITH_SOUNDS` in `shareLink.ts`). `m1.` links still open (tested with a hard-coded v1 link made by the old encoder). Sounds count towards `tooLong`. Reply page: Read it to me for the shared Message (next to 'Show the letters') and for Dad's reply (under the reply card; it reads what's typed at the time of the tap). Dad's phone has no mute button, so it's never muted there.
 - Left for Dad: open a QR link on his phone and play-test both buttons.
+
+Resolved 2026-11-08: Dad play-tested it and approved.

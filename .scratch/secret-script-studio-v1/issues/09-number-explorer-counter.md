@@ -4,11 +4,15 @@
 
 **Blocked by:** 03 (Draw the first Glyph)
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] Core: Number Explorer state (chosen My Script, Digit Count, number); increment and decrement; the view gives each column's digit slot (Glyph or Missing Glyph) and value, plus which columns rolled over (tested)
-- [ ] The view's per-column item counts (loose blocks, Stacks, Stacks of Stacks) are computed and tested here, even though ticket 10 draws them
-- [ ] − at 0 and + at 999 are simply disabled (tested; no message)
-- [ ] Defaults to the most recently used My Script; opens at Digit Count 10 every time (tested)
-- [ ] Odometer roll-over animation, short and gentle
-- [ ] Tapping a Missing digit opens the Glyph canvas for that digit
+- [x] Core: Number Explorer state (chosen My Script, Digit Count, number); increment and decrement; the view gives each column's digit slot (Glyph or Missing Glyph) and value, plus which columns rolled over (tested)
+- [x] The view's per-column item counts (loose blocks, Stacks, Stacks of Stacks) are computed and tested here, even though ticket 10 draws them
+- [x] − at 0 and + at 999 are simply disabled (tested; no message)
+- [x] Defaults to the most recently used My Script; opens at Digit Count 10 every time (tested)
+- [x] Odometer roll-over animation, short and gentle
+- [x] Tapping a Missing digit opens the Glyph canvas for that digit
+
+## Comments
+
+Implemented on integration branch `secret-script-studio-v1` (TDD through the Studio core; screens checked in Edge at 1280x800 and 800x1280). On-device feel is part of ticket 15.

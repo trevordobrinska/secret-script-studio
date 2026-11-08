@@ -4,9 +4,13 @@
 
 **Blocked by:** 01 (Scaffold, deploy and home screen)
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] Core: muted setting, saved and kept across reload (tested)
-- [ ] A few soft, short sounds (synthesized like Doodle Monsters, or generated in code); nothing loud or sudden
-- [ ] Mute button in the same place on every screen
-- [ ] Sounds play only after the first touch (browser autoplay rules)
+- [x] Core: muted setting, saved and kept across reload (tested)
+- [x] A few soft, short sounds (synthesized like Doodle Monsters, or generated in code); nothing loud or sudden
+- [x] Mute button in the same place on every screen
+- [x] Sounds play only after the first touch (browser autoplay rules)
+
+## Comments
+
+Implemented on integration branch `secret-script-studio-v1` (TDD through the Studio core; screens checked in Edge at 1280x800 and 800x1280). On-device feel is part of ticket 15.

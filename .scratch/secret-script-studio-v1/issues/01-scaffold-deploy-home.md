@@ -4,13 +4,17 @@
 
 **Blocked by:** None (can start immediately)
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] Vite + TypeScript + Vitest project set up; `npm test` runs and passes with at least one core test
-- [ ] Studio core factory takes injected storage and clock and is only touched by tests through its public interface
-- [ ] In-memory storage plus test helpers (fake clock, a builder for a new core)
-- [ ] Home screen with three big tiles that never move; each placeholder screen has a home button in the same place
-- [ ] PWA manifest and icons so add-to-home-screen opens fullscreen
-- [ ] Build works under the GitHub Pages project path (relative base)
+- [x] Vite + TypeScript + Vitest project set up; `npm test` runs and passes with at least one core test
+- [x] Studio core factory takes injected storage and clock and is only touched by tests through its public interface
+- [x] In-memory storage plus test helpers (fake clock, a builder for a new core)
+- [x] Home screen with three big tiles that never move; each placeholder screen has a home button in the same place
+- [x] PWA manifest and icons so add-to-home-screen opens fullscreen
+- [x] Build works under the GitHub Pages project path (relative base)
 - [ ] Published to GitHub Pages at `trevordobrinska.github.io/secret-script-studio/`. **Confirm with the user before creating or pushing the GitHub repo.**
-- [ ] Checked in desktop Chrome's device toolbar (tablet size, touch)
+- [x] Checked in desktop Chrome's device toolbar (tablet size, touch)
+
+## Comments
+
+Built on integration branch `secret-script-studio-v1`. Deploy workflow `.github/workflows/deploy.yml` is ready; publishing (creating/pushing the GitHub repo) awaits Dad's confirmation, so that box stays open. Tablet-size check done in Edge (Chromium) with touch emulation.

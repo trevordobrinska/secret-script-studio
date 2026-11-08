@@ -4,10 +4,14 @@
 
 **Blocked by:** 01 (Scaffold, deploy and home screen)
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] Library content as static data: World Script name, characters (Unicode text, name, sound), numerals (character, value)
-- [ ] Core: Library catalog view (tested with a content check: every World Script has a name and at least one character; every character has a name and sound; numerals have whole-number values)
-- [ ] Starter content: Greek, Cyrillic and one numeral-only system (e.g. Roman)
-- [ ] World Script list and page screens; read-only, no tracing or quizzes; big characters that are easy to copy from
-- [ ] Numeral-only systems show their numerals and values
+- [x] Library content as static data: World Script name, characters (Unicode text, name, sound), numerals (character, value)
+- [x] Core: Library catalog view (tested with a content check: every World Script has a name and at least one character; every character has a name and sound; numerals have whole-number values)
+- [x] Starter content: Greek, Cyrillic and one numeral-only system (e.g. Roman)
+- [x] World Script list and page screens; read-only, no tracing or quizzes; big characters that are easy to copy from
+- [x] Numeral-only systems show their numerals and values
+
+## Comments
+
+Implemented on integration branch `secret-script-studio-v1` (TDD through the Studio core; screens checked in Edge at 1280x800 and 800x1280). On-device feel is part of ticket 15.

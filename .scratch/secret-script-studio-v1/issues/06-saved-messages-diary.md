@@ -4,11 +4,15 @@
 
 **Blocked by:** 04 (Write a Message with Missing Glyphs)
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] Core: save, edit, delete Messages; list per My Script, newest first (tested)
-- [ ] Core: redrawing a Glyph changes the layout of existing Messages (tested)
-- [ ] Persistence test: Messages survive a reload
-- [ ] Messages list screen with Glyph previews
-- [ ] Secret mode toggle on the Write screen hides the plain-letter line
-- [ ] Delete asks for confirmation
+- [x] Core: save, edit, delete Messages; list per My Script, newest first (tested)
+- [x] Core: redrawing a Glyph changes the layout of existing Messages (tested)
+- [x] Persistence test: Messages survive a reload
+- [x] Messages list screen with Glyph previews
+- [x] Secret mode toggle on the Write screen hides the plain-letter line
+- [x] Delete asks for confirmation
+
+## Comments
+
+Implemented on integration branch `secret-script-studio-v1` (TDD through the Studio core; screens checked in Edge at 1280x800 and 800x1280). On-device feel is part of ticket 15.

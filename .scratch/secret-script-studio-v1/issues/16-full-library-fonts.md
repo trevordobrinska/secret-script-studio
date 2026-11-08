@@ -6,9 +6,13 @@
 
 **Status:** ready-for-agent
 
-- [ ] World Scripts: Greek, Cyrillic, Hangul, Hebrew, Arabic, Devanagari, Georgian, Armenian, hiragana, katakana, Elder Futhark runes, Ogham, Thai, Ethiopic, Cherokee, Tifinagh, each with character names and sounds and its numerals where it has them
-- [ ] Numeral systems: Roman, Mayan, Babylonian, Chinese, Eastern Arabic, Devanagari
+- [x] World Scripts: Greek, Cyrillic, Hangul, Hebrew, Arabic, Devanagari, Georgian, Armenian, hiragana, katakana, Elder Futhark runes, Ogham, Thai, Ethiopic, Cherokee, Tifinagh, each with character names and sounds and its numerals where it has them
+- [x] Numeral systems: Roman, Mayan, Babylonian, Chinese, Eastern Arabic, Devanagari
 - [ ] Free fonts (e.g. Noto, OFL) bundled, subset where practical, only for scripts ticket 15 found missing; license credits recorded
-- [ ] The Library content check (ticket 12) passes for all entries
+- [x] The Library content check (ticket 12) passes for all entries
 - [ ] Re-check on the tablet that nothing renders as empty boxes
-- [ ] Enchanting-table alphabet is **not** included
+- [x] Enchanting-table alphabet is **not** included
+
+## Comments
+
+Content part done on `secret-script-studio-v1`: 21 World Scripts and numeral systems (Hebrew/Arabic shown right to left). Fonts are not bundled yet: they wait on ticket 15's list of scripts that render as empty boxes. Status left open.

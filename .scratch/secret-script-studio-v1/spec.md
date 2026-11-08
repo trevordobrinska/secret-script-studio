@@ -69,7 +69,7 @@ Actors: **the kid** (my 10yo son, on his tablet) and **Dad** (me, usually on my 
 34. As Dad, I want to tap to show the plain-letter decoding, so that I can read it even if I haven't learned his script.
 35. As Dad, I want to type a reply on my phone's keyboard and see it in his Glyphs, so that I can answer in his script.
 36. As Dad, I want to hand him my phone or print my reply, so that he gets my answer without accounts or messaging apps.
-37. As Dad, if the link is broken or cut off, I want a gentle "this secret note couldn't be opened" message instead of an error, so that nothing feels broken.
+37. As Dad, if the link is broken or cut off, I want a gentle "this secret Message couldn't be opened" message instead of an error, so that nothing feels broken.
 38. As Dad, I want the shared page to work without his tablet or any server, so that the link holds everything needed.
 
 ### Printing

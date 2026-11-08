@@ -4,11 +4,15 @@
 
 **Blocked by:** 03 (Draw the first Glyph)
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] Core: Message layout turns text into cells (Glyph, Missing Glyph with its slot, plain gap, plain character) (tested, e.g. "he draws H and I, writes HI MOM, and the O shows as a Missing Glyph")
-- [ ] Lowercase is folded to uppercase; characters that aren't Glyph slots become plain characters (tested)
-- [ ] Glyph keyboard with every slot, plus space and backspace; the layout never shifts
-- [ ] Two lines: Glyphs above, plain letters below, wrapping sensibly on a tablet screen
-- [ ] Tapping a Missing Glyph opens the canvas for that slot and returns to the Message
-- [ ] The Message here is a draft; saving it is ticket 06
+- [x] Core: Message layout turns text into cells (Glyph, Missing Glyph with its slot, plain gap, plain character) (tested, e.g. "he draws H and I, writes HI MOM, and the O shows as a Missing Glyph")
+- [x] Lowercase is folded to uppercase; characters that aren't Glyph slots become plain characters (tested)
+- [x] Glyph keyboard with every slot, plus space and backspace; the layout never shifts
+- [x] Two lines: Glyphs above, plain letters below, wrapping sensibly on a tablet screen
+- [x] Tapping a Missing Glyph opens the canvas for that slot and returns to the Message
+- [x] The Message here is a draft; saving it is ticket 06
+
+## Comments
+
+Implemented on integration branch `secret-script-studio-v1` (TDD through the Studio core; screens checked in Edge at 1280x800 and 800x1280). On-device feel is part of ticket 15.

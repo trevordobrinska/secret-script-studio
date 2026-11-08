@@ -5,6 +5,7 @@ import { slotLabel, type GlyphSlot } from "../core/myScript";
 import { glyphImage } from "../render/glyphRenderer";
 import { messageView } from "../render/messageView";
 import { playKey, playTap } from "../sound/sound";
+import { openPrintChoice } from "./printChoice";
 import { el, type RenderScreen } from "./screen";
 import { writeTools } from "./writeTools";
 
@@ -38,7 +39,16 @@ export const writeScreen: RenderScreen<{ name: "write"; scriptId: string }> = (r
     playTap();
     go({ name: "share", scriptId, text: core.draft(scriptId), returnTo: { name: "write", scriptId } });
   });
-  barActions.append(share);
+  const print = el("button", "ms-button wr-print", "Print");
+  print.type = "button";
+  print.addEventListener("click", () => {
+    playTap();
+    openPrintChoice((options) => {
+      const result = core.printLayout(scriptId, core.draft(scriptId), options);
+      return result.ok ? result.layout : undefined;
+    }, playTap);
+  });
+  barActions.append(print, share);
   root.append(barActions);
 
   const tools = writeTools(core, scriptId, go, () => drawMessage());
@@ -49,7 +59,7 @@ export const writeScreen: RenderScreen<{ name: "write"; scriptId: string }> = (r
   function drawMessage(): void {
     tools.update();
     const draft = core.draft(scriptId);
-    share.disabled = draft.trim() === "";
+    share.disabled = print.disabled = draft.trim() === "";
     if (draft === "") {
       message.replaceChildren(el("p", "wr-hint", "Tap the keys to write in " + script!.name + "."));
       return;

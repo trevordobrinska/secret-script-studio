@@ -96,11 +96,15 @@
 .wr-share {
   background: var(--my-scripts);
 }
+.wr-print {
+  background: var(--library);
+}
 /* Keep the Write screen's title clear of the buttons on both sides of the bar. */
 .wr-title {
   width: 100%;
   box-sizing: border-box;
-  padding: 0 300px;
+  /* Left: the home button. Right: Print, Share and the mute button. */
+  padding: 0 384px 0 112px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;

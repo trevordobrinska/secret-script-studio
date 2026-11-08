@@ -1,6 +1,7 @@
 import "./reply.css";
 import type { SharedMessage, StudioCore } from "../core/studioCore";
 import { messageView } from "../render/messageView";
+import { openPrintChoice } from "../screens/printChoice";
 import { el } from "../screens/screen";
 
 /** Glyph size on Dad's phone (a phone is about 360–430 CSS px wide). */
@@ -74,9 +75,26 @@ function replyPage(core: StudioCore, shared: SharedMessage): HTMLElement {
     ),
   );
 
-  // Ticket 08 (printing): the Print buttons for the reply go in here.
+  // Printing, for when the tablet can't print: his note, or Dad's reply, each in his Glyphs.
   const actions = el("div", "rp-actions");
+  const printNote = el("button", "rp-button", "Print his note");
+  printNote.type = "button";
+  printNote.addEventListener("click", () => printText(shared.text));
+  const printReply = el("button", "rp-button", "Print your reply");
+  printReply.type = "button";
+  printReply.addEventListener("click", () => printText(input.value));
+  const updatePrintReply = () => (printReply.disabled = input.value.trim() === "");
+  input.addEventListener("input", updatePrintReply);
+  updatePrintReply();
+  actions.append(printNote, printReply);
   page.append(actions);
+
+  function printText(text: string): void {
+    openPrintChoice((options) => {
+      const result = core.sharedPrintLayout(shared, text, options);
+      return result.ok ? result.layout : undefined;
+    });
+  }
 
   return page;
 }

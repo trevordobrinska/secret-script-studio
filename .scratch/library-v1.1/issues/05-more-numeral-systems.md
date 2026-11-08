@@ -4,13 +4,13 @@
 
 **Blocked by:** 01 (About for every World Script), 02 (Tap a World Character to hear it)
 
-**Status:** ready-for-human
+**Status:** resolved
 
 - [x] Kaktovik numerals: digits 0–19 (base 20; About tells how Alaskan middle-schoolers invented them in the 1990s)
 - [x] Egyptian numerals: 1, 10, 100, 1000, 10 000, 100 000, 1 000 000
 - [x] Attic Greek numerals: Ι Π Δ Η Χ Μ plus the combined five-times forms (code points checked against the Unicode chart)
 - [x] Chinese rod numerals: units and tens forms for 1–9
-- [ ] Each has an About; facts double-checked
+- [x] Each has an About; facts double-checked
 - [x] The Library content check passes; the Library list's numeral sample still fits on its card
 - [x] Kaktovik font: if no free font exists, record "draw as SVG strokes" on v1 ticket 16
 - [x] Abouts listed in a comment below for Dad to skim
@@ -42,3 +42,5 @@ Kaktovik font: Noto Sans Symbols 2 (OFL) seems to cover it. That's recorded on v
 - **Chinese rod numerals**: Counting rods were little sticks of bamboo or bone that people in ancient China laid out on a board to do math, more than 2,000 years ago. Ones are rods standing up and tens are rods lying down, so you can tell the places apart, and an empty space meant zero. Chinese mathematicians even used them for negative numbers, more than a thousand years before Europe did!
 
 Agent work merged on `library-v1.1` (2026-11-08). Left for Dad: the fact check (flagged facts listed above) and the About skim.
+
+Resolved 2026-11-08: Dad checked it in Edge and approved the Abouts.

@@ -4,14 +4,14 @@
 
 **Blocked by:** none
 
-**Status:** ready-for-human
+**Status:** resolved
 
 - [x] `WorldScript.about` (required) added to the data shape
 - [x] Library content check: every World Script has a non-empty About (tested through the core)
 - [x] Abouts drafted for all 21 existing entries: plain words a 10-year-old reads easily, 2–3 sentences, one hook each, facts double-checked
 - [x] World Script page shows the About under the title, above the right-to-left note and the grid; calm body text, not tappable
-- [ ] Checked by eye in Edge at 1280x800 and 800x1280 (long Abouts don't push the grid off-screen awkwardly)
-- [ ] **Dad skims every About** for accuracy and tone (human step: list them all in a comment below for easy reading)
+- [x] Checked by eye in Edge at 1280x800 and 800x1280 (long Abouts don't push the grid off-screen awkwardly)
+- [x] **Dad skims every About** for accuracy and tone (human step: list them all in a comment below for easy reading)
 
 ## Comments
 
@@ -46,3 +46,5 @@ Facts I was least sure of, worth a closer look: Thai "44 consonant letters" (the
 - **Eastern Arabic numerals**: Eastern Arabic numerals are used in Egypt, Iraq, Saudi Arabia and other Arabic-speaking countries. They came from India more than 1,000 years ago, and our own 0 to 9 come from the same family. Arabic words are read right to left, but numbers are still read left to right!
 
 Agent work merged on `library-v1.1` (2026-11-08). Left for Dad: the Edge by-eye check at 1280x800 and 800x1280, and the About skim listed above.
+
+Resolved 2026-11-08: Dad checked it in Edge and approved the Abouts.

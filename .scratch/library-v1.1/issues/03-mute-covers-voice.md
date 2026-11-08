@@ -4,12 +4,12 @@
 
 **Blocked by:** 02 (Tap a World Character to hear it)
 
-**Status:** ready-for-human
+**Status:** resolved
 
 - [x] Core: when muted, the pronunciation view reports "glow and wiggle, don't speak" (tested)
 - [x] Muting while a letter is speaking stops it straight away
 - [x] Mute button wiggle: a short, gentle one-shot animation; the button never changes position; repeated muted taps don't stack wiggles
-- [ ] Checked by eye in Edge
+- [x] Checked by eye in Edge
 
 ## Comments
 
@@ -17,3 +17,5 @@
 - Edge check not done: the agent couldn't look at it in a browser. Left unchecked for Dad: tap a letter while muted (card glows, button wiggles once, no sound); tap fast several times; mute mid-word.
 
 Agent work merged on `library-v1.1` (2026-11-08). Code-review fix: speech stops only when mute switches on, not on every refresh. Left for Dad: the by-eye check in Edge.
+
+Resolved 2026-11-08: Dad checked it in Edge and approved the Abouts.

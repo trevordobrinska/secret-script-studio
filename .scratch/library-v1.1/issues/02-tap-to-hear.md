@@ -4,14 +4,14 @@
 
 **Blocked by:** none
 
-**Status:** ready-for-human
+**Status:** resolved
 
 - [x] Data: `WorldScript.voice?` (BCP 47 tag) and `WorldCharacter.say?` added; voice tags filled in for the existing scripts per the spec's mapping
 - [x] Core: pronunciation rule (tested): native voice when a matching language is available (primary-subtag match); English fallback says the name, never the sound text; numerals say their text natively or their value in English; numeral-only systems always use English; `say` overrides; first form split off multi-form text; rate 0.8
 - [x] Content check: `voice` tags are well-formed (tested)
 - [x] `src/sound/speech.ts`: voice list (handles late `voiceschanged`), speak with cancel-before-speak, start/end callbacks, silent no-op without speech synthesis
 - [x] Character and numeral cards become buttons; the card glows while speaking (about 600 ms when there's no speech)
-- [ ] Checked by ear in Edge: Greek, Hangul, kana and Hindi speak natively if Windows has those voices; runes and Roman fall back to English; 0.8× sounds right
+- [x] Checked by ear in Edge: Greek, Hangul, kana and Hindi speak natively if Windows has those voices; runes and Roman fall back to English; 0.8× sounds right
 
 ## Comments
 
@@ -22,3 +22,5 @@
 - Ear check in Edge not done: the agent cannot listen. Left unchecked for Dad.
 
 Agent work merged on `library-v1.1` (2026-11-08), plus code-review fixes: a card glows at most 4 s even if the voice never reports `end`, and language-tag parsing is now one shared helper. Left for Dad: the ear check in Edge. Two decisions are still open: (1) Chinese and Eastern Arabic numerals speak natively because of their voice tags, even though the spec says numeral-only systems always use English; (2) whether the native voice reading the bare letter ("Λ") is good enough, or `say` should carry the letter's name ("λάμδα") as DESIGN.md's example does.
+
+Resolved 2026-11-08: Dad checked it in Edge and approved the Abouts.

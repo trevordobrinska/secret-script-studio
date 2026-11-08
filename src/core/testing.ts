@@ -67,3 +67,35 @@ export async function loadedStudio(options: StudioOptions = {}): Promise<StudioC
   await studio.load();
   return studio;
 }
+
+/**
+ * Strokes the way a finger really draws them: `strokes` curvy strokes of
+ * `points` closely spaced points each (wobbly arcs, different per `seed`).
+ * Much heavier than A_DOWN_STROKE, for share-link size stories.
+ */
+export function fingerDrawnStrokes(seed: number, { strokes = 2, points = 40 } = {}): Stroke[] {
+  return Array.from({ length: strokes }, (_, s) =>
+    Array.from({ length: points }, (_, i) => {
+      const t = i / (points - 1);
+      const angle = seed * 0.7 + s * 2.1 + t * Math.PI * 1.4;
+      const radius = 0.3 + 0.04 * Math.sin(t * 17 + seed + s);
+      return { x: 0.5 + radius * Math.cos(angle), y: 0.5 + radius * Math.sin(angle) };
+    }),
+  );
+}
+
+/**
+ * A loaded Studio core with one My Script where each of `drawn` holds
+ * finger-drawn strokes (fingerDrawnStrokes). Throws if a step fails.
+ */
+export async function studioWithFingerDrawnScript(
+  drawn: readonly GlyphSlot[],
+  shape: { strokes?: number; points?: number } = {},
+): Promise<{ studio: StudioCore; script: MyScript }> {
+  const { studio, script } = await studioWithMyScript();
+  drawn.forEach((slot, i) => {
+    const result = studio.saveGlyph(script.id, slot, fingerDrawnStrokes(i + 1, shape));
+    if (result !== "saved") throw new Error(`Couldn't draw ${slot}: ${result}`);
+  });
+  return { studio, script: studio.myScript(script.id)! };
+}

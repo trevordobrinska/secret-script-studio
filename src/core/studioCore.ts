@@ -5,6 +5,7 @@ import { SETTINGS_SCHEMA_VERSION, type SettingsRecord, type StudioStorage } from
 import { createMyScriptBook, type MyScriptCommands } from "./myScriptBook";
 import type { GlyphSlot } from "./myScript";
 import { createWriting, type WritingCommands } from "./writing";
+import { createSharing, type SharingCommands } from "./sharing";
 
 /** Everything the Studio core needs from the outside world. */
 export interface StudioCoreDeps {
@@ -63,7 +64,7 @@ const DEFAULT_SETTINGS: SettingsView = { muted: false, numberHintSeen: false };
  * The Studio core: every rule of the app, with no DOM. Screens read its
  * views and call its commands. Commands return results and never throw.
  */
-export interface StudioCore extends MyScriptCommands, WritingCommands {
+export interface StudioCore extends MyScriptCommands, WritingCommands, SharingCommands {
   /** The screen that is showing now. The app opens on home. */
   screen(): Screen;
   /** The home screen's tiles, in their fixed order. */
@@ -107,10 +108,12 @@ export function createStudioCore({ storage, clock }: StudioCoreDeps): StudioCore
   });
 
   const writing = createWriting({ myScript: myScriptBook.commands.myScript });
+  const sharing = createSharing({ myScript: myScriptBook.commands.myScript });
 
   return {
     ...myScriptBook.commands,
     ...writing,
+    ...sharing,
     screen: () => current,
     homeTiles: () => HOME_TILES,
     open(screen) {

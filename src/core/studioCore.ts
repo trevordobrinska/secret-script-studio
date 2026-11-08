@@ -5,6 +5,7 @@ import { SETTINGS_SCHEMA_VERSION, type SettingsRecord, type StudioStorage } from
 import { createMyScriptBook, type MyScriptCommands } from "./myScriptBook";
 import type { GlyphSlot } from "./myScript";
 import { createNumberExplorer, type NumberExplorerCommands } from "./numberExplorer";
+import { createWriting, type WritingCommands } from "./writing";
 
 /** Everything the Studio core needs from the outside world. */
 export interface StudioCoreDeps {
@@ -41,14 +42,13 @@ export type Screen =
       readonly slot: GlyphSlot;
       /** The name nudge's letters: "Save + next" offers these first. */
       readonly startWith?: readonly GlyphSlot[];
-      /**
-       * Where Save and Back go, if not the My Script's Glyph grid (e.g. the
-       * Number Explorer, after tapping a Missing digit).
-       */
+      /** Where Save and Back go (e.g. the Write screen or the Number Explorer); without it, the Glyph grid. */
       readonly returnTo?: Screen;
     }
   /** The name nudge for a brand-new My Script: "start with the letters of your name". */
-  | { readonly name: "nameNudge"; readonly scriptId: string };
+  | { readonly name: "nameNudge"; readonly scriptId: string }
+  /** The Write screen: writing a Message in a My Script with its Glyph keyboard (the draft is in the core). */
+  | { readonly name: "write"; readonly scriptId: string };
 
 export type { WorldCharacter, WorldNumeral, WorldScript } from "./library/worldScript";
 
@@ -64,7 +64,7 @@ const DEFAULT_SETTINGS: SettingsView = { muted: false, numberHintSeen: false };
  * The Studio core: every rule of the app, with no DOM. Screens read its
  * views and call its commands. Commands return results and never throw.
  */
-export interface StudioCore extends MyScriptCommands, NumberExplorerCommands {
+export interface StudioCore extends MyScriptCommands, WritingCommands, NumberExplorerCommands {
   /** The screen that is showing now. The app opens on home. */
   screen(): Screen;
   /** The home screen's tiles, in their fixed order. */
@@ -107,10 +107,13 @@ export function createStudioCore({ storage, clock }: StudioCoreDeps): StudioCore
     remove: (scriptId) => myScriptDeleted(scriptId),
   });
 
+  const writing = createWriting({ myScript: myScriptBook.commands.myScript });
+
   const numberExplorer = createNumberExplorer({ clock, myScripts: myScriptBook.commands.myScripts });
 
   return {
     ...myScriptBook.commands,
+    ...writing,
     ...numberExplorer.commands,
     screen: () => current,
     homeTiles: () => HOME_TILES,

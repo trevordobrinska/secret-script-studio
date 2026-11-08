@@ -11,17 +11,14 @@ import { el, type RenderScreen } from "./screen";
  * Monsters: one finger at a time, every coalesced sample, and the whole
  * drawing repainted (rAF-throttled). Points are kept normalized (0–1).
  */
-export const glyphCanvasScreen: RenderScreen<Extract<Screen, { name: "glyphCanvas" }>> = (
-  root,
-  screen,
-  { core, go },
-) => {
+export const glyphCanvasScreen: RenderScreen<Extract<Screen, { name: "glyphCanvas" }>> = (root, screen, { core, go }) => {
   const script = core.myScript(screen.scriptId);
   if (!script) {
     root.append(el("p", "placeholder", "This My Script isn't here."));
     return;
   }
   const { startWith, returnTo } = screen;
+  // Save and Back go where he came from (e.g. the Write screen), else the grid.
   const backToGrid = () => go(returnTo ?? { name: "glyphGrid", scriptId: script.id, startWith });
 
   // Redrawing starts from the Glyph he has, so he can undo or add to it.

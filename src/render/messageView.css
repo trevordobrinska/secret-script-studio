@@ -1,0 +1,53 @@
+/* A laid-out Message (messageView.ts): Glyphs on top, plain letters underneath. */
+
+.mv-message {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  row-gap: 14px;
+}
+/* A word never splits across lines. */
+.mv-word {
+  display: inline-flex;
+  flex-wrap: nowrap;
+  gap: 4px;
+  margin-right: 4px;
+}
+.mv-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+}
+.mv-box {
+  width: var(--mv-cell);
+  height: var(--mv-cell);
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+/* A Missing Glyph: an empty dotted box. */
+.mv-missingGlyph .mv-box {
+  border: 3px dashed var(--soft-ink);
+  border-radius: 10px;
+}
+/* A space with no Glyph: an ordinary gap, a bit narrower than a Glyph. */
+.mv-gap .mv-box {
+  width: calc(var(--mv-cell) * 0.5);
+}
+/* Anything that isn't a Glyph slot shows as itself. */
+.mv-plain .mv-box {
+  font-size: calc(var(--mv-cell) * 0.6);
+  color: var(--soft-ink);
+}
+.mv-letter {
+  min-height: 1.2em;
+  font-size: 20px;
+  line-height: 1.2em;
+  color: var(--soft-ink);
+}

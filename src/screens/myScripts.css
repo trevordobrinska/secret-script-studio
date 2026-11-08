@@ -230,6 +230,20 @@
   background: var(--my-scripts);
 }
 
+/* Buttons above the Glyph grid (Write a Message). */
+.ms-grid-actions {
+  width: 100%;
+  max-width: 1200px;
+  box-sizing: border-box;
+  padding: 0 calc(var(--gap) * 2);
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+}
+.ms-write {
+  background: var(--my-scripts);
+}
+
 /* The Glyph grid: drawn Glyphs in his ink, Missing Glyphs as dotted boxes. */
 .ms-grid {
   flex: 1;

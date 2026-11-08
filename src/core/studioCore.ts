@@ -9,6 +9,7 @@ import { createWriting, type WritingCommands } from "./writing";
 import { createDiary, type DiaryCommands } from "./diary";
 import { backupFileName, backupText, parseBackup, type BackupCommands } from "./backup";
 import { createSharing, type SharingCommands } from "./sharing";
+import { createPrinting, type PrintingCommands } from "./printing";
 
 /** Everything the Studio core needs from the outside world. */
 export interface StudioCoreDeps {
@@ -64,6 +65,7 @@ export type Screen =
   | { readonly name: "share"; readonly scriptId: string; readonly text: string; readonly returnTo?: Screen };
 
 export type { SharedMessage } from "./sharing";
+export type { CipherKeyEntry, PrintLayout, PrintOptions } from "./printing";
 export type { WorldCharacter, WorldNumeral, WorldScript } from "./library/worldScript";
 
 /** The Settings as the screens see them. */
@@ -84,7 +86,8 @@ export interface StudioCore
     DiaryCommands,
     NumberExplorerCommands,
     BackupCommands,
-    SharingCommands {
+    SharingCommands,
+    PrintingCommands {
   /** The screen that is showing now. The app opens on home. */
   screen(): Screen;
   /** The home screen's tiles, in their fixed order. */
@@ -129,6 +132,7 @@ export function createStudioCore({ storage, clock }: StudioCoreDeps): StudioCore
 
   const writing = createWriting({ myScript: myScriptBook.commands.myScript });
   const sharing = createSharing({ myScript: myScriptBook.commands.myScript });
+  const printing = createPrinting({ myScript: myScriptBook.commands.myScript });
 
   const diary = createDiary({
     clock,
@@ -162,6 +166,7 @@ export function createStudioCore({ storage, clock }: StudioCoreDeps): StudioCore
     ...diary.commands,
     ...numberExplorer.commands,
     ...sharing,
+    ...printing,
     screen: () => current,
     homeTiles: () => HOME_TILES,
     open(screen) {

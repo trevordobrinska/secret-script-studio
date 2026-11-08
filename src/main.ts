@@ -9,10 +9,9 @@ const core = createStudioCore({ storage: indexedDbStudioStorage(), clock: system
 const root = document.querySelector<HTMLElement>("#screen")!;
 const homeButton = document.querySelector<HTMLElement>("#home-button")!;
 
-// Draw home straight away; nothing on it depends on saved data yet.
-// Screens that do should wait for `core.load()` (it never rejects).
-startRouter(core, root, homeButton);
-void core.load();
+// Draw once saved data is in (My Scripts are), so no screen shows half-loaded.
+// `core.load()` never rejects and IndexedDB is quick, so this is near-instant.
+void core.load().then(() => startRouter(core, root, homeButton));
 
 registerServiceWorker();
 

@@ -1,0 +1,220 @@
+/* My Scripts screens: the list, New My Script, the Glyph grid and the Glyph canvas. */
+
+.ms-button {
+  min-height: 72px;
+  padding: 0 28px;
+  border: 3px solid var(--ink);
+  border-radius: 20px;
+  background: var(--card);
+  box-shadow: 0 4px 0 var(--ink);
+  font-size: 26px;
+  font-weight: bold;
+  transition: transform 80ms ease-out, box-shadow 80ms ease-out;
+}
+.ms-button:active:not(:disabled) {
+  transform: translateY(4px);
+  box-shadow: 0 0 0 var(--ink);
+}
+.ms-button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* The list of My Scripts. */
+.ms-list {
+  flex: 1;
+  width: 100%;
+  max-width: 720px;
+  box-sizing: border-box;
+  padding: var(--gap) calc(var(--gap) * 2) calc(var(--gap) * 3);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  overflow-y: auto;
+}
+.ms-script {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  text-align: left;
+}
+.ms-swatch {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 3px solid var(--ink);
+}
+.ms-new {
+  background: var(--my-scripts);
+}
+.ms-hint {
+  margin: 24px 0 0;
+  font-size: 28px;
+  text-align: center;
+  color: var(--soft-ink);
+}
+
+/* New My Script. */
+.ms-form {
+  width: 100%;
+  max-width: 720px;
+  box-sizing: border-box;
+  padding: 0 calc(var(--gap) * 2) var(--gap);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+}
+.ms-label {
+  font-size: 22px;
+  font-weight: bold;
+  color: var(--soft-ink);
+}
+.ms-name {
+  font: inherit;
+  font-size: 30px;
+  padding: 12px 18px;
+  border: 3px solid var(--ink);
+  border-radius: 16px;
+  background: var(--card);
+  color: var(--ink);
+  user-select: text;
+  -webkit-user-select: text;
+}
+.ms-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.ms-ink {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 3px solid var(--ink);
+  outline-offset: 4px;
+}
+.ms-width {
+  width: 120px;
+  height: 88px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 3px solid var(--ink);
+  border-radius: 16px;
+  background: var(--card);
+  font-size: 18px;
+  outline-offset: 4px;
+}
+.ms-width-line {
+  width: 72px;
+  border-radius: 99px;
+}
+.ms-ink.chosen,
+.ms-width.chosen {
+  outline: 5px solid var(--ink);
+}
+.ms-go {
+  margin-top: 12px;
+  align-self: center;
+  min-width: 240px;
+  background: var(--my-scripts);
+}
+
+/* The Glyph grid: drawn Glyphs in his ink, Missing Glyphs as dotted boxes. */
+.ms-grid {
+  flex: 1;
+  width: 100%;
+  max-width: 1200px;
+  box-sizing: border-box;
+  padding: var(--gap) calc(var(--gap) * 2) calc(var(--gap) * 3);
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  align-content: start;
+  gap: 14px;
+  overflow-y: auto;
+}
+.ms-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 4px 6px;
+  border: 2px solid var(--line);
+  border-radius: 16px;
+  background: var(--card);
+}
+.ms-slot-box {
+  width: 72px;
+  height: 72px;
+  box-sizing: border-box;
+  display: block;
+}
+.ms-slot.missing .ms-slot-box {
+  border: 3px dashed var(--line);
+  border-radius: 10px;
+}
+.ms-slot-label {
+  font-size: 18px;
+  color: var(--soft-ink);
+}
+
+/* The Glyph canvas: a big square, tools beside it (landscape) or below (portrait). */
+.ms-drawing-slot {
+  display: inline-block;
+  min-width: 56px;
+  padding: 0 12px;
+  border: 3px solid var(--ink);
+  border-radius: 14px;
+  background: var(--card);
+  line-height: 60px;
+}
+.ms-stage {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0 var(--gap) var(--gap);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+}
+.ms-canvas {
+  width: min(calc(100vh - var(--bar) - 32px), calc(100vw - 280px));
+  aspect-ratio: 1;
+  border: 3px solid var(--ink);
+  border-radius: 12px;
+  background: #fff;
+  touch-action: none;
+}
+.ms-tools {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 180px;
+}
+.ms-save {
+  background: #9fd8a3;
+}
+.ms-clear.confirming {
+  background: #f2c6a0;
+}
+@media (orientation: portrait) {
+  .ms-stage {
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+  .ms-canvas {
+    width: min(calc(100vw - 32px), calc(100vh - var(--bar) - 140px));
+  }
+  .ms-tools {
+    flex-direction: row;
+    width: auto;
+  }
+  .ms-tool {
+    padding: 0 18px;
+  }
+}

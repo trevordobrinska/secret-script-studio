@@ -1,6 +1,10 @@
 import type { Screen, StudioCore } from "../core/studioCore";
 import { homeScreen } from "./homeScreen";
 import { placeholderScreen } from "./placeholderScreen";
+import { myScriptsScreen } from "./myScriptsScreen";
+import { newMyScriptScreen } from "./newMyScriptScreen";
+import { glyphGridScreen } from "./glyphGridScreen";
+import { glyphCanvasScreen } from "./glyphCanvasScreen";
 import type { RenderScreen, ScreenContext } from "./screen";
 
 /**
@@ -10,9 +14,12 @@ import type { RenderScreen, ScreenContext } from "./screen";
  */
 const SCREENS: { [N in Screen["name"]]: RenderScreen<Extract<Screen, { name: N }>> } = {
   home: homeScreen,
-  myScripts: placeholderScreen,
+  myScripts: myScriptsScreen,
   library: placeholderScreen,
   numberExplorer: placeholderScreen,
+  newMyScript: newMyScriptScreen,
+  glyphGrid: glyphGridScreen,
+  glyphCanvas: glyphCanvasScreen,
 };
 
 /**

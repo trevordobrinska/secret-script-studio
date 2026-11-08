@@ -6,6 +6,7 @@ import { glyphImage } from "../render/glyphRenderer";
 import { messageView } from "../render/messageView";
 import { playKey, playTap } from "../sound/sound";
 import { el, type RenderScreen } from "./screen";
+import { writeTools } from "./writeTools";
 
 const MESSAGE_CELL = 64;
 const KEY_GLYPH = 44;
@@ -15,8 +16,9 @@ const KEY_GLYPH = 44;
  * each), and below it a keyboard of his own Glyphs with space and
  * backspace. The keyboard is built once and never moves; only the Message
  * redraws as he types. Tapping a Missing Glyph opens the canvas for it and
- * comes back here. Share (top bar) shows the draft as a QR code.
- * (Saving the Message is ticket 06.)
+ * comes back here. A row of tools above the Message (writeTools) has the
+ * diary, secret mode, New Message and Save; Share (in the top bar, left of
+ * the mute button) shows the draft as a QR code.
  */
 export const writeScreen: RenderScreen<{ name: "write"; scriptId: string }> = (root, screen, { core, go }) => {
   const script = core.myScript(screen.scriptId);
@@ -28,7 +30,7 @@ export const writeScreen: RenderScreen<{ name: "write"; scriptId: string }> = (r
 
   root.append(el("h1", "screen-title wr-title", script.name));
 
-  // Top-bar buttons, left of the mute button. Ticket 06 can add Save here.
+  // Share sits in the top bar, left of the mute button, so the tools row keeps its room.
   const barActions = el("div", "wr-bar-actions");
   const share = el("button", "ms-button wr-share", "Share");
   share.type = "button";
@@ -39,11 +41,13 @@ export const writeScreen: RenderScreen<{ name: "write"; scriptId: string }> = (r
   barActions.append(share);
   root.append(barActions);
 
+  const tools = writeTools(core, scriptId, go, () => drawMessage());
   const message = el("div", "wr-message");
   const keyboard = el("div", "wr-keyboard");
-  root.append(message, keyboard);
+  root.append(tools.row, message, keyboard);
 
   function drawMessage(): void {
+    tools.update();
     const draft = core.draft(scriptId);
     share.disabled = draft.trim() === "";
     if (draft === "") {
@@ -52,6 +56,7 @@ export const writeScreen: RenderScreen<{ name: "write"; scriptId: string }> = (r
     }
     const view = messageView(core.messageLayout(scriptId, draft), script!, {
       cellSize: MESSAGE_CELL,
+      plainLetters: !core.secretMode(),
       onMissingGlyph: (slot) => {
         playTap();
         go({ name: "glyphCanvas", scriptId, slot, returnTo: { name: "write", scriptId } });

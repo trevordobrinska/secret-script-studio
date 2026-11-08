@@ -61,6 +61,14 @@ export async function studioWithMyScript(
   return { studio, script: studio.myScript(created.script.id)! };
 }
 
+/** Presses + in the Number Explorer until it shows `n`. Throws if it can't get there. */
+export function countTo(studio: StudioCore, n: number): void {
+  while (studio.numberExplorer().number < n) {
+    if (!studio.countUp()) throw new Error(`Couldn't count up to ${n}`);
+  }
+  if (studio.numberExplorer().number !== n) throw new Error(`Counted past ${n}`);
+}
+
 /** A Studio core that has finished loading from storage, as the app does at start-up. */
 export async function loadedStudio(options: StudioOptions = {}): Promise<StudioCore> {
   const studio = newStudio(options);

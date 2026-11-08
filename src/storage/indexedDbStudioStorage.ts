@@ -1,14 +1,18 @@
+import type { MessageRecord } from "../core/message";
 import type { MyScriptRecord } from "../core/myScript";
 import type { SettingsRecord, StudioStorage } from "../core/studioStorage";
 
 /** Prefixed with the app's name: every Arcade game shares one browser origin. */
 const DB_NAME = "secret-script-studio";
 /** Bump (and extend `upgrade`) when adding object stores or indexes. */
-const DB_VERSION = 2;
+const DB_VERSION = 3;
 
 const SETTINGS = "settings";
 /** Added in DB_VERSION 2 (ticket 03). */
 const MY_SCRIPTS = "myScripts";
+/** Added in DB_VERSION 3 (ticket 06), with an index on each Message's scriptId. */
+const MESSAGES = "messages";
+const MESSAGES_BY_SCRIPT = "scriptId";
 /** The single key the Settings record is kept under in the settings store. */
 const SETTINGS_KEY = "settings";
 
@@ -47,8 +51,22 @@ export function indexedDbStudioStorage(): StudioStorage {
     deleteMyScript: async (id) => {
       await run(MY_SCRIPTS, "readwrite", (s) => void s.delete(id));
     },
-    deleteMessagesOfMyScript: async (_scriptId) => {
-      // Ticket 06: delete this My Script's Messages from the messages store here.
+    deleteMessagesOfMyScript: async (scriptId) => {
+      await run(MESSAGES, "readwrite", (s) => {
+        const cursor = s.index(MESSAGES_BY_SCRIPT).openKeyCursor(IDBKeyRange.only(scriptId));
+        cursor.onsuccess = () => {
+          if (!cursor.result) return;
+          s.delete(cursor.result.primaryKey);
+          cursor.result.continue();
+        };
+      });
+    },
+    listMessages: async () => (await run<MessageRecord[]>(MESSAGES, "readonly", (s) => s.getAll())) ?? [],
+    saveMessage: async (message) => {
+      await run(MESSAGES, "readwrite", (s) => void s.put(message));
+    },
+    deleteMessage: async (id) => {
+      await run(MESSAGES, "readwrite", (s) => void s.delete(id));
     },
   };
 }
@@ -68,6 +86,10 @@ function upgrade(db: IDBDatabase): void {
   if (!db.objectStoreNames.contains(SETTINGS)) db.createObjectStore(SETTINGS);
   // One record per My Script (with all its Glyphs), keyed by its id.
   if (!db.objectStoreNames.contains(MY_SCRIPTS)) db.createObjectStore(MY_SCRIPTS, { keyPath: "id" });
+  // One record per Message, keyed by its id, findable by its My Script.
+  if (!db.objectStoreNames.contains(MESSAGES)) {
+    db.createObjectStore(MESSAGES, { keyPath: "id" }).createIndex(MESSAGES_BY_SCRIPT, "scriptId");
+  }
 }
 
 function done(tx: IDBTransaction): Promise<void> {

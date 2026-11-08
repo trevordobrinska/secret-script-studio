@@ -23,6 +23,14 @@
         <path d="M21 39 V29 H27 V39" />
       </svg>
     </button>
+    <!-- The shared mute button: fixed top-right on every screen, home included. -->
+    <button id="mute-button" type="button" aria-label="Sound on" aria-pressed="false">
+      <svg viewBox="0 0 48 48" aria-hidden="true">
+        <path d="M8 19 H16 L26 10 V38 L16 29 H8 Z" />
+        <path class="sound-waves" d="M32 18 Q36 24 32 30 M37 13 Q44 24 37 35" />
+        <path class="sound-cross" d="M32 18 L42 30 M42 18 L32 30" />
+      </svg>
+    </button>
     <main id="screen"></main>
     <script type="module" src="/src/main.ts"></script>
   </body>

@@ -1,5 +1,5 @@
 import type { Clock } from "./deps";
-import type { SettingsRecord, StudioStorage } from "./studioStorage";
+import { SETTINGS_SCHEMA_VERSION, type SettingsRecord, type StudioStorage } from "./studioStorage";
 
 /** Everything the Studio core needs from the outside world. */
 export interface StudioCoreDeps {
@@ -45,11 +45,16 @@ export interface StudioCore {
    */
   load(): Promise<void>;
   settings(): SettingsView;
+  /** Turns the sounds off (true) or on (false). Remembered across reloads. */
+  setMuted(muted: boolean): void;
+  /** Resolves once every save started so far has finished (or failed and been logged). */
+  saved(): Promise<void>;
 }
 
 export function createStudioCore({ storage }: StudioCoreDeps): StudioCore {
   let current: Screen = { name: "home" };
   let settings: SettingsView = DEFAULT_SETTINGS;
+  let pending: Promise<void> = Promise.resolve();
 
   return {
     screen: () => current,
@@ -69,7 +74,19 @@ export function createStudioCore({ storage }: StudioCoreDeps): StudioCore {
       }
     },
     settings: () => settings,
+    setMuted(muted) {
+      settings = { ...settings, muted };
+      saveSettings();
+    },
+    saved: () => pending,
   };
+
+  function saveSettings(): void {
+    const record: SettingsRecord = { schemaVersion: SETTINGS_SCHEMA_VERSION, ...settings };
+    pending = pending
+      .then(() => storage.saveSettings(record))
+      .catch((error) => console.warn("Couldn't save the Settings.", error));
+  }
 }
 
 function settingsFrom(record: SettingsRecord): SettingsView {

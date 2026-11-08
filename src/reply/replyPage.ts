@@ -2,6 +2,7 @@ import "./reply.css";
 import type { SharedMessage, StudioCore } from "../core/studioCore";
 import { messageView } from "../render/messageView";
 import { openPrintChoice } from "../screens/printChoice";
+import { readItToMeButton } from "../screens/readItToMeButton";
 import { el } from "../screens/screen";
 
 /** Glyph size on Dad's phone (a phone is about 360–430 CSS px wide). */
@@ -14,7 +15,8 @@ const MAX_REPLY = 400;
  * outside the router, with a core that has no real storage (nothing is
  * saved on his phone): the link holds everything. It shows the Message in
  * the kid's Glyphs, a button to reveal the plain letters, and a box where
- * Dad types a reply that is laid out in the same Glyphs.
+ * Dad types a reply that is laid out in the same Glyphs. Both can be read
+ * aloud in the kid's Sounds (the link carries them).
  */
 export async function startReplyPage(core: StudioCore, root: HTMLElement, link: string): Promise<void> {
   root.dataset.screen = "reply";
@@ -44,7 +46,9 @@ function replyPage(core: StudioCore, shared: SharedMessage): HTMLElement {
     drawMessage();
   });
   drawMessage();
-  page.append(messageCard, reveal);
+  const messageActions = el("div", "rp-actions");
+  messageActions.append(reveal, phoneButton(readItToMeButton(() => core.readItToMe(shared.text, shared.glyphs))));
+  page.append(messageCard, messageActions);
 
   // Dad's reply, laid out live in the shared Glyphs.
   page.append(el("h2", "rp-heading", "Write back in his Glyphs"));
@@ -65,9 +69,17 @@ function replyPage(core: StudioCore, shared: SharedMessage): HTMLElement {
   };
   input.addEventListener("input", drawReply);
   drawReply();
+  // Read Dad's reply aloud in the shared Sounds, as it is when he taps.
+  const readReply = phoneButton(readItToMeButton(() => core.readItToMe(input.value, shared.glyphs)));
+  const updateReadReply = () => (readReply.disabled = input.value.trim() === "");
+  input.addEventListener("input", updateReadReply);
+  updateReadReply();
+  const replyActions = el("div", "rp-actions");
+  replyActions.append(readReply);
   page.append(
     input,
     reply,
+    replyActions,
     el(
       "p",
       "rp-small",
@@ -97,6 +109,12 @@ function replyPage(core: StudioCore, shared: SharedMessage): HTMLElement {
   }
 
   return page;
+}
+
+/** Gives a Studio button the reply page's look, keeping its other classes (such as its glow). */
+function phoneButton(button: HTMLButtonElement): HTMLButtonElement {
+  button.classList.replace("ms-button", "rp-button");
+  return button;
 }
 
 function couldntOpenPage(): HTMLElement {

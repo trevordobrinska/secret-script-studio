@@ -141,6 +141,57 @@ describe("sharing a Message by link", () => {
   });
 });
 
+describe("Sounds in the link", () => {
+  const stroke: Stroke = [
+    { x: 0.5, y: 0.2 },
+    { x: 0.5, y: 0.8 },
+  ];
+
+  it("Dad's opened Glyphs carry his Sounds; those without one come back without", async () => {
+    const { studio, script } = await studioWithMyScript();
+    studio.saveGlyph(script.id, "K", [stroke], "kla");
+    studio.saveGlyph(script.id, "Z", [stroke], "zø 😀");
+    studio.saveGlyph(script.id, "B", [stroke]);
+    const shared = await studio.shareLink(script.id, "KZB", APP);
+    if (!shared.ok) throw new Error(shared.reason);
+    const opened = await studio.openShareLink(shared.link);
+    if (!opened.ok) throw new Error(opened.reason);
+    expect(opened.message.glyphs.K!.sound).toBe("kla");
+    expect(opened.message.glyphs.Z!.sound).toBe("zø 😀");
+    expect(opened.message.glyphs.B).not.toHaveProperty("sound");
+  });
+
+  it("a link made before Sounds (version 1) still opens, with no Sounds", async () => {
+    // Packed by the version 1 encoder: Sky Runes, "HI DAD", H and I each one down stroke.
+    const v1Link = "https://example.com/#m1.4wzOrlQIKs1LLbbOv-jG5uGp4OLowsTOyKTAy-DDAaEA";
+    const { studio } = await studioWithMyScript();
+    const opened = await studio.openShareLink(v1Link);
+    if (!opened.ok) throw new Error(opened.reason);
+    expect(opened.message).toMatchObject({ name: "Sky Runes", ink: "#3b6fd1", strokeWidth: 0.07, text: "HI DAD" });
+    expect(Object.keys(opened.message.glyphs).sort()).toEqual(["H", "I"]);
+    expect(opened.message.glyphs.H!.strokes).toHaveLength(1);
+    expect(opened.message.glyphs.H).not.toHaveProperty("sound");
+    expect(opened.message.glyphs.I).not.toHaveProperty("sound");
+  });
+
+  it("Sounds count towards the QR limit: a Message that fits without them is too long with them", async () => {
+    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("") as GlyphSlot[];
+    const { studio, script } = await studioWithMyScript();
+    for (const slot of letters) studio.saveGlyph(script.id, slot, [stroke]);
+    expect((await studio.shareLink(script.id, letters.join(""), APP)).ok).toBe(true);
+    // Full-length Sounds that don't compress away: pseudo-random CJK characters.
+    let seed = 11;
+    for (const slot of letters) {
+      const sound = Array.from({ length: 12 }, () => {
+        seed = (seed * 48271) % 2147483647;
+        return String.fromCharCode(0x4e00 + (seed % 0x5000));
+      }).join("");
+      studio.saveGlyph(script.id, slot, [stroke], sound);
+    }
+    expect(await studio.shareLink(script.id, letters.join(""), APP)).toEqual({ ok: false, reason: "tooLong" });
+  });
+});
+
 describe("too long for one QR code", () => {
   it("a short Message using a dozen finger-drawn Glyphs fits", async () => {
     const letters = ["H", "I", "D", "A", "L", "O", "V", "E", "Y", "U", "S", "T"] as const;
@@ -200,7 +251,7 @@ describe("links that can't be opened", () => {
   it("a link from an unknown (newer) version gives couldn't open", async () => {
     const link = await aGoodLink();
     const { studio } = await studioWithMyScript();
-    expect(await studio.openShareLink(link.replace("#m1.", "#m2."))).toEqual({ ok: false, reason: "couldntOpen" });
+    expect(await studio.openShareLink(link.replace("#m2.", "#m3."))).toEqual({ ok: false, reason: "couldntOpen" });
   });
 
   it("the fragment alone opens too, with or without its #", async () => {
@@ -223,7 +274,7 @@ describe("when the app opens in Reply mode", () => {
     const { studio } = await studioWithMyScript();
     expect(studio.isShareLink("#m1.")).toBe(true);
     expect(studio.isShareLink("#m1.abc$%^")).toBe(true);
-    expect(studio.isShareLink("#m2.SGVsbG8")).toBe(true);
+    expect(studio.isShareLink("#m3.SGVsbG8")).toBe(true);
   });
 
   it.each([

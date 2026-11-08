@@ -53,14 +53,16 @@ describe("Read it to me", () => {
     expect(studio.readItToMe("KZ B", glyphs)).toEqual(english("klazo b"));
   });
 
-  it("reads a SharedMessage in its own Glyphs, lowercase typing included", async () => {
-    const { studio, script } = await studioWithMyScript({ drawn: ["H", "I"] });
+  it("reads a SharedMessage in its Sounds on Dad's phone, and Dad's reply too, lowercase typing included", async () => {
+    const { studio, script } = await studioWithMyScript({ drawn: ["I"] });
+    withSounds(studio, script, { H: "kla", D: "zo" });
     const shared = await studio.shareLink(script.id, "HI DAD", "https://example.com/");
     if (!shared.ok) throw new Error(shared.reason);
-    const opened = await studio.openShareLink(shared.link);
+    const { studio: dadsPhone } = await studioWithMyScript();
+    const opened = await dadsPhone.openShareLink(shared.link);
     if (!opened.ok) throw new Error(opened.reason);
-    expect(studio.readItToMe(opened.message.text, opened.message.glyphs)).toEqual(english("hi dad"));
-    expect(studio.readItToMe("ok hi!", opened.message.glyphs)).toEqual(english("ok hi!"));
+    expect(dadsPhone.readItToMe(opened.message.text, opened.message.glyphs)).toEqual(english("klai zoazo"));
+    expect(dadsPhone.readItToMe("ok hi!", opened.message.glyphs)).toEqual(english("ok klai!"));
   });
 
   it("has nothing to say for an empty Message", async () => {

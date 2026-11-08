@@ -3,7 +3,9 @@
  * nothing is ever sent to a server. Pure and DOM-free; it only uses the
  * web-platform CompressionStream, which browsers and Node both have.
  *
- * Fragment format, version 1:  `m1.<base64url(deflate-raw(payload))>`
+ * Fragment format, version 2:  `m2.<base64url(deflate-raw(payload))>`
+ * Version 1 links (`m1.`, made before Sounds) still open: the same payload
+ * without the Sounds.
  *
  * Payload bytes (varint = unsigned LEB128):
  *   varint nameLength, name (UTF-8)
@@ -11,19 +13,25 @@
  *   1 byte stroke width in thousandths of the Glyph square
  *   varint textLength, text (UTF-8, already folded)
  *   1 byte glyphCount, then for each Glyph:
- *     1 byte slot (its index in GLYPH_SLOTS: that order must never change for v1)
+ *     1 byte slot (its index in GLYPH_SLOTS: that order must never change)
  *     varint strokeCount, then for each stroke:
  *       varint pointCount, then the first point as two bytes (x, y on a
  *       0..GRID grid) and every later point as two zigzag varint deltas.
+ *     varint soundLength, sound (UTF-8); length 0 means no Sound. (Not in v1.)
  *
  * Strokes are made compact first: snapped to the GRID, repeated points
  * dropped, then simplified (Ramer-Douglas-Peucker, SIMPLIFY_TOLERANCE).
  */
-import { GLYPH_SLOTS, type Glyph, type GlyphSlot, type Point, type ScriptLook, type Stroke } from "./myScript";
+import { GLYPH_SLOTS, canHaveSound, cleanSound, type Glyph, type GlyphSlot, type Point, type ScriptLook, type Stroke } from "./myScript";
 import { foldMessageText, slotForChar, type GlyphSet } from "./messageLayout";
 
-/** Bump when the payload format changes; old versions then give "couldn't open". */
-export const SHARE_LINK_VERSION = 1;
+/**
+ * The version new links are packed in. Bump when the payload format changes;
+ * a version the decoder doesn't know gives "couldn't open".
+ */
+export const SHARE_LINK_VERSION = 2;
+/** The oldest version that still opens: version 1 links were made before Sounds. */
+const OLDEST_OPENABLE_VERSION = 1;
 
 /**
  * The longest whole link (in characters, all ASCII) that still fits a QR
@@ -87,8 +95,9 @@ export async function unpackShareLink(link: string): Promise<UnpackResult> {
     const fragment = fragmentOf(link);
     if (fragment.length > MAX_FRAGMENT_LENGTH) return couldntOpen();
     const match = /^m(\d+)\.([A-Za-z0-9_-]+)$/.exec(fragment);
-    if (!match || Number(match[1]) !== SHARE_LINK_VERSION) return couldntOpen();
-    const message = decodePayload(await inflateRaw(fromBase64Url(match[2])));
+    const version = Number(match?.[1]);
+    if (!match || version < OLDEST_OPENABLE_VERSION || version > SHARE_LINK_VERSION) return couldntOpen();
+    const message = decodePayload(await inflateRaw(fromBase64Url(match[2])), version);
     return message ? { ok: true, message } : couldntOpen();
   } catch {
     return couldntOpen();
@@ -189,12 +198,13 @@ function encodePayload(message: SharedMessage): Uint8Array {
         putVarint(zigzag(stroke[i][1] - stroke[i - 1][1]));
       }
     }
+    putString(message.glyphs[slot]!.sound ?? "");
   }
   return Uint8Array.from(out);
 }
 
 /** Reads a payload; undefined if anything is off (cut short, out of range, bytes left over). */
-function decodePayload(bytes: Uint8Array): SharedMessage | undefined {
+function decodePayload(bytes: Uint8Array, version: number): SharedMessage | undefined {
   let at = 0;
   const byte = () => {
     if (at >= bytes.length) throw new RangeError("cut short");
@@ -246,7 +256,10 @@ function decodePayload(bytes: Uint8Array): SharedMessage | undefined {
       }
       strokes.push(points);
     }
-    glyphs[slot] = { strokes, updatedAt: 0 };
+    // Kept by the same rules as a backup: cleaned, and dropped on a space or punctuation mark.
+    const read = version >= 2 ? cleanSound(string()) : undefined;
+    const sound = canHaveSound(slot) ? read : undefined;
+    glyphs[slot] = sound ? { strokes, sound, updatedAt: 0 } : { strokes, updatedAt: 0 };
   }
   if (at !== bytes.length || strokeWidth <= 0) return undefined;
   return { name, ink, strokeWidth, text, glyphs };

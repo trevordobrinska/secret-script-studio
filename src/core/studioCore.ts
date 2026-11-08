@@ -48,7 +48,11 @@ export type Screen =
   /** The name nudge for a brand-new My Script: "start with the letters of your name". */
   | { readonly name: "nameNudge"; readonly scriptId: string }
   /** The Write screen: writing a Message in a My Script with its Glyph keyboard (the draft is in the core). */
-  | { readonly name: "write"; readonly scriptId: string };
+  | { readonly name: "write"; readonly scriptId: string }
+  /** A My Script's diary: its saved Messages, newest first. */
+  | { readonly name: "messages"; readonly scriptId: string }
+  /** Re-reading one saved Message (with Edit and Delete). */
+  | { readonly name: "message"; readonly messageId: string };
 
 export type { WorldCharacter, WorldNumeral, WorldScript } from "./library/worldScript";
 

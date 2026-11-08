@@ -31,6 +31,13 @@ export const glyphGridScreen: RenderScreen<{ name: "glyphGrid"; scriptId: string
     go({ name: "write", scriptId: script.id });
   });
   actions.append(write);
+  const diary = el("button", "ms-button", "Messages");
+  diary.type = "button";
+  diary.addEventListener("click", () => {
+    playTap();
+    go({ name: "messages", scriptId: script.id });
+  });
+  actions.append(diary);
   root.append(actions);
   const scroller = el("div", "ms-grid-scroller");
   const open = (slot: GlyphSlot) => go({ name: "glyphCanvas", scriptId: script.id, slot, startWith });

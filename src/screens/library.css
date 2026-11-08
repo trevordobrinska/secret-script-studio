@@ -33,8 +33,17 @@
 }
 
 .library-sample {
+  max-width: 100%;
+  overflow: hidden;
   font-size: 56px;
   line-height: 1.2;
+  white-space: nowrap;
+}
+
+/* Numerals read smallest first, left to right, even where the digits are right-to-left characters (Eastern Arabic). */
+.library-sample-numerals {
+  direction: ltr;
+  unicode-bidi: bidi-override;
 }
 
 .library-name {

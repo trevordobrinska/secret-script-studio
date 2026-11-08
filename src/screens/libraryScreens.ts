@@ -9,8 +9,9 @@ export const libraryScreen: RenderScreen = (root, _screen, { core, go }) => {
   for (const script of core.library()) {
     const item = el("button", `library-item library-${script.kind}`);
     item.type = "button";
-    const sample = script.kind === "writing" ? script.characters[0]?.text : script.numerals.map((n) => n.text).join(" ");
-    item.append(el("span", "library-sample", sample ?? ""), el("span", "library-name", script.name));
+    // A small taste, like the writing systems' first letter: the full set lives on the World Script's page.
+    const sample = script.kind === "writing" ? script.characters[0]?.text : script.numerals.slice(0, 3).map((n) => n.text).join(" ");
+    item.append(el("span", `library-sample library-sample-${script.kind}`, sample ?? ""), el("span", "library-name", script.name));
     item.addEventListener("click", () => go({ name: "worldScript", scriptId: script.id }));
     list.append(item);
   }

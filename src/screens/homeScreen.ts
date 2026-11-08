@@ -1,3 +1,4 @@
+import { playTap } from "../sound/sound";
 import type { Section } from "../core/studioCore";
 import { el, type RenderScreen } from "./screen";
 import { SECTION_NAMES } from "./sectionNames";
@@ -17,7 +18,10 @@ export const homeScreen: RenderScreen = (root, _screen, { core, go }) => {
     const tile = el("button", `tile tile-${section}`);
     tile.type = "button";
     tile.append(el("span", "tile-art", TILE_ART[section]), el("span", "tile-name", SECTION_NAMES[section]));
-    tile.addEventListener("click", () => go({ name: section }));
+    tile.addEventListener("click", () => {
+      playTap();
+      go({ name: section });
+    });
     tiles.append(tile);
   }
   root.append(tiles);

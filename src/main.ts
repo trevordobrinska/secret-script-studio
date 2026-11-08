@@ -3,6 +3,8 @@ import { systemClock } from "./core/deps";
 import { createStudioCore } from "./core/studioCore";
 import { startRouter } from "./screens/router";
 import { indexedDbStudioStorage } from "./storage/indexedDbStudioStorage";
+import { startMuteButton } from "./sound/muteButton";
+import { startSound } from "./sound/sound";
 
 const core = createStudioCore({ storage: indexedDbStudioStorage(), clock: systemClock });
 
@@ -12,7 +14,9 @@ const homeButton = document.querySelector<HTMLElement>("#home-button")!;
 // Draw home straight away; nothing on it depends on saved data yet.
 // Screens that do should wait for `core.load()` (it never rejects).
 startRouter(core, root, homeButton);
-void core.load();
+startSound(() => core.settings().muted);
+const muteButton = document.querySelector<HTMLButtonElement>("#mute-button")!;
+void core.load().then(() => startMuteButton(core, muteButton));
 
 registerServiceWorker();
 

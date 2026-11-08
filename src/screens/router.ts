@@ -1,3 +1,4 @@
+import { playTap } from "../sound/sound";
 import type { Screen, StudioCore } from "../core/studioCore";
 import { homeScreen } from "./homeScreen";
 import { placeholderScreen } from "./placeholderScreen";
@@ -43,6 +44,7 @@ export function startRouter(core: StudioCore, root: HTMLElement, homeButton: HTM
   }
 
   homeButton.addEventListener("click", () => {
+    playTap();
     core.goHome();
     render();
   });

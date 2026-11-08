@@ -1,0 +1,154 @@
+/*
+ * App-wide styles. Calm: soft paper background, one ink color, no flashing.
+ * Layout is fixed: the home button sits in the same corner on every screen,
+ * and every screen keeps its content clear of the top bar (--bar).
+ * A screen's own styles go in a CSS file next to it, imported by that screen.
+ */
+:root {
+  --paper: #f6efe0;
+  --card: #fffaf0;
+  --ink: #2f3a56;
+  --soft-ink: #6b7390;
+  --line: #d9cfb8;
+  --my-scripts: #f2c6a0;
+  --library: #b9d7c4;
+  --number-explorer: #bccbe8;
+  --bar: 104px; /* top bar height, home button lives in it */
+  --gap: 16px;
+  font-family: "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
+  color: var(--ink);
+  background: var(--paper);
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  touch-action: manipulation;
+  cursor: pointer;
+}
+
+/* Every screen fills the window below the top bar's padding. */
+#screen {
+  position: fixed;
+  inset: 0;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* The shared home button: fixed top-left, above every screen. */
+#home-button {
+  position: fixed;
+  top: calc(var(--gap) + env(safe-area-inset-top));
+  left: calc(var(--gap) + env(safe-area-inset-left));
+  z-index: 10;
+  width: 72px;
+  height: 72px;
+  padding: 10px;
+  border: 3px solid var(--ink);
+  border-radius: 20px;
+  background: var(--card);
+  box-shadow: 0 4px 0 var(--ink);
+  transition: transform 80ms ease-out, box-shadow 80ms ease-out;
+}
+#home-button svg {
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+#home-button:active,
+.tile:active {
+  transform: translateY(4px);
+  box-shadow: 0 0 0 var(--ink);
+}
+
+/* Titles sit in the top bar, centered, so they never collide with the home button. */
+.home-title,
+.screen-title {
+  margin: 0;
+  height: var(--bar);
+  line-height: var(--bar);
+  font-size: 36px;
+  text-align: center;
+}
+
+/* Home: three big tiles that never move. Row in landscape, column in portrait. */
+.home-tiles {
+  flex: 1;
+  width: 100%;
+  max-width: 1200px;
+  box-sizing: border-box;
+  padding: var(--gap) calc(var(--gap) * 2) calc(var(--gap) * 3);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: calc(var(--gap) * 2);
+}
+@media (orientation: portrait) {
+  .home-tiles {
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(3, 1fr);
+  }
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  border: 4px solid var(--ink);
+  border-radius: 28px;
+  box-shadow: 0 6px 0 var(--ink);
+  transition: transform 80ms ease-out, box-shadow 80ms ease-out;
+}
+.tile-myScripts {
+  background: var(--my-scripts);
+}
+.tile-library {
+  background: var(--library);
+}
+.tile-numberExplorer {
+  background: var(--number-explorer);
+}
+.tile-art {
+  font-size: 72px;
+  line-height: 1;
+}
+.tile-name {
+  font-size: 32px;
+  font-weight: bold;
+}
+
+.placeholder {
+  margin: auto;
+  font-size: 28px;
+  color: var(--soft-ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}

@@ -1,0 +1,97 @@
+/* Library: list of World Scripts and each World Script's page. */
+.library-list,
+.world-script-page {
+  position: absolute;
+  inset: var(--bar) 0 0 0;
+  overflow-y: auto;
+  padding: var(--gap) calc(var(--gap) * 2) calc(var(--gap) * 3);
+}
+
+.library-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--gap);
+  align-content: start;
+}
+
+.library-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-height: 160px;
+  padding: var(--gap);
+  border: 2px solid var(--line);
+  border-radius: 20px;
+  background: var(--card);
+  color: var(--ink);
+  font: inherit;
+}
+
+.library-item:active {
+  background: var(--library);
+}
+
+.library-sample {
+  font-size: 56px;
+  line-height: 1.2;
+}
+
+.library-name {
+  font-size: 24px;
+}
+
+.library-back {
+  min-height: 56px;
+  padding: 0 20px;
+  margin-bottom: var(--gap);
+  border: 2px solid var(--line);
+  border-radius: 16px;
+  background: var(--card);
+  color: var(--ink);
+  font: inherit;
+  font-size: 22px;
+}
+
+.world-heading {
+  margin: calc(var(--gap) * 2) 0 var(--gap);
+  font-size: 28px;
+}
+
+.world-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: var(--gap);
+}
+
+.world-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px;
+  border: 2px solid var(--line);
+  border-radius: 16px;
+  background: var(--card);
+  text-align: center;
+}
+
+.world-char {
+  font-size: 64px;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.world-name {
+  font-size: 22px;
+}
+
+.world-sound,
+.world-value {
+  font-size: 22px;
+  color: var(--soft-ink);
+}
+
+.world-value {
+  font-size: 32px;
+  color: var(--ink);
+}

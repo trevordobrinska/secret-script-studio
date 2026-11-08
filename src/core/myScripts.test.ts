@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { GLYPH_SLOTS, slotLabel } from "./myScript";
-import { inMemoryStudioStorage } from "./studioStorage";
+import { inMemoryStudioStorage, type StudioStorage } from "./studioStorage";
 import {
   A_DAY,
   A_DOWN_STROKE,
@@ -134,6 +134,16 @@ describe("My Scripts are saved on the tablet", () => {
     expect(reopened.myScripts()).toEqual([studio.myScript(script.id)]);
     expect(reopened.myScript(script.id)?.glyphs.I?.strokes).toEqual([AN_ACROSS_STROKE]);
     expect(reopened.missingSlots(script.id)).toHaveLength(GLYPH_SLOTS.length - 2);
+  });
+
+  it("if storage can't be written, his Glyph still stays for this visit", async () => {
+    const full: StudioStorage = {
+      ...inMemoryStudioStorage(),
+      saveMyScript: () => Promise.reject(new Error("storage is full")),
+    };
+    const { studio, script } = await studioWithMyScript({ storage: full, drawn: ["H"] });
+    await expect(studio.saved()).resolves.toBeUndefined();
+    expect(studio.missingSlots(script.id)).not.toContain("H");
   });
 
   it("a My Script made after reopening gets its own id", async () => {

@@ -1,5 +1,7 @@
 import type { Clock } from "./deps";
-import type { SettingsRecord, StudioStorage } from "./studioStorage";
+import { LIBRARY } from "./library/catalog";
+import type { WorldScript } from "./library/worldScript";
+import { SETTINGS_SCHEMA_VERSION, type SettingsRecord, type StudioStorage } from "./studioStorage";
 import { createMyScriptBook, type MyScriptCommands } from "./myScriptBook";
 import type { GlyphSlot } from "./myScript";
 
@@ -21,12 +23,15 @@ const HOME_TILES: readonly Section[] = ["myScripts", "library", "numberExplorer"
 export type Screen =
   | { readonly name: "home" }
   | { readonly name: Section }
+  | { readonly name: "worldScript"; readonly scriptId: string }
   /** Making a new My Script: name, ink and stroke width. */
   | { readonly name: "newMyScript" }
   /** A My Script's grid of Glyph slots. */
   | { readonly name: "glyphGrid"; readonly scriptId: string }
   /** The Glyph canvas, drawing one slot of a My Script. */
   | { readonly name: "glyphCanvas"; readonly scriptId: string; readonly slot: GlyphSlot };
+
+export type { WorldCharacter, WorldNumeral, WorldScript } from "./library/worldScript";
 
 /** The Settings as the screens see them. */
 export interface SettingsView {
@@ -55,29 +60,35 @@ export interface StudioCore extends MyScriptCommands {
    */
   load(): Promise<void>;
   settings(): SettingsView;
-  /** Settles once everything changed so far is saved. Rejects if saving failed. */
+  /** The Library's World Scripts, in list order. Read-only. */
+  library(): readonly WorldScript[];
+  /** One World Script by id, or undefined if there is none. */
+  worldScript(id: string): WorldScript | undefined;
+  /** Turns the sounds off (true) or on (false). Remembered across reloads. */
+  setMuted(muted: boolean): void;
+  /** Resolves once every save started so far has finished (or failed and been logged). */
   saved(): Promise<void>;
 }
 
 export function createStudioCore({ storage, clock }: StudioCoreDeps): StudioCore {
   let current: Screen = { name: "home" };
   let settings: SettingsView = DEFAULT_SETTINGS;
+  let pending: Promise<void> = Promise.resolve();
 
-  // Commands change the core at once and save in the background, one write
-  // after another; one failing doesn't stop the next. `saved()` waits for them.
-  let saving: Promise<void> = Promise.resolve();
-  function store(change: () => Promise<void>): void {
-    saving = saving.catch(() => {}).then(change);
-  }
-
+  // Commands change the core at once and save in the background on the one
+  // `pending` queue, one write after another; a failed write is logged and
+  // doesn't stop the next. `saved()` waits for them all.
   const myScriptBook = createMyScriptBook({
     clock,
-    save: (record) => store(() => storage.saveMyScript(record)),
+    save: (record) => {
+      pending = pending
+        .then(() => storage.saveMyScript(record))
+        .catch((error) => console.warn("Couldn't save a My Script.", error));
+    },
   });
 
   return {
     ...myScriptBook.commands,
-    saved: () => saving,
     screen: () => current,
     homeTiles: () => HOME_TILES,
     open(screen) {
@@ -100,7 +111,21 @@ export function createStudioCore({ storage, clock }: StudioCoreDeps): StudioCore
       }
     },
     settings: () => settings,
+    library: () => LIBRARY,
+    worldScript: (id) => LIBRARY.find((script) => script.id === id),
+    setMuted(muted) {
+      settings = { ...settings, muted };
+      saveSettings();
+    },
+    saved: () => pending,
   };
+
+  function saveSettings(): void {
+    const record: SettingsRecord = { schemaVersion: SETTINGS_SCHEMA_VERSION, ...settings };
+    pending = pending
+      .then(() => storage.saveSettings(record))
+      .catch((error) => console.warn("Couldn't save the Settings.", error));
+  }
 }
 
 function settingsFrom(record: SettingsRecord): SettingsView {

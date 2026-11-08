@@ -1,5 +1,7 @@
+import { playTap } from "../sound/sound";
 import type { Screen, StudioCore } from "../core/studioCore";
 import { homeScreen } from "./homeScreen";
+import { libraryScreen, worldScriptScreen } from "./libraryScreens";
 import { placeholderScreen } from "./placeholderScreen";
 import { myScriptsScreen } from "./myScriptsScreen";
 import { newMyScriptScreen } from "./newMyScriptScreen";
@@ -15,7 +17,8 @@ import type { RenderScreen, ScreenContext } from "./screen";
 const SCREENS: { [N in Screen["name"]]: RenderScreen<Extract<Screen, { name: N }>> } = {
   home: homeScreen,
   myScripts: myScriptsScreen,
-  library: placeholderScreen,
+  library: libraryScreen,
+  worldScript: worldScriptScreen,
   numberExplorer: placeholderScreen,
   newMyScript: newMyScriptScreen,
   glyphGrid: glyphGridScreen,
@@ -50,6 +53,7 @@ export function startRouter(core: StudioCore, root: HTMLElement, homeButton: HTM
   }
 
   homeButton.addEventListener("click", () => {
+    playTap();
     core.goHome();
     render();
   });

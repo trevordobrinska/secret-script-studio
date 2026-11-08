@@ -1,5 +1,5 @@
 import "./numberStacks.css";
-import { NUMBER_MAX, type NumberColumn, type NumberExplorerView } from "../core/numberExplorer";
+import { type NumberColumn, type NumberExplorerView } from "../core/numberExplorer";
 import { el } from "./screen";
 
 /**
@@ -61,7 +61,7 @@ export function stacksRow(): StacksRow {
       const layouts = new Map<number, PileLayout>();
       let cap = MAX_BLOCK;
       for (const column of [...view.columns].sort((a, b) => a.place - b.place)) {
-        const layout = pileLayout(view.digitCount, column.place, columnWidth, height, cap);
+        const layout = pileLayout(view.digitCount, column, columnWidth, height, cap);
         layouts.set(column.place, layout);
         cap = Math.max(layout.scale, 0.5);
       }
@@ -76,11 +76,11 @@ function pile(view: NumberExplorerView, column: NumberColumn, width: number, hei
   box.style.setProperty("--place", placeColor(column.place));
   if (width < 8 || height < 8) return box;
 
-  const base = view.digitCount;
-  const old = previousItems(view, column);
+  const { digitCount } = view;
+  const old = column.previousItemCount;
 
   for (let i = 0; i < column.itemCount; i++) {
-    const item = itemCanvas(base, column.place, slots[i]);
+    const item = itemCanvas(digitCount, column.place, slots[i]);
     if (view.lastStep && column.changed) {
       if (column.rolledOver) {
         // On − a bigger item split into these: they spring out from the left.
@@ -98,11 +98,11 @@ function pile(view: NumberExplorerView, column: NumberColumn, width: number, hei
   if (view.lastStep && column.changed) {
     if (column.rolledOver && view.lastStep === "up") {
       // The full pile snaps together and slides off to the left.
-      for (let i = 0; i < old; i++) box.append(ghost(base, column.place, slots[i], "ne-st-combine-out"));
+      for (let i = 0; i < old; i++) box.append(ghost(digitCount, column.place, slots[i], "ne-st-combine-out"));
     } else if (!column.rolledOver && view.lastStep === "down") {
       // One item breaks apart into the next column (or just goes, for a block).
       const into = column.place > 0 ? "ne-st-split-out" : "ne-st-pop-out";
-      box.append(ghost(base, column.place, slots[column.itemCount], into));
+      box.append(ghost(digitCount, column.place, slots[column.itemCount], into));
     }
   }
   return box;
@@ -113,15 +113,8 @@ function rolledRight(view: NumberExplorerView, column: NumberColumn): boolean {
   return view.columns.some((c) => c.place === column.place - 1 && c.rolledOver);
 }
 
-/** How many items the column had before the last step. */
-function previousItems(view: NumberExplorerView, column: NumberColumn): number {
-  if (!view.lastStep || !column.changed) return column.itemCount;
-  if (view.lastStep === "up") return column.rolledOver ? view.digitCount - 1 : column.value - 1;
-  return column.rolledOver ? 0 : column.value + 1;
-}
-
-function ghost(base: number, place: number, slot: Slot | undefined, animation: string): HTMLElement {
-  const g = itemCanvas(base, place, slot);
+function ghost(digitCount: number, place: number, slot: Slot | undefined, animation: string): HTMLElement {
+  const g = itemCanvas(digitCount, place, slot);
   g.classList.add("ne-st-ghost", animation);
   g.addEventListener("animationend", () => g.remove());
   setTimeout(() => g.remove(), SNAP_MS + 200);
@@ -140,8 +133,8 @@ interface Slot {
  * up (1 wide, Digit Count tall), a Stack of Stacks lies them side by side
  * (a square), the next stands those up, and so on.
  */
-function itemShape(base: number, place: number): { w: number; h: number } {
-  return { w: base ** Math.floor(place / 2), h: base ** Math.ceil(place / 2) };
+function itemShape(digitCount: number, place: number): { w: number; h: number } {
+  return { w: digitCount ** Math.floor(place / 2), h: digitCount ** Math.ceil(place / 2) };
 }
 
 interface PileLayout {
@@ -152,13 +145,13 @@ interface PileLayout {
 
 /**
  * Where each item of a pile goes, with at most `maxScale` pixels per block.
- * The grid is laid out for the most items the column can ever hold below
- * NUMBER_MAX (Digit Count − 1, or fewer in the leftmost columns), so items
- * never move or resize while he counts; they fill it from the top, left to right.
+ * The grid is laid out for the most items the column can ever hold (the
+ * core's `maxItemCount`), so items never move or resize while he counts;
+ * they fill it from the top, left to right.
  */
-function pileLayout(base: number, place: number, width: number, height: number, maxScale: number): PileLayout {
-  const capacity = Math.max(1, Math.min(base - 1, Math.floor(NUMBER_MAX / base ** place)));
-  const shape = itemShape(base, place);
+function pileLayout(digitCount: number, column: NumberColumn, width: number, height: number, maxScale: number): PileLayout {
+  const capacity = Math.max(1, column.maxItemCount);
+  const shape = itemShape(digitCount, column.place);
   let best = { scale: 0, across: 1, rows: 1 };
   for (let across = 1; across <= capacity; across++) {
     const rows = Math.ceil(capacity / across);
@@ -182,7 +175,7 @@ function pileLayout(base: number, place: number, width: number, height: number, 
   return { slots, scale };
 }
 
-function itemCanvas(base: number, place: number, slot: Slot | undefined): HTMLCanvasElement {
+function itemCanvas(digitCount: number, place: number, slot: Slot | undefined): HTMLCanvasElement {
   const canvas = document.createElement("canvas");
   canvas.className = "ne-item";
   if (!slot) return canvas;
@@ -192,7 +185,7 @@ function itemCanvas(base: number, place: number, slot: Slot | undefined): HTMLCa
   Object.assign(canvas.style, { left: `${slot.x}px`, top: `${slot.y}px`, width: `${slot.w}px`, height: `${slot.h}px` });
   const ctx = canvas.getContext("2d")!;
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  paintItem(ctx, base, place, 0, 0, slot.w, slot.h);
+  paintItem(ctx, digitCount, place, 0, 0, slot.w, slot.h);
   return canvas;
 }
 
@@ -202,7 +195,7 @@ function itemCanvas(base: number, place: number, slot: Slot | undefined): HTMLCa
  * odd places, side by side on even ones). Parts too small to see are filled
  * with the smaller items' color instead of being drawn one by one.
  */
-function paintItem(ctx: CanvasRenderingContext2D, base: number, place: number, x: number, y: number, w: number, h: number): void {
+function paintItem(ctx: CanvasRenderingContext2D, digitCount: number, place: number, x: number, y: number, w: number, h: number): void {
   const color = placeColor(place);
   if (place === 0) {
     const inset = Math.min(w, h) > 8 ? 1 : 0.25;
@@ -222,16 +215,16 @@ function paintItem(ctx: CanvasRenderingContext2D, base: number, place: number, x
   const ih = h - 2 * pad;
   const upright = place % 2 === 1;
   const gap = pad / 2;
-  const partW = upright ? iw : (iw - (base - 1) * gap) / base;
-  const partH = upright ? (ih - (base - 1) * gap) / base : ih;
+  const partW = upright ? iw : (iw - (digitCount - 1) * gap) / digitCount;
+  const partH = upright ? (ih - (digitCount - 1) * gap) / digitCount : ih;
   if (Math.min(partW, partH) < MIN_PART) {
     // Too small to draw block by block: the smaller items' color, with lines where they meet if those still show.
     ctx.fillStyle = placeColor(place - 1);
     ctx.fillRect(ix, iy, iw, ih);
-    const step = upright ? ih / base : iw / base;
+    const step = upright ? ih / digitCount : iw / digitCount;
     if (step >= 1.2) {
       ctx.fillStyle = color;
-      for (let i = 1; i < base; i++) {
+      for (let i = 1; i < digitCount; i++) {
         const line = step >= 2 ? 1 : 0.5;
         if (upright) ctx.fillRect(ix, iy + i * step - line / 2, iw, line);
         else ctx.fillRect(ix + i * step - line / 2, iy, line, ih);
@@ -239,10 +232,10 @@ function paintItem(ctx: CanvasRenderingContext2D, base: number, place: number, x
     }
     return;
   }
-  for (let i = 0; i < base; i++) {
+  for (let i = 0; i < digitCount; i++) {
     const px = upright ? ix : ix + i * (partW + gap);
     const py = upright ? iy + i * (partH + gap) : iy;
-    paintItem(ctx, base, place - 1, px, py, partW, partH);
+    paintItem(ctx, digitCount, place - 1, px, py, partW, partH);
   }
 }
 

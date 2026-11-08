@@ -65,6 +65,8 @@ export type Screen =
   | { readonly name: "share"; readonly scriptId: string; readonly text: string; readonly returnTo?: Screen };
 
 export type { SharedMessage } from "./sharing";
+export type { MessageCell, MessageLayout } from "./messageLayout";
+export type { ScriptLook } from "./myScript";
 export type { CipherKeyEntry, PrintLayout, PrintOptions } from "./printing";
 export type { WorldCharacter, WorldNumeral, WorldScript } from "./library/worldScript";
 
@@ -117,16 +119,18 @@ export function createStudioCore({ storage, clock }: StudioCoreDeps): StudioCore
   let settings: SettingsView = DEFAULT_SETTINGS;
   let pending: Promise<void> = Promise.resolve();
 
-  // Commands change the core at once and save in the background on the one
-  // `pending` queue, one write after another; a failed write is logged and
-  // doesn't stop the next. `saved()` waits for them all.
+  /**
+   * Commands change the core at once and save in the background on the one
+   * `pending` queue, one write after another; a failed write is logged with
+   * `failure` and doesn't stop the next. `saved()` waits for them all.
+   */
+  function queueSave(write: () => Promise<void>, failure: string): void {
+    pending = pending.then(write).catch((error) => console.warn(failure, error));
+  }
+
   const myScriptBook = createMyScriptBook({
     clock,
-    save: (record) => {
-      pending = pending
-        .then(() => storage.saveMyScript(record))
-        .catch((error) => console.warn("Couldn't save a My Script.", error));
-    },
+    save: (record) => queueSave(() => storage.saveMyScript(record), "Couldn't save a My Script."),
     remove: (scriptId) => myScriptDeleted(scriptId),
   });
 
@@ -138,16 +142,8 @@ export function createStudioCore({ storage, clock }: StudioCoreDeps): StudioCore
     clock,
     myScript: myScriptBook.commands.myScript,
     writing,
-    save: (record) => {
-      pending = pending
-        .then(() => storage.saveMessage(record))
-        .catch((error) => console.warn("Couldn't save a Message.", error));
-    },
-    remove: (id) => {
-      pending = pending
-        .then(() => storage.deleteMessage(id))
-        .catch((error) => console.warn("Couldn't delete a Message.", error));
-    },
+    save: (record) => queueSave(() => storage.saveMessage(record), "Couldn't save a Message."),
+    remove: (id) => queueSave(() => storage.deleteMessage(id), "Couldn't delete a Message."),
   });
 
   const numberExplorer = createNumberExplorer({
@@ -212,7 +208,9 @@ export function createStudioCore({ storage, clock }: StudioCoreDeps): StudioCore
       if (!contents) return { ok: false, reason: "unreadable" };
       myScriptBook.restored(contents.myScripts);
       diary.restored(contents.messages);
-      settings = contents.settings;
+      // Nothing on this tablet is lost: its sound stays as it is, and the
+      // hint counts as seen if either the tablet or the file has seen it.
+      settings = { ...settings, numberHintSeen: settings.numberHintSeen || contents.settings.numberHintSeen };
       saveSettings();
       return { ok: true, myScripts: contents.myScripts.length, messages: contents.messages.length };
     },
@@ -221,17 +219,15 @@ export function createStudioCore({ storage, clock }: StudioCoreDeps): StudioCore
   /** A My Script was deleted: its Messages (and its draft) go with it. */
   function myScriptDeleted(scriptId: string): void {
     diary.myScriptDeleted(scriptId);
-    pending = pending
-      .then(() => storage.deleteMyScript(scriptId))
-      .then(() => storage.deleteMessagesOfMyScript(scriptId))
-      .catch((error) => console.warn("Couldn't delete a My Script.", error));
+    queueSave(async () => {
+      await storage.deleteMyScript(scriptId);
+      await storage.deleteMessagesOfMyScript(scriptId);
+    }, "Couldn't delete a My Script.");
   }
 
   function saveSettings(): void {
     const record: SettingsRecord = { schemaVersion: SETTINGS_SCHEMA_VERSION, ...settings };
-    pending = pending
-      .then(() => storage.saveSettings(record))
-      .catch((error) => console.warn("Couldn't save the Settings.", error));
+    queueSave(() => storage.saveSettings(record), "Couldn't save the Settings.");
   }
 }
 

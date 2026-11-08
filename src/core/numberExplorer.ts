@@ -29,6 +29,17 @@ export interface NumberColumn {
   /** How many items to draw for this column: `value` of them. */
   readonly itemCount: number;
   /**
+   * How many items the column had before the last + or − (the same as
+   * `itemCount` when it didn't change), so the Stacks can snap from there.
+   */
+  readonly previousItemCount: number;
+  /**
+   * The most items this column can ever hold while counting up to
+   * NUMBER_MAX (Digit Count − 1, or fewer in the leftmost columns), so its
+   * pile can be laid out once and never move.
+   */
+  readonly maxItemCount: number;
+  /**
    * How many blocks one item in this column is: Digit Count ^ place.
    * 1 = a loose block, Digit Count = a Stack, Digit Count² = a Stack of Stacks.
    */
@@ -188,6 +199,8 @@ export function createNumberExplorer({ clock, myScripts, hintSeen, markHintSeen 
         glyph: script?.glyphs[slot],
         leading: place >= used,
         itemCount: value,
+        previousItemCount: old,
+        maxItemCount: Math.min(top, Math.floor(NUMBER_MAX / digitCount ** place)),
         blocksPerItem: digitCount ** place,
         changed: old !== value,
         rolledOver,

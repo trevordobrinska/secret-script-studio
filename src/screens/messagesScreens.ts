@@ -52,13 +52,13 @@ export const messagesScreen: RenderScreen<{ name: "messages"; scriptId: string }
   function card(message: Message): HTMLElement {
     const open = button("", "msg-card");
     open.dataset.messageId = message.id;
-    const cells = core.messageLayout(scriptId, message.text);
+    const chars = Array.from(message.text);
     const preview = el("span", "msg-preview");
-    preview.append(messageView(cells.slice(0, PREVIEW_CELLS), script!, {
+    preview.append(messageView(core.messageLayout(scriptId, chars.slice(0, PREVIEW_CELLS).join("")), script!, {
       cellSize: PREVIEW_CELL,
       plainLetters: !core.secretMode(),
     }));
-    if (cells.length > PREVIEW_CELLS) preview.append(el("span", "msg-more", "…"));
+    if (chars.length > PREVIEW_CELLS) preview.append(el("span", "msg-more", "…"));
     open.append(preview, el("span", "msg-date", dayOf(message.createdAt)));
     open.addEventListener("click", () => {
       playTap();

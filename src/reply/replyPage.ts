@@ -6,7 +6,7 @@ import { el } from "../screens/screen";
 
 /** Glyph size on Dad's phone (a phone is about 360–430 CSS px wide). */
 const CELL = 44;
-/** A reply longer than this would be a letter, not a note. */
+/** A reply longer than this would be a letter, not a quick answer. */
 const MAX_REPLY = 400;
 
 /**
@@ -24,27 +24,27 @@ export async function startReplyPage(core: StudioCore, root: HTMLElement, link: 
 
 function replyPage(core: StudioCore, shared: SharedMessage): HTMLElement {
   const page = el("div", "rp-page");
-  document.title = `A secret note in ${shared.name}`;
+  document.title = `A secret Message in ${shared.name}`;
 
-  page.append(el("h1", "rp-title", "A secret note"), el("p", "rp-subtitle", `written in ${shared.name}`));
+  page.append(el("h1", "rp-title", "A secret Message"), el("p", "rp-subtitle", `written in ${shared.name}`));
 
   // The Message, letters hidden until Dad asks.
   let revealed = false;
-  const note = el("div", "rp-card rp-note");
+  const messageCard = el("div", "rp-card rp-note");
   const reveal = el("button", "rp-button", "Show the letters");
   reveal.type = "button";
-  const drawNote = () => {
-    note.replaceChildren(
+  const drawMessage = () => {
+    messageCard.replaceChildren(
       messageView(core.sharedLayout(shared, shared.text), shared, { cellSize: CELL, plainLetters: revealed }),
     );
     reveal.textContent = revealed ? "Hide the letters" : "Show the letters";
   };
   reveal.addEventListener("click", () => {
     revealed = !revealed;
-    drawNote();
+    drawMessage();
   });
-  drawNote();
-  page.append(note, reveal);
+  drawMessage();
+  page.append(messageCard, reveal);
 
   // Dad's reply, laid out live in the shared Glyphs.
   page.append(el("h2", "rp-heading", "Write back in his Glyphs"));
@@ -71,22 +71,22 @@ function replyPage(core: StudioCore, shared: SharedMessage): HTMLElement {
     el(
       "p",
       "rp-small",
-      "Dotted boxes are letters he hasn't drawn yet, or that weren't in his note. Hand him your phone to read it.",
+      "Dotted boxes are letters he hasn't drawn yet, or that weren't in his Message. Hand him your phone to read it.",
     ),
   );
 
-  // Printing, for when the tablet can't print: his note, or Dad's reply, each in his Glyphs.
+  // Printing, for when the tablet can't print: his Message, or Dad's reply, each in his Glyphs.
   const actions = el("div", "rp-actions");
-  const printNote = el("button", "rp-button", "Print his note");
-  printNote.type = "button";
-  printNote.addEventListener("click", () => printText(shared.text));
+  const printMessage = el("button", "rp-button", "Print his Message");
+  printMessage.type = "button";
+  printMessage.addEventListener("click", () => printText(shared.text));
   const printReply = el("button", "rp-button", "Print your reply");
   printReply.type = "button";
   printReply.addEventListener("click", () => printText(input.value));
   const updatePrintReply = () => (printReply.disabled = input.value.trim() === "");
   input.addEventListener("input", updatePrintReply);
   updatePrintReply();
-  actions.append(printNote, printReply);
+  actions.append(printMessage, printReply);
   page.append(actions);
 
   function printText(text: string): void {
@@ -102,7 +102,7 @@ function replyPage(core: StudioCore, shared: SharedMessage): HTMLElement {
 function couldntOpenPage(): HTMLElement {
   const page = el("div", "rp-page rp-couldnt");
   page.append(
-    el("h1", "rp-title", "This secret note couldn't be opened."),
+    el("h1", "rp-title", "This secret Message couldn't be opened."),
     el("p", "rp-subtitle", "The link may have been cut short. Ask for the code again and scan it once more."),
   );
   return page;

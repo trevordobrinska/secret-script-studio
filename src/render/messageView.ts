@@ -1,5 +1,5 @@
 import "./messageView.css";
-import { messageWords, type MessageCell } from "../core/messageLayout";
+import type { MessageCell, MessageLayout } from "../core/studioCore";
 import type { GlyphSlot } from "../core/myScript";
 import { glyphImage, type GlyphInk } from "./glyphRenderer";
 
@@ -19,12 +19,12 @@ export interface MessageViewOptions {
  * screen, and meant for the Reply page too (`look` can be a My Script or
  * a shared Message's ink and width).
  */
-export function messageView(cells: readonly MessageCell[], look: GlyphInk, options: MessageViewOptions): HTMLElement {
+export function messageView(layout: MessageLayout, look: GlyphInk, options: MessageViewOptions): HTMLElement {
   const { cellSize, onMissingGlyph, plainLetters = true } = options;
   const view = document.createElement("div");
   view.className = "mv-message";
   view.style.setProperty("--mv-cell", `${cellSize}px`);
-  for (const word of messageWords(cells)) {
+  for (const word of layout.words) {
     const w = document.createElement("span");
     w.className = "mv-word";
     for (const cell of word) w.append(cellView(cell));

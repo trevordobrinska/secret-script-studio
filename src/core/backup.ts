@@ -50,9 +50,11 @@ export interface BackupCommands {
   makeBackup(): BackupFile;
   /**
    * Reads a Backup file's text and merges it in by id: each My Script and
-   * Message in the file is added, or replaces the one with the same id; the
-   * file's Settings replace the current ones. Nothing else is deleted. If
-   * anything in the file is wrong, nothing at all changes.
+   * Message in the file is added, or replaces the one with the same id.
+   * The Settings are merged so nothing on the tablet is lost: mute stays as
+   * the tablet has it, and the Number Explorer hint counts as seen if the
+   * tablet or the file has seen it. Nothing else is deleted. If anything in
+   * the file is wrong, nothing at all changes.
    */
   restoreBackup(text: string): RestoreResult;
 }

@@ -1,6 +1,6 @@
 import "./styles.css";
 import { systemClock } from "./core/deps";
-import { createStudioCore } from "./core/studioCore";
+import { createStudioCore, type StudioCore } from "./core/studioCore";
 import { inMemoryStudioStorage } from "./core/studioStorage";
 import { startReplyPage } from "./reply/replyPage";
 import { startRouter } from "./screens/router";
@@ -12,8 +12,11 @@ const root = document.querySelector<HTMLElement>("#screen")!;
 const homeButton = document.querySelector<HTMLElement>("#home-button")!;
 const muteButton = document.querySelector<HTMLButtonElement>("#mute-button")!;
 
-// A link with a fragment is a shared Message: Reply mode (Dad's phone).
-if (location.hash.length > 1) startReplyMode();
+// Reply mode (Dad's phone) runs on a core with throwaway in-memory storage:
+// nothing is saved on his phone. That core also decides whether the address
+// is a share link at all; any other fragment starts the Studio as usual.
+const replyCore = createStudioCore({ storage: inMemoryStudioStorage(), clock: systemClock });
+if (replyCore.isShareLink(location.hash)) startReplyMode(replyCore);
 else startStudio();
 
 registerServiceWorker();
@@ -33,10 +36,9 @@ function startStudio(): void {
  * Reply mode: no IndexedDB, nothing saved on this phone (the core gets a
  * throwaway in-memory storage and never loads), no home or mute button.
  */
-function startReplyMode(): void {
+function startReplyMode(core: StudioCore): void {
   homeButton.hidden = true;
   muteButton.hidden = true;
-  const core = createStudioCore({ storage: inMemoryStudioStorage(), clock: systemClock });
   void startReplyPage(core, root, location.href);
   // Scanning another code while this page is open only changes the fragment.
   window.addEventListener("hashchange", () => location.reload());

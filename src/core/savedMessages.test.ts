@@ -153,16 +153,16 @@ describe("redrawing a Glyph", () => {
     const saved = writeAndSave(studio, script.id, "HI");
 
     studio.saveGlyph(script.id, "H", [AN_ACROSS_STROKE]);
-    const cells = studio.messageLayout(script.id, studio.message(saved.id)!.text);
+    const { cells } = studio.messageLayout(script.id, studio.message(saved.id)!.text);
     expect(cells[0]).toMatchObject({ kind: "glyph", slot: "H", glyph: { strokes: [AN_ACROSS_STROKE] } });
   });
 
   it("a Missing Glyph in a saved Message becomes a Glyph once he draws it", async () => {
     const { studio, script } = await studioWithMyScript({ drawn: ["H"] });
     const { text } = writeAndSave(studio, script.id, "HI");
-    expect(studio.messageLayout(script.id, text)[1]).toMatchObject({ kind: "missingGlyph", slot: "I" });
+    expect(studio.messageLayout(script.id, text).cells[1]).toMatchObject({ kind: "missingGlyph", slot: "I" });
     studio.saveGlyph(script.id, "I", [A_DOWN_STROKE]);
-    expect(studio.messageLayout(script.id, text)[1]).toMatchObject({ kind: "glyph", slot: "I" });
+    expect(studio.messageLayout(script.id, text).cells[1]).toMatchObject({ kind: "glyph", slot: "I" });
   });
 });
 

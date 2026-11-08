@@ -1,6 +1,5 @@
 import "./printSheet.css";
-import { messageWords, type MessageCell } from "../core/messageLayout";
-import type { PrintLayout } from "../core/studioCore";
+import type { MessageCell, PrintLayout } from "../core/studioCore";
 import { glyphSvg } from "./glyphRenderer";
 
 const SHEET_ID = "print-sheet";
@@ -25,9 +24,9 @@ export function printSheet(layout: PrintLayout): void {
 
 function messagePage(layout: PrintLayout): HTMLElement {
   const page = div("pr-page pr-message-page");
-  page.append(div("pr-caption", `A secret note in ${layout.name}`));
+  page.append(div("pr-caption", `A secret Message in ${layout.name}`));
   const message = div("pr-message");
-  for (const word of messageWords(layout.message)) {
+  for (const word of layout.message.words) {
     const w = div("pr-word");
     for (const cell of word) w.append(cellView(cell, layout));
     message.append(w);

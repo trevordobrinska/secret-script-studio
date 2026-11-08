@@ -1,13 +1,14 @@
-import { charForSlot, foldMessageText, layoutMessage, type MessageCell } from "./messageLayout";
+import { charForSlot, foldMessageText, layoutMessage, NO_LAYOUT, type MessageLayout } from "./messageLayout";
 import type { GlyphSlot, MyScript } from "./myScript";
 
 /** The Write screen part of the Studio core's interface. */
 export interface WritingCommands {
   /**
    * Message text laid out in a My Script's Glyphs, as they are now (so a
-   * redrawn Glyph shows its new shape). Empty for an unknown id.
+   * redrawn Glyph shows its new shape), with its words for wrapping.
+   * Empty for an unknown id.
    */
-  messageLayout(scriptId: string, text: string): readonly MessageCell[];
+  messageLayout(scriptId: string, text: string): MessageLayout;
   /**
    * The Message he is writing in a My Script, not saved yet (folded to
    * uppercase). It is kept while he goes off to draw a Glyph and comes
@@ -42,7 +43,7 @@ export function createWriting({ myScript }: WritingDeps): WritingCommands {
   return {
     messageLayout(scriptId, text) {
       const script = myScript(scriptId);
-      return script ? layoutMessage(text, script.glyphs) : [];
+      return script ? layoutMessage(text, script.glyphs) : NO_LAYOUT;
     },
     draft: (scriptId) => drafts.get(scriptId) ?? "",
     typeKey(scriptId, slot) {

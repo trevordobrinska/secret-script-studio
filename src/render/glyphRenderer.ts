@@ -1,10 +1,7 @@
-import type { Stroke } from "../core/myScript";
+import type { ScriptLook, Stroke } from "../core/myScript";
 
-/** How a Glyph's strokes look: the My Script's ink and stroke width (a fraction of the square). */
-export interface GlyphInk {
-  readonly ink: string;
-  readonly strokeWidth: number;
-}
+/** How a Glyph's strokes look: the ink and stroke width (a fraction of the square) of a ScriptLook. */
+export type GlyphInk = Pick<ScriptLook, "ink" | "strokeWidth">;
 
 /** A square on the canvas, in canvas pixels. */
 export interface Box {

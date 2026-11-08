@@ -1,5 +1,5 @@
 import "./digitCount.css";
-import { DIGIT_SLOTS, slotLabel } from "../core/myScript";
+import { DIGIT_SLOTS, slotLabel, type GlyphSlot } from "../core/myScript";
 import { DIGIT_COUNT_MAX, DIGIT_COUNT_MIN, NUMBER_MAX, type NumberExplorerView } from "../core/numberExplorer";
 import { glyphImage } from "../render/glyphRenderer";
 import { playKey, playTap } from "../sound/sound";
@@ -21,11 +21,14 @@ export interface DigitCountControl {
 }
 
 /**
- * "How many digits?": a row of his digit Glyphs (Missing ones as dotted boxes
- * he can tap to draw), Fewer / More buttons (2 to 16), a small "base N"
- * caption, the one-time "Try fewer digits!" hint, and a "Type a number"
- * button that opens a 0–9 keypad. After any change it calls `redraw`, so
- * the whole screen shows the new digits.
+ * "How many digits?": the row of all 16 digit positions is the control.
+ * His digits in use show as his Glyphs (Missing ones as dashed boxes with a
+ * pencil, tap to draw), the rest as faint ghost tiles: tap a ghost to add
+ * digits up to it, tap the last digit in use to take it away (2 to 16).
+ * Fewer / More buttons do the same one step at a time. Also a small
+ * "base N" caption, the one-time "Try fewer digits!" hint, and a "Type a
+ * number" button that opens a 0–9 keypad. After any change it calls
+ * `redraw`, so the whole screen shows the new digits.
  */
 export function digitCountControl({ core, go }: ScreenContext, redraw: () => void): DigitCountControl {
   const row = el("div", "dc-row");
@@ -47,12 +50,8 @@ export function digitCountControl({ core, go }: ScreenContext, redraw: () => voi
   line.append(fewer, tiles, more);
   row.append(top, line);
 
-  const changeBy = (delta: number) => {
-    if (core.setDigitCount(core.numberExplorer().digitCount + delta)) playTap();
-    redraw();
-  };
-  fewer.addEventListener("click", () => changeBy(-1));
-  more.addEventListener("click", () => changeBy(+1));
+  fewer.addEventListener("click", () => setCount(core.numberExplorer().digitCount - 1));
+  more.addEventListener("click", () => setCount(core.numberExplorer().digitCount + 1));
 
   const keypad = typeANumberKeypad((typed) => {
     core.enterNumber(typed);
@@ -64,36 +63,91 @@ export function digitCountControl({ core, go }: ScreenContext, redraw: () => voi
   });
 
   function draw(view: NumberExplorerView): void {
-    const { script, digitCount } = view;
+    const { digitCount } = view;
     caption.textContent = `base ${digitCount}`;
     hint.hidden = !view.hint;
     fewer.disabled = digitCount <= DIGIT_COUNT_MIN;
     more.disabled = digitCount >= DIGIT_COUNT_MAX;
-    tiles.replaceChildren(
-      ...DIGIT_SLOTS.slice(0, digitCount).map((slot) => {
-        const glyph = script?.glyphs[slot];
-        if (glyph && script) {
-          const tile = el("span", "dc-tile");
-          tile.append(glyphImage(glyph.strokes, script, TILE));
-          return tile;
-        }
-        // A Missing Glyph: a dotted box with the plain digit, tap to draw it.
-        const tile = el("button", "dc-tile missing", slotLabel(slot));
-        tile.type = "button";
-        tile.disabled = !script;
-        tile.setAttribute("aria-label", `Draw your ${slotLabel(slot)}`);
-        if (script) {
-          tile.addEventListener("click", () => {
-            playTap();
-            go({ name: "glyphCanvas", scriptId: script.id, slot, returnTo: { name: "numberExplorer" } });
-          });
-        }
-        return tile;
-      }),
-    );
+    tiles.replaceChildren(...DIGIT_SLOTS.slice(0, DIGIT_COUNT_MAX).map((slot, value) => digitTile(view, slot, value)));
+  }
+
+  /**
+   * One of the 16 digit positions. Active ones (below the Digit Count) are
+   * his Glyphs, or dashed Missing tiles with a pencil badge; the rest are
+   * faint ghost tiles. Tapping a ghost adds digits up to it; tapping the
+   * last active tile (it has a "−" badge) takes it away, down to 2.
+   * Missing digits are drawn by tapping them, or, on the last tile, its
+   * pencil badge.
+   */
+  function digitTile({ script, digitCount }: NumberExplorerView, slot: GlyphSlot, value: number): HTMLElement {
+    const label = slotLabel(slot);
+    const glyph = script?.glyphs[slot];
+    const active = value < digitCount;
+    const removable = value === digitCount - 1 && digitCount > DIGIT_COUNT_MIN;
+    const missing = active && !glyph;
+    const draw = () => {
+      if (!script) return;
+      playTap();
+      go({ name: "glyphCanvas", scriptId: script.id, slot, returnTo: { name: "numberExplorer" } });
+    };
+
+    const box = el("span", "dc-slot");
+    const tile = el("button", `dc-tile${active ? "" : " ghost"}${missing ? " missing" : ""}`);
+    tile.type = "button";
+    if (glyph && script) tile.append(glyphImage(glyph.strokes, script, TILE));
+    else tile.textContent = label;
+    box.append(tile);
+
+    if (!active) {
+      tile.setAttribute("aria-label", `Use digits up to ${label}`);
+      tile.addEventListener("click", () => setCount(value + 1));
+    } else if (removable) {
+      tile.setAttribute("aria-label", `Take away the ${label}`);
+      tile.addEventListener("click", () => setCount(value));
+      box.append(badge("dc-badge dc-remove", "−"));
+    } else if (missing) {
+      tile.setAttribute("aria-label", `Draw your ${label}`);
+      tile.disabled = !script;
+      tile.addEventListener("click", draw);
+    } else {
+      // A drawn digit in the middle: nothing to do, so it isn't a button.
+      tile.disabled = true;
+      tile.classList.add("still");
+      tile.setAttribute("aria-label", `Your ${label}`);
+    }
+
+    if (missing && script) {
+      // The pencil says "draw me". On the last tile (where a tap takes it away) it's its own button.
+      const pencil = removable ? el("button", "dc-badge dc-draw") : badge("dc-badge dc-draw", "");
+      pencil.innerHTML = PENCIL;
+      if (pencil instanceof HTMLButtonElement) {
+        pencil.type = "button";
+        pencil.setAttribute("aria-label", `Draw your ${label}`);
+        pencil.addEventListener("click", draw);
+      }
+      box.append(pencil);
+    }
+    return box;
+  }
+
+  function setCount(count: number): void {
+    if (core.setDigitCount(count)) playTap();
+    redraw();
   }
 
   return { row, keypad: keypad.element, draw };
+}
+
+/** A small pencil, drawn as SVG so it looks the same on every tablet. */
+const PENCIL =
+  '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20l1.2-4.6L16 4.6a2 2 0 0 1 2.8 0l.6.6a2 2 0 0 1 0 2.8L8.6 18.8z" ' +
+  'fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/></svg>';
+
+/** A decorative corner badge on a digit tile. */
+function badge(className: string, text: string): HTMLElement {
+  const b = el("span", className, text);
+  b.setAttribute("aria-hidden", "true");
+  return b;
 }
 
 /** The 0–9 keypad dialog. `onEnter` gets the regular number he typed. */

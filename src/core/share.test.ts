@@ -64,7 +64,7 @@ describe("sharing a Message by link", () => {
 
   it("letters he hasn't drawn yet still show as Missing Glyphs on Dad's side", async () => {
     const { studio, message } = await shareAndOpen(["H", "I", "M"], "HI MOM");
-    expect(shapes(studio.sharedLayout(message, message.text))).toEqual([
+    expect(shapes(studio.sharedLayout(message, message.text).cells)).toEqual([
       "glyph:H",
       "glyph:I",
       "gap: ",
@@ -212,10 +212,37 @@ describe("links that can't be opened", () => {
   });
 });
 
+describe("when the app opens in Reply mode", () => {
+  it("a share link opens Reply mode, as the whole address or just its fragment", async () => {
+    const { link, studio } = await shareAndOpen(["H"], "HI");
+    expect(studio.isShareLink(link)).toBe(true);
+    expect(studio.isShareLink(link.slice(link.indexOf("#")))).toBe(true);
+  });
+
+  it("a broken or newer-version share link still opens Reply mode, which then says it couldn't be opened", async () => {
+    const { studio } = await studioWithMyScript();
+    expect(studio.isShareLink("#m1.")).toBe(true);
+    expect(studio.isShareLink("#m1.abc$%^")).toBe(true);
+    expect(studio.isShareLink("#m2.SGVsbG8")).toBe(true);
+  });
+
+  it.each([
+    ["no fragment", ""],
+    ["just a #", "#"],
+    ["the app's own address", APP],
+    ["some other fragment", "#hello"],
+    ["a fragment that only starts with m", "#menu"],
+    ["an anchor-like fragment", "#top"],
+  ])("%s starts the Studio as usual", async (_, link) => {
+    const { studio } = await studioWithMyScript();
+    expect(studio.isShareLink(link)).toBe(false);
+  });
+});
+
 describe("Dad's reply", () => {
   it("Dad's reply is laid out in the shared Glyphs; phone characters that aren't slots stay plain", async () => {
     const { studio, message } = await shareAndOpen(["H", "I", "space"], "HI HI");
-    expect(shapes(studio.sharedLayout(message, "hi Tom é!"))).toEqual([
+    expect(shapes(studio.sharedLayout(message, "hi Tom é!").cells)).toEqual([
       "glyph:H",
       "glyph:I",
       "glyph: ",
@@ -233,7 +260,7 @@ describe("Dad's reply", () => {
     const { studio: dadsPhone } = await studioWithMyScript();
     const opened = await dadsPhone.openShareLink(link);
     if (!opened.ok) throw new Error(opened.reason);
-    expect(shapes(dadsPhone.sharedLayout(opened.message, "hi"))).toEqual(["glyph:H", "glyph:I"]);
+    expect(shapes(dadsPhone.sharedLayout(opened.message, "hi").cells)).toEqual(["glyph:H", "glyph:I"]);
   });
 });
 

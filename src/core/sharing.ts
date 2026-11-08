@@ -1,6 +1,6 @@
-import { foldMessageText, layoutMessage, type MessageCell } from "./messageLayout";
+import { foldedMessageText, layoutMessage, type MessageLayout } from "./messageLayout";
 import type { MyScript } from "./myScript";
-import { glyphsUsed, packShareLink, unpackShareLink, type SharedMessage } from "./shareLink";
+import { glyphsUsed, isShareLink, packShareLink, unpackShareLink, type SharedMessage } from "./shareLink";
 
 export type { SharedMessage } from "./shareLink";
 
@@ -23,8 +23,15 @@ export interface SharingCommands {
   shareLink(scriptId: string, text: string, appAddress: string): Promise<ShareLinkResult>;
   /** Opens a share link (whole URL or fragment) into a read-only shared Message. Never throws. */
   openShareLink(link: string): Promise<OpenShareLinkResult>;
+  /**
+   * Whether a link (whole URL or fragment) looks like a share link, so the
+   * app should open in Reply mode. It only checks the shape (`#m<version>.…`);
+   * a broken or unknown-version share link still counts (Reply mode then
+   * says it couldn't be opened). Anything else starts the Studio as usual.
+   */
+  isShareLink(link: string): boolean;
   /** Text (the shared Message, or Dad's reply) laid out in a shared Message's Glyphs. */
-  sharedLayout(shared: SharedMessage, text: string): readonly MessageCell[];
+  sharedLayout(shared: SharedMessage, text: string): MessageLayout;
 }
 
 interface SharingDeps {
@@ -37,20 +44,13 @@ export function createSharing({ myScript }: SharingDeps): SharingCommands {
     async shareLink(scriptId, text, appAddress) {
       const script = myScript(scriptId);
       if (!script) return { ok: false, reason: "noScript" };
-      const folded = foldMessageText(text);
-      if (folded.trim() === "") return { ok: false, reason: "empty" };
-      return packShareLink(
-        {
-          name: script.name,
-          ink: script.ink,
-          strokeWidth: script.strokeWidth,
-          text: folded,
-          glyphs: glyphsUsed(folded, script.glyphs),
-        },
-        appAddress,
-      );
+      const folded = foldedMessageText(text);
+      if (folded === undefined) return { ok: false, reason: "empty" };
+      const { name, ink, strokeWidth } = script;
+      return packShareLink({ name, ink, strokeWidth, text: folded, glyphs: glyphsUsed(folded, script.glyphs) }, appAddress);
     },
     openShareLink: (link) => unpackShareLink(link),
+    isShareLink,
     sharedLayout: (shared, text) => layoutMessage(text, shared.glyphs),
   };
 }

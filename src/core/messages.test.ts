@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { layoutMessage, messageWords, type MessageCell } from "./messageLayout";
+import type { MessageCell } from "./messageLayout";
+import type { StudioCore } from "./studioCore";
 import { A_DOWN_STROKE, studioWithMyScript } from "./testing";
 
 /** The cells as short strings, so a story's layout reads at a glance. */
@@ -10,7 +11,7 @@ function shapes(cells: readonly MessageCell[]): string[] {
 describe("the Message layout", () => {
   it("he draws H and I, writes HI MOM, and the O shows as a Missing Glyph", async () => {
     const { studio, script } = await studioWithMyScript({ drawn: ["H", "I", "M"] });
-    const cells = studio.messageLayout(script.id, "HI MOM");
+    const { cells } = studio.messageLayout(script.id, "HI MOM");
     expect(shapes(cells)).toEqual([
       "glyph:H",
       "glyph:I",
@@ -25,24 +26,24 @@ describe("the Message layout", () => {
 
   it("an unknown My Script lays out nothing", async () => {
     const { studio } = await studioWithMyScript();
-    expect(studio.messageLayout("no-such-script", "HI")).toEqual([]);
+    expect(studio.messageLayout("no-such-script", "HI")).toEqual({ cells: [], words: [] });
   });
 });
 
 describe("folding and plain characters", () => {
   it("lowercase letters are folded to uppercase and use the same Glyphs", async () => {
     const { studio, script } = await studioWithMyScript({ drawn: ["H", "I"] });
-    expect(shapes(studio.messageLayout(script.id, "hi Hi"))).toEqual(["glyph:H", "glyph:I", "gap: ", "glyph:H", "glyph:I"]);
+    expect(shapes(studio.messageLayout(script.id, "hi Hi").cells)).toEqual(["glyph:H", "glyph:I", "gap: ", "glyph:H", "glyph:I"]);
   });
 
   it("characters that aren't Glyph slots, like Dad's é or @, stay plain characters", async () => {
     const { studio, script } = await studioWithMyScript({ drawn: ["A"] });
-    expect(shapes(studio.messageLayout(script.id, "é@a😀"))).toEqual(["plain:é", "plain:@", "glyph:A", "plain:😀"]);
+    expect(shapes(studio.messageLayout(script.id, "é@a😀").cells)).toEqual(["plain:é", "plain:@", "glyph:A", "plain:😀"]);
   });
 
   it("digits and the marks . , ? ! are Glyph slots too", async () => {
     const { studio, script } = await studioWithMyScript({ drawn: ["7", "?"] });
-    expect(shapes(studio.messageLayout(script.id, "7!?."))).toEqual([
+    expect(shapes(studio.messageLayout(script.id, "7!?.").cells)).toEqual([
       "glyph:7",
       "missingGlyph:!",
       "glyph:?",
@@ -52,7 +53,7 @@ describe("folding and plain characters", () => {
 
   it("a space he has drawn a Glyph for shows that Glyph instead of a gap", async () => {
     const { studio, script } = await studioWithMyScript({ drawn: ["space"] });
-    expect(studio.messageLayout(script.id, "A B")[1]).toEqual({
+    expect(studio.messageLayout(script.id, "A B").cells[1]).toEqual({
       kind: "glyph",
       slot: "space",
       char: " ",
@@ -62,23 +63,24 @@ describe("folding and plain characters", () => {
 
   it("new lines from Dad's keyboard become ordinary gaps", async () => {
     const { studio, script } = await studioWithMyScript();
-    expect(shapes(studio.messageLayout(script.id, "A\nB"))).toEqual(["missingGlyph:A", "gap: ", "missingGlyph:B"]);
+    expect(shapes(studio.messageLayout(script.id, "A\nB").cells)).toEqual(["missingGlyph:A", "gap: ", "missingGlyph:B"]);
   });
 });
 
 describe("Glyphs change live in the layout", () => {
   it("after he draws the Missing O, the same Message shows his new O", async () => {
     const { studio, script } = await studioWithMyScript({ drawn: ["M"] });
-    expect(studio.messageLayout(script.id, "MOM")[1].kind).toBe("missingGlyph");
+    expect(studio.messageLayout(script.id, "MOM").cells[1].kind).toBe("missingGlyph");
     studio.saveGlyph(script.id, "O", [A_DOWN_STROKE]);
-    expect(studio.messageLayout(script.id, "MOM")[1]).toMatchObject({ kind: "glyph", slot: "O" });
+    expect(studio.messageLayout(script.id, "MOM").cells[1]).toMatchObject({ kind: "glyph", slot: "O" });
   });
 });
 
 describe("laying out with a shared set of Glyphs", () => {
-  it("works the same with Glyphs that came from somewhere else, like a share link", () => {
-    const glyphs = { H: { strokes: [A_DOWN_STROKE], updatedAt: 0 } };
-    expect(shapes(layoutMessage("hi you", glyphs))).toEqual([
+  it("works the same with Glyphs that came from somewhere else, like a share link", async () => {
+    const { studio } = await studioWithMyScript();
+    const shared = { name: "Sky Runes", ink: "#3b6fd1", strokeWidth: 0.07, text: "HI", glyphs: { H: { strokes: [A_DOWN_STROKE], updatedAt: 0 } } };
+    expect(shapes(studio.sharedLayout(shared, "hi you").cells)).toEqual([
       "glyph:H",
       "missingGlyph:I",
       "gap: ",
@@ -90,11 +92,33 @@ describe("laying out with a shared set of Glyphs", () => {
 });
 
 describe("wrapping a Message into words", () => {
-  it("each word stays together, and each space is its own piece to break at", () => {
-    const words = messageWords(layoutMessage("HI  MOM", {}));
+  it("each word stays together, and each space is its own piece to break at", async () => {
+    const { studio, script } = await studioWithMyScript({ drawn: ["H"] });
+    const { words } = studio.messageLayout(script.id, "HI  MOM");
     expect(words.map((w) => w.map((c) => c.char).join(""))).toEqual(["HI", " ", " ", "MOM"]);
   });
+
+  it("a space he has drawn a Glyph for is still a place to break the line", async () => {
+    const { studio, script } = await studioWithMyScript({ drawn: ["space"] });
+    const { words } = studio.messageLayout(script.id, "A B");
+    expect(words.map((w) => w.map((c) => c.kind))).toEqual([["missingGlyph"], ["glyph"], ["missingGlyph"]]);
+  });
+
+  it("the printout and the Reply page wrap the same way", async () => {
+    const { studio, script } = await studioWithMyScript({ drawn: ["H", "I"] });
+    const print = studio.printLayout(script.id, "HI MOM", { cipherKey: false });
+    expect(print.ok && print.layout.message.words.map((w) => w.length)).toEqual([2, 1, 3]);
+    const opened = await studio.openShareLink((await linkFor(studio, script.id, "HI MOM")));
+    if (!opened.ok) throw new Error("couldn't open the link");
+    expect(studio.sharedLayout(opened.message, "HI MOM").words.map((w) => w.length)).toEqual([2, 1, 3]);
+  });
 });
+
+async function linkFor(studio: StudioCore, scriptId: string, text: string): Promise<string> {
+  const shared = await studio.shareLink(scriptId, text, "https://example.test/");
+  if (!shared.ok) throw new Error(`couldn't share: ${shared.reason}`);
+  return shared.link;
+}
 
 describe("typing on the Glyph keyboard", () => {
   it("he types H, I, space, M, O, M and the draft reads HI MOM", async () => {
@@ -122,7 +146,7 @@ describe("typing on the Glyph keyboard", () => {
     studio.saveGlyph(script.id, "O", [A_DOWN_STROKE]);
     studio.open(write);
     expect(studio.draft(script.id)).toBe("O");
-    expect(studio.messageLayout(script.id, studio.draft(script.id))[0].kind).toBe("glyph");
+    expect(studio.messageLayout(script.id, studio.draft(script.id)).cells[0].kind).toBe("glyph");
   });
 
   it("each My Script has its own draft", async () => {

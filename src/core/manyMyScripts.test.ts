@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-import { GLYPH_SLOTS } from "./myScript";
 import { inMemoryStudioStorage } from "./studioStorage";
 import { A_DAY, A_DOWN_STROKE, fakeClock, loadedStudio, studioWithMyScript } from "./testing";
 
@@ -22,6 +21,12 @@ describe("renaming a My Script", () => {
     const { studio, script } = await studioWithMyScript();
     expect(studio.renameMyScript(script.id, "   ")).toBe("needsName");
     expect(studio.myScript(script.id)?.name).toBe(script.name);
+  });
+
+  it("keeps a long new name to 30 characters, like a new My Script's", async () => {
+    const { studio, script } = await studioWithMyScript();
+    expect(studio.renameMyScript(script.id, "The Very Secret Runes of the Northern Sky")).toBe("renamed");
+    expect(studio.myScript(script.id)?.name).toBe("The Very Secret Runes of the N");
   });
 
   it("of a My Script that doesn't exist does nothing", async () => {
@@ -105,7 +110,8 @@ describe("the next empty one, after saving a Glyph", () => {
   });
 
   it("is none once every slot has a Glyph", async () => {
-    const { studio, script } = await studioWithMyScript({ drawn: GLYPH_SLOTS });
+    const { studio, script } = await studioWithMyScript();
+    for (const slot of studio.missingSlots(script.id)) studio.saveGlyph(script.id, slot, [A_DOWN_STROKE]);
     expect(studio.nextMissingSlot(script.id, "A")).toBeUndefined();
     expect(studio.nextMissingSlot("nope", "A")).toBeUndefined();
   });

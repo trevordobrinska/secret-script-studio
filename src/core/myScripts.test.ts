@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-import { GLYPH_SLOTS, slotLabel } from "./myScript";
 import { inMemoryStudioStorage, type StudioStorage } from "./studioStorage";
 import {
   A_DAY,
@@ -63,16 +62,33 @@ describe("creating a My Script", () => {
   });
 });
 
+describe("a My Script's name", () => {
+  it("is kept to 30 characters when it's long", () => {
+    const studio = newStudio();
+    const made = studio.createMyScript({ name: "  The Very Secret Runes of the Northern Sky ", ink: "#3b6fd1", strokeWidth: 0.07 });
+    expect(made.ok && made.script.name).toBe("The Very Secret Runes of the N");
+  });
+});
+
+/** Every Glyph slot, in grid order: A–Z, 0–9, the extra digits ten to fifteen, space, then . , ? ! */
+const EVERY_SLOT = [
+  ..."ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+  ...["ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "space", ".", ",", "?", "!"],
+];
+
 describe("Glyph slots", () => {
-  it("are A–Z, 0–9, the extra digits ten to fifteen, space, then . , ? !", () => {
-    expect(GLYPH_SLOTS.map(slotLabel).join(" ")).toBe(
-      "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 space . , ? !",
-    );
+  it("in a brand-new My Script are all Missing Glyphs, in grid order", async () => {
+    const { studio, script } = await studioWithMyScript();
+    expect(studio.missingSlots(script.id)).toEqual(EVERY_SLOT);
   });
 
-  it("in a brand-new My Script are all Missing Glyphs", async () => {
+  it("are shown to him as A–Z, 0–9, 10 to 15, space, then . , ? !", async () => {
     const { studio, script } = await studioWithMyScript();
-    expect(studio.missingSlots(script.id)).toEqual(GLYPH_SLOTS);
+    for (const slot of studio.missingSlots(script.id)) studio.saveGlyph(script.id, slot, [A_DOWN_STROKE]);
+    const print = studio.printLayout(script.id, "A", { cipherKey: true });
+    expect(print.ok && print.layout.cipherKey?.map((entry) => entry.label).join(" ")).toBe(
+      "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 space . , ? !",
+    );
   });
 });
 
@@ -82,7 +98,7 @@ describe("drawing a Glyph", () => {
     expect(studio.saveGlyph(script.id, "H", [A_DOWN_STROKE, AN_ACROSS_STROKE])).toBe("saved");
     expect(studio.myScript(script.id)?.glyphs.H).toEqual({ strokes: [A_DOWN_STROKE, AN_ACROSS_STROKE], updatedAt: A_DAY });
     expect(studio.missingSlots(script.id)).not.toContain("H");
-    expect(studio.missingSlots(script.id)).toHaveLength(GLYPH_SLOTS.length - 1);
+    expect(studio.missingSlots(script.id)).toHaveLength(EVERY_SLOT.length - 1);
   });
 
   it("keeps points inside the canvas square", async () => {
@@ -133,7 +149,7 @@ describe("My Scripts are saved on the tablet", () => {
     const reopened = await loadedStudio({ storage });
     expect(reopened.myScripts()).toEqual([studio.myScript(script.id)]);
     expect(reopened.myScript(script.id)?.glyphs.I?.strokes).toEqual([AN_ACROSS_STROKE]);
-    expect(reopened.missingSlots(script.id)).toHaveLength(GLYPH_SLOTS.length - 2);
+    expect(reopened.missingSlots(script.id)).toHaveLength(EVERY_SLOT.length - 2);
   });
 
   it("if storage can't be written, his Glyph still stays for this visit", async () => {

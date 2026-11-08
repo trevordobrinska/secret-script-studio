@@ -19,7 +19,7 @@
  * Strokes are made compact first: snapped to the GRID, repeated points
  * dropped, then simplified (Ramer-Douglas-Peucker, SIMPLIFY_TOLERANCE).
  */
-import { GLYPH_SLOTS, type Glyph, type GlyphSlot, type Point, type Stroke } from "./myScript";
+import { GLYPH_SLOTS, type Glyph, type GlyphSlot, type Point, type ScriptLook, type Stroke } from "./myScript";
 import { foldMessageText, slotForChar, type GlyphSet } from "./messageLayout";
 
 /** Bump when the payload format changes; old versions then give "couldn't open". */
@@ -41,11 +41,7 @@ const SIMPLIFY_TOLERANCE = 0.7;
 const MAX_FRAGMENT_LENGTH = 8000;
 
 /** A Message as opened from a share link: read-only, with its own Glyphs (only those it uses). */
-export interface SharedMessage {
-  /** The My Script's name. */
-  readonly name: string;
-  readonly ink: string;
-  readonly strokeWidth: number;
+export interface SharedMessage extends ScriptLook {
   /** The Message text (folded: A–Z uppercase). */
   readonly text: string;
   /** The Glyphs the text uses that he had drawn. `updatedAt` is 0: links don't carry times. */
@@ -74,11 +70,21 @@ export async function packShareLink(message: SharedMessage, appAddress: string):
   return link.length > MAX_SHARE_LINK_LENGTH ? { ok: false, reason: "tooLong" } : { ok: true, link };
 }
 
+/** The fragment of a link (whole URL, or the fragment with or without `#`). */
+function fragmentOf(link: string): string {
+  const hash = link.indexOf("#");
+  return hash >= 0 ? link.slice(hash + 1) : link;
+}
+
+/** Whether a link looks like a share link (`m<version>.` then anything), whether or not it opens. */
+export function isShareLink(link: string): boolean {
+  return /^m\d+\./.test(fragmentOf(link));
+}
+
 /** Opens a share link (a whole URL, or just its fragment with or without `#`). Never throws. */
 export async function unpackShareLink(link: string): Promise<UnpackResult> {
   try {
-    const hash = link.indexOf("#");
-    const fragment = hash >= 0 ? link.slice(hash + 1) : link;
+    const fragment = fragmentOf(link);
     if (fragment.length > MAX_FRAGMENT_LENGTH) return couldntOpen();
     const match = /^m(\d+)\.([A-Za-z0-9_-]+)$/.exec(fragment);
     if (!match || Number(match[1]) !== SHARE_LINK_VERSION) return couldntOpen();

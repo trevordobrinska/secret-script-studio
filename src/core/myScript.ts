@@ -64,14 +64,24 @@ export type InkColor = (typeof INK_COLORS)[number];
 export const STROKE_WIDTHS = { thin: 0.04, medium: 0.07, thick: 0.1 } as const;
 export type StrokeWidth = (typeof STROKE_WIDTHS)[keyof typeof STROKE_WIDTHS];
 
-/** A writing system he invented, with the Glyphs drawn so far. */
-export interface MyScript {
-  readonly id: string;
+/**
+ * How a My Script looks: its name, ink and stroke width. A My Script, a
+ * shared Message and a printout all carry one.
+ */
+export interface ScriptLook {
   readonly name: string;
   /** A CSS hex color, one of INK_COLORS. */
   readonly ink: string;
   /** Stroke width as a fraction of the Glyph square's side (one of STROKE_WIDTHS). */
   readonly strokeWidth: number;
+}
+
+/** The longest name a My Script can have (longer names are cut to this). */
+export const NAME_MAX_LENGTH = 30;
+
+/** A writing system he invented, with the Glyphs drawn so far. */
+export interface MyScript extends ScriptLook {
+  readonly id: string;
   /** ms since 1970. */
   readonly createdAt: number;
   /** ms since 1970: last change to the name, ink, width or any Glyph. */

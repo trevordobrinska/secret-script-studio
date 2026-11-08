@@ -1,5 +1,5 @@
 import "./myScripts.css";
-import type { MyScript } from "../core/myScript";
+import { NAME_MAX_LENGTH, type MyScript } from "../core/myScript";
 import { glyphImage } from "../render/glyphRenderer";
 import { playTap } from "../sound/sound";
 import { el, type RenderScreen } from "./screen";
@@ -86,7 +86,7 @@ export const myScriptsScreen: RenderScreen<{ name: "myScripts" }> = (root, _scre
     const form = el("form", "ms-card-form");
     const name = el("input", "ms-name ms-rename-input");
     name.type = "text";
-    name.maxLength = 30;
+    name.maxLength = NAME_MAX_LENGTH;
     name.value = script.name;
     name.autocomplete = "off";
     name.setAttribute("aria-label", "New name");

@@ -1,5 +1,5 @@
-import { foldMessageText, layoutMessage, type GlyphSet, type MessageCell } from "./messageLayout";
-import { GLYPH_SLOTS, slotLabel, type Glyph, type GlyphSlot, type MyScript } from "./myScript";
+import { foldedMessageText, layoutMessage, type GlyphSet, type MessageLayout } from "./messageLayout";
+import { GLYPH_SLOTS, slotLabel, type Glyph, type GlyphSlot, type MyScript, type ScriptLook } from "./myScript";
 import type { SharedMessage } from "./shareLink";
 
 /** What to print besides the Message page. */
@@ -12,13 +12,9 @@ export interface PrintOptions {
  * A printout: a Message page and, when chosen, a Cipher Key page. The
  * renderer draws it as SVG on a print-only page.
  */
-export interface PrintLayout {
-  /** The My Script's name. */
-  readonly name: string;
-  readonly ink: string;
-  readonly strokeWidth: number;
-  /** The Message page: the same layout cells the screens draw. */
-  readonly message: readonly MessageCell[];
+export interface PrintLayout extends ScriptLook {
+  /** The Message page: the same layout (cells and words) the screens draw. */
+  readonly message: MessageLayout;
   /**
    * The Cipher Key page, only when chosen: each drawn Glyph with the
    * letter, digit or mark it stands for. Letters A–Z, then digits 0–9 and
@@ -68,19 +64,19 @@ export function createPrinting({ myScript }: PrintingDeps): PrintingCommands {
 }
 
 function printout(
-  look: Pick<MyScript | SharedMessage, "name" | "ink" | "strokeWidth">,
+  { name, ink, strokeWidth }: ScriptLook,
   text: string,
   glyphs: GlyphSet,
   { cipherKey }: PrintOptions,
 ): PrintLayoutResult {
-  const folded = foldMessageText(text);
-  if (folded.trim() === "") return { ok: false, reason: "empty" };
+  const folded = foldedMessageText(text);
+  if (folded === undefined) return { ok: false, reason: "empty" };
   return {
     ok: true,
     layout: {
-      name: look.name,
-      ink: look.ink,
-      strokeWidth: look.strokeWidth,
+      name,
+      ink,
+      strokeWidth,
       message: layoutMessage(folded, glyphs),
       ...(cipherKey ? { cipherKey: cipherKeyOf(glyphs) } : {}),
     },

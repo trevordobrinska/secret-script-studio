@@ -1,5 +1,5 @@
 import "./myScripts.css";
-import { INK_COLORS, STROKE_WIDTHS } from "../core/myScript";
+import { INK_COLORS, NAME_MAX_LENGTH, STROKE_WIDTHS } from "../core/myScript";
 import { el, type RenderScreen } from "./screen";
 
 const WIDTH_NAMES: Record<keyof typeof STROKE_WIDTHS, string> = { thin: "Thin", medium: "Medium", thick: "Thick" };
@@ -14,7 +14,7 @@ export const newMyScriptScreen: RenderScreen<{ name: "newMyScript" }> = (root, _
 
   const name = el("input", "ms-name");
   name.type = "text";
-  name.maxLength = 30;
+  name.maxLength = NAME_MAX_LENGTH;
   name.placeholder = "Name it…";
   name.autocomplete = "off";
   form.append(el("label", "ms-label", "Name"), name);

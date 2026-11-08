@@ -194,6 +194,29 @@ describe("counting with + and −", () => {
     expect(view.columns.map((c) => c.changed)).toEqual([true, true, true]);
   });
 
+  it("each column says how many items it had before the step, so the Stacks can snap from there", async () => {
+    const up = await explorerAt(199);
+    up.countUp();
+    expect(up.numberExplorer().columns.map((c) => [c.previousItemCount, c.itemCount])).toEqual([[1, 2], [9, 0], [9, 0]]);
+
+    const down = await explorerAt(100);
+    down.countDown();
+    expect(down.numberExplorer().columns.map((c) => [c.previousItemCount, c.itemCount])).toEqual([[1, 0], [0, 9], [0, 9]]);
+
+    const plain = await explorerAt(41);
+    plain.countUp();
+    expect(plain.numberExplorer().columns.map((c) => [c.previousItemCount, c.itemCount])).toEqual([[0, 0], [4, 4], [1, 2]]);
+  });
+
+  it("before any step, or after the Digit Count changes, each column had what it has now", async () => {
+    const studio = await explorerAt(0);
+    expect(studio.numberExplorer().columns.map((c) => c.previousItemCount)).toEqual([0, 0, 0]);
+    countTo(studio, 9);
+    studio.countUp();
+    studio.setDigitCount(4);
+    expect(studio.numberExplorer().columns.map((c) => c.previousItemCount)).toEqual([0, 0, 0, 2, 2]);
+  });
+
   it("an ordinary step changes only the last digit, with no roll-over", async () => {
     const studio = await explorerAt(41);
     studio.countUp();
@@ -334,6 +357,19 @@ describe("Digit Counts from 2 to 16", () => {
     expect([fives.value, ones.value]).toEqual([1, 0]);
     expect(ones.rolledOver).toBe(true);
     expect(fives.changed).toBe(true);
+  });
+
+  it("each column knows the most items it can ever hold below 999, so its Stacks have a fixed spot", async () => {
+    const studio = await explorerAt(0);
+    const most = (count: number) => {
+      studio.setDigitCount(count);
+      return studio.numberExplorer().columns.map((c) => c.maxItemCount);
+    };
+    expect(most(10)).toEqual([9, 9, 9]);
+    expect(most(16)).toEqual([3, 15, 15]);
+    expect(most(5)).toEqual([1, 4, 4, 4, 4]);
+    expect(most(3)).toEqual([1, 2, 2, 2, 2, 2, 2]);
+    expect(most(2)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
   });
 
   it("only takes whole Digit Counts from 2 to 16", async () => {

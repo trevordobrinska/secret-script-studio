@@ -72,10 +72,16 @@
   align-items: center;
   gap: 4px;
 }
-.dc-tile {
+/* One of the 16 digit positions: a tile plus its corner badges. */
+.dc-slot {
+  position: relative;
   flex: 0 1 48px;
   min-width: 0;
   aspect-ratio: 1;
+}
+.dc-tile {
+  width: 100%;
+  height: 100%;
   box-sizing: border-box;
   display: flex;
   align-items: center;
@@ -96,8 +102,64 @@
   color: var(--soft-ink);
   font-size: 16px;
 }
-.dc-tile.missing:disabled {
+.dc-tile:disabled {
   cursor: default;
+  color: inherit;
+}
+.dc-tile.missing:disabled {
+  color: var(--soft-ink);
+}
+/* A digit not in use: a faint ghost; tap it to use digits up to it. */
+.dc-tile.ghost {
+  border: 2px dashed var(--line);
+  background: transparent;
+  color: var(--soft-ink);
+  font-size: 16px;
+  opacity: 0.4;
+}
+.dc-tile.ghost:active {
+  opacity: 0.7;
+}
+/* Small corner badges: "−" on the last digit (tap to take it away), a pencil on Missing ones. */
+.dc-badge {
+  position: absolute;
+  z-index: 1;
+  width: 20px;
+  height: 20px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  background: var(--card);
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1;
+  pointer-events: none;
+}
+.dc-remove {
+  top: -6px;
+  left: 0;
+  background: var(--number-explorer);
+}
+.dc-draw {
+  top: -6px;
+  right: 0;
+}
+.dc-draw svg {
+  width: 12px;
+  height: 12px;
+}
+/* On the last digit the pencil is its own button: a bigger invisible target around it. */
+button.dc-draw {
+  pointer-events: auto;
+}
+button.dc-draw::before {
+  content: "";
+  position: absolute;
+  inset: -8px;
 }
 
 /* The keypad: a calm dialog over the screen (below the home and mute buttons). */
@@ -172,7 +234,7 @@
     flex-wrap: wrap;
     align-content: center;
   }
-  .dc-tile {
+  .dc-slot {
     flex: 0 0 48px;
   }
 }

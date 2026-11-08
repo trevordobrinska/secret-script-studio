@@ -14,7 +14,7 @@ describe("printing a Message from a My Script", () => {
     const { studio, script } = await studioWithMyScript({ drawn: ["H", "I"] });
     const print = studio.printLayout(script.id, "hi a!", { cipherKey: false });
     if (!print.ok) throw new Error(print.reason);
-    expect(shapes(print.layout.message)).toEqual([
+    expect(shapes(print.layout.message.cells)).toEqual([
       "glyph:H",
       "glyph:I",
       "gap: ",
@@ -65,7 +65,7 @@ describe("printing a Message from a My Script", () => {
     studio.saveGlyph(script.id, "H", dot);
     const print = studio.printLayout(script.id, "H", { cipherKey: true });
     if (!print.ok) throw new Error(print.reason);
-    const [cell] = print.layout.message;
+    const [cell] = print.layout.message.cells;
     expect(cell.kind === "glyph" && cell.glyph.strokes).toEqual(dot);
     expect(print.layout.cipherKey?.[0].glyph.strokes).toEqual(dot);
   });
@@ -96,7 +96,7 @@ describe("printing from the Reply page (a shared Message)", () => {
     const { dad, message } = await openedLink();
     const print = dad.sharedPrintLayout(message, message.text, { cipherKey: false });
     if (!print.ok) throw new Error(print.reason);
-    expect(shapes(print.layout.message)).toEqual(["glyph:H", "glyph:I", "gap: ", "glyph:H", "glyph:I"]);
+    expect(shapes(print.layout.message.cells)).toEqual(["glyph:H", "glyph:I", "gap: ", "glyph:H", "glyph:I"]);
     expect(print.layout).toMatchObject({ name: "Sky Runes", ink: "#3b6fd1", strokeWidth: 0.07 });
     expect(print.layout.cipherKey).toBeUndefined();
   });
@@ -112,7 +112,7 @@ describe("printing from the Reply page (a shared Message)", () => {
     const { dad, message } = await openedLink();
     const print = dad.sharedPrintLayout(message, "ha 7", { cipherKey: true });
     if (!print.ok) throw new Error(print.reason);
-    expect(shapes(print.layout.message)).toEqual(["glyph:H", "missingGlyph:A", "gap: ", "missingGlyph:7"]);
+    expect(shapes(print.layout.message.cells)).toEqual(["glyph:H", "missingGlyph:A", "gap: ", "missingGlyph:7"]);
     expect(print.layout.cipherKey?.map((entry) => entry.label)).toEqual(["H", "I"]);
   });
 

@@ -1,4 +1,5 @@
 import "./myScripts.css";
+import { NAME_MAX_LENGTH } from "../core/myScript";
 import { playTap } from "../sound/sound";
 import { el, type RenderScreen } from "./screen";
 
@@ -19,7 +20,7 @@ export const nameNudgeScreen: RenderScreen<{ name: "nameNudge"; scriptId: string
 
   const word = el("input", "ms-name");
   word.type = "text";
-  word.maxLength = 30;
+  word.maxLength = NAME_MAX_LENGTH;
   word.placeholder = "Your name, or any word…";
   word.autocomplete = "off";
   const letters = el("div", "ms-nudge-letters");

@@ -18,6 +18,24 @@ export type MessageCell =
   /** Anything that isn't a Glyph slot (e.g. "é" or "@" from Dad's phone keyboard), shown as itself. */
   | { readonly kind: "plain"; readonly char: string };
 
+/**
+ * A laid-out Message: its cells, and the same cells grouped into words for
+ * wrapping. Every screen and the printout wrap by `words`, so lines only
+ * break between words.
+ */
+export interface MessageLayout {
+  /** One cell per character, in order. */
+  readonly cells: readonly MessageCell[];
+  /**
+   * The cells grouped into words: each run of non-space cells is one word,
+   * and each space (a gap, or a drawn space Glyph) is a word of its own.
+   */
+  readonly words: readonly (readonly MessageCell[])[];
+}
+
+/** An empty layout (nothing to show, e.g. for an unknown My Script). */
+export const NO_LAYOUT: MessageLayout = { cells: [], words: [] };
+
 /** The Glyphs a layout can use: a My Script's `glyphs`, or a shared Message's. */
 export type GlyphSet = Readonly<Partial<Record<GlyphSlot, Glyph>>>;
 
@@ -36,6 +54,12 @@ export function foldMessageText(text: string): string {
   return text.replace(/[a-z]/g, (c) => c.toUpperCase()).replace(/\s/g, " ");
 }
 
+/** Message text folded, or undefined if there's nothing in it but spaces (an empty Message). */
+export function foldedMessageText(text: string): string | undefined {
+  const folded = foldMessageText(text);
+  return folded.trim() === "" ? undefined : folded;
+}
+
 /** The Glyph slot a (folded) character is written with, or undefined if it isn't one. */
 export function slotForChar(char: string): GlyphSlot | undefined {
   if (char === " ") return "space";
@@ -49,8 +73,8 @@ export function charForSlot(slot: GlyphSlot): string | undefined {
 }
 
 /** Lays out Message text in a set of Glyphs, one cell per character (lowercase folded first). */
-export function layoutMessage(text: string, glyphs: GlyphSet): MessageCell[] {
-  return Array.from(foldMessageText(text), (char): MessageCell => {
+export function layoutMessage(text: string, glyphs: GlyphSet): MessageLayout {
+  const cells = Array.from(foldMessageText(text), (char): MessageCell => {
     const slot = slotForChar(char);
     if (!slot) return { kind: "plain", char };
     const glyph = glyphs[slot];
@@ -58,14 +82,11 @@ export function layoutMessage(text: string, glyphs: GlyphSet): MessageCell[] {
     if (slot === "space") return { kind: "gap", char: " " };
     return { kind: "missingGlyph", slot, char };
   });
+  return { cells, words: wordsOf(cells) };
 }
 
-/**
- * The cells grouped into words, for wrapping: each run of non-space cells
- * is one word, and each space (gap, or a drawn space Glyph) is a word of
- * its own. Lines should only break between words.
- */
-export function messageWords(cells: readonly MessageCell[]): MessageCell[][] {
+/** The cells grouped into words (see MessageLayout.words). Lines only break between words. */
+function wordsOf(cells: readonly MessageCell[]): MessageCell[][] {
   const words: MessageCell[][] = [];
   let word: MessageCell[] = [];
   for (const cell of cells) {

@@ -54,6 +54,7 @@ describe("Backup", () => {
 
     const storage = inMemoryStudioStorage();
     const fresh = await loadedStudio({ storage });
+    fresh.setMuted(true); // this tablet is muted too, so the whole state should match
     expect(fresh.restoreBackup(backup.text)).toEqual({ ok: true, myScripts: 2, messages: 3 });
     expect(everything(fresh)).toEqual(everything(studio));
     expect(fresh.settings()).toEqual({ muted: true, numberHintSeen: true });
@@ -113,6 +114,37 @@ describe("Restore merges by id", () => {
     await studio.saved();
     const reloaded = await loadedStudio({ storage });
     expect(everything(reloaded)).toEqual(everything(studio));
+  });
+});
+
+describe("Restore and the Settings", () => {
+  it("keeps the sound on this tablet the way it is now, whatever the file says", async () => {
+    const { studio: muted } = await aBusyTablet();
+    const mutedBackup = muted.makeBackup().text;
+    const loud = await loadedStudio();
+    loud.restoreBackup(mutedBackup);
+    expect(loud.settings().muted).toBe(false);
+
+    const quiet = await loadedStudio();
+    const unmutedBackup = quiet.makeBackup().text;
+    quiet.setMuted(true);
+    quiet.restoreBackup(unmutedBackup);
+    expect(quiet.settings().muted).toBe(true);
+  });
+
+  it("the 'Try fewer digits!' hint counts as seen if either the tablet or the file has seen it", async () => {
+    const { studio: seen } = await aBusyTablet();
+    const seenBackup = seen.makeBackup().text;
+    const storage = inMemoryStudioStorage();
+    const fresh = await loadedStudio({ storage });
+    fresh.restoreBackup(seenBackup);
+    expect(fresh.settings().numberHintSeen).toBe(true);
+    await fresh.saved();
+    expect((await loadedStudio({ storage })).settings()).toEqual({ muted: false, numberHintSeen: true });
+
+    const notSeenBackup = (await loadedStudio()).makeBackup().text;
+    seen.restoreBackup(notSeenBackup);
+    expect(seen.settings()).toEqual({ muted: true, numberHintSeen: true });
   });
 });
 

@@ -3,21 +3,22 @@ import {
   GLYPH_SLOTS,
   INK_COLORS,
   MY_SCRIPT_SCHEMA_VERSION,
+  NAME_MAX_LENGTH,
   STROKE_WIDTHS,
   type GlyphSlot,
   type MyScript,
   type MyScriptRecord,
   type Point,
+  type ScriptLook,
   type Stroke,
 } from "./myScript";
 
-/** What he picks when making a new My Script. */
-export interface NewMyScript {
-  readonly name: string;
-  /** One of INK_COLORS. */
-  readonly ink: string;
-  /** One of the STROKE_WIDTHS values. */
-  readonly strokeWidth: number;
+/** What he picks when making a new My Script: its look (ink from INK_COLORS, width from STROKE_WIDTHS). */
+export type NewMyScript = ScriptLook;
+
+/** A name as kept: trimmed, then cut to NAME_MAX_LENGTH characters (never splitting an emoji). */
+function cleanName(name: string): string {
+  return Array.from(name.trim()).slice(0, NAME_MAX_LENGTH).join("").trimEnd();
 }
 
 export type CreateMyScriptResult =
@@ -36,7 +37,7 @@ export interface MyScriptCommands {
   myScripts(): readonly MyScript[];
   /** One My Script, or undefined if there's no such id. */
   myScript(id: string): MyScript | undefined;
-  /** Makes a new, empty My Script. The name is trimmed and must not be blank. */
+  /** Makes a new, empty My Script. The name is trimmed, must not be blank, and is cut to NAME_MAX_LENGTH. */
   createMyScript(details: NewMyScript): CreateMyScriptResult;
   /**
    * Saves the strokes he drew for one slot (points normalized to the
@@ -44,7 +45,7 @@ export interface MyScriptCommands {
    * Points are clamped into the square; strokes with no points are dropped.
    */
   saveGlyph(scriptId: string, slot: GlyphSlot, strokes: readonly Stroke[]): SaveGlyphResult;
-  /** Gives a My Script a new name (trimmed, must not be blank). Its Glyphs stay. */
+  /** Gives a My Script a new name (trimmed, must not be blank, cut to NAME_MAX_LENGTH). Its Glyphs stay. */
   renameMyScript(id: string, name: string): RenameMyScriptResult;
   /**
    * Deletes a My Script, its Glyphs and its Messages, for good. (The
@@ -97,7 +98,7 @@ export function createMyScriptBook({ clock, save, remove }: MyScriptBookDeps) {
     myScripts: () => [...scripts.values()].sort((a, b) => a.createdAt - b.createdAt || a.id.localeCompare(b.id)),
     myScript: (id) => scripts.get(id),
     createMyScript({ name, ink, strokeWidth }) {
-      const trimmed = name.trim();
+      const trimmed = cleanName(name);
       if (!trimmed) return { ok: false, reason: "needsName" };
       if (!(INK_COLORS as readonly string[]).includes(ink)) return { ok: false, reason: "unknownInk" };
       if (!(Object.values(STROKE_WIDTHS) as number[]).includes(strokeWidth)) {
@@ -120,7 +121,7 @@ export function createMyScriptBook({ clock, save, remove }: MyScriptBookDeps) {
     renameMyScript(id, name) {
       const script = scripts.get(id);
       if (!script) return "noScript";
-      const trimmed = name.trim();
+      const trimmed = cleanName(name);
       if (!trimmed) return "needsName";
       put({ ...script, name: trimmed, updatedAt: clock.now() });
       return "renamed";

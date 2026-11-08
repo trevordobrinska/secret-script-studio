@@ -1,6 +1,6 @@
 import type { StudioCore, WorldCharacter, WorldNumeral } from "../core/studioCore";
-import { wiggleMuteButton } from "../sound/muteButton";
-import { speak, stopSpeaking, voiceLangs } from "../sound/speech";
+import { stopSpeaking, voiceLangs } from "../sound/speech";
+import { tapToHear } from "../sound/tapToHear";
 import { el, type RenderScreen } from "./screen";
 import { SECTION_NAMES } from "./sectionNames";
 import "./library.css";
@@ -66,14 +66,6 @@ export const worldScriptScreen: RenderScreen<{ name: "worldScript"; scriptId: st
   return stopSpeaking;
 };
 
-/** How long a card glows when nothing is spoken (no speech synthesis on this device). */
-const GLOW_MS = 600;
-/** The longest a card glows while speaking, in case the voice never says it's finished (some browsers drop `end` after a cut-off). */
-const MAX_GLOW_MS = 4000;
-
-/** Turns off the card that's glowing now, if any: only one card glows at a time. */
-let unlightCurrent: (() => void) | undefined;
-
 /**
  * A World Character card: a button that says it aloud (the core decides what), glowing while it speaks.
  * While muted it glows briefly and wiggles the mute button instead.
@@ -82,26 +74,7 @@ function worldCard(core: StudioCore, scriptId: string, entry: WorldCharacter | W
   const card = el("button", "world-card");
   card.type = "button";
   card.append(...parts);
-  let glowTimer: number | undefined;
-  const unlight = () => {
-    window.clearTimeout(glowTimer);
-    card.classList.remove("speaking");
-    if (unlightCurrent === unlight) unlightCurrent = undefined;
-  };
-  /** Glows for at most `ms`, turning off whichever other card was glowing. */
-  const light = (ms: number) => {
-    if (unlightCurrent !== unlight) unlightCurrent?.();
-    unlightCurrent = unlight;
-    card.classList.add("speaking");
-    window.clearTimeout(glowTimer);
-    glowTimer = window.setTimeout(unlight, ms);
-  };
-  card.addEventListener("click", () => {
-    const tap = core.worldCharacterTap(scriptId, entry, voiceLangs());
-    if (!tap) return;
-    if (tap.kind === "muted") wiggleMuteButton();
-    const spoken = tap.kind === "speak" && speak(tap.speech, { onStart: () => light(MAX_GLOW_MS), onEnd: unlight });
-    light(spoken ? MAX_GLOW_MS : GLOW_MS);
-  });
+  const hear = tapToHear(card);
+  card.addEventListener("click", () => hear(core.worldCharacterTap(scriptId, entry, voiceLangs())));
   return card;
 }

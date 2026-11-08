@@ -1,0 +1,45 @@
+/**
+ * Tap to hear's glow and mute wiggle, shared by everything that speaks on
+ * a tap (World Character cards, a Glyph's 🔊). The core decides what a tap
+ * says; this says it, and glows the element (class "speaking") meanwhile.
+ */
+import type { GlyphTap, WorldCharacterTap } from "../core/studioCore";
+import { wiggleMuteButton } from "./muteButton";
+import { speak } from "./speech";
+
+/** How long the glow lasts when nothing is spoken (muted, or no speech synthesis on this device). */
+const GLOW_MS = 600;
+/** The longest a glow lasts while speaking, in case the voice never says it's finished (some browsers drop `end` after a cut-off). */
+const MAX_GLOW_MS = 4000;
+
+/** Turns off whatever is glowing now, if anything: only one thing glows at a time. */
+let unlightCurrent: (() => void) | undefined;
+
+/**
+ * Makes a "hear" function for `glowing`: give it a tap's result and it
+ * speaks it (cutting off any earlier speech) while `glowing` glows. While
+ * muted it glows briefly and wiggles the mute button once. An undefined
+ * tap does nothing.
+ */
+export function tapToHear(glowing: HTMLElement): (tap: GlyphTap | WorldCharacterTap | undefined) => void {
+  let glowTimer: number | undefined;
+  const unlight = () => {
+    window.clearTimeout(glowTimer);
+    glowing.classList.remove("speaking");
+    if (unlightCurrent === unlight) unlightCurrent = undefined;
+  };
+  /** Glows for at most `ms`, turning off whatever else was glowing. */
+  const light = (ms: number) => {
+    if (unlightCurrent !== unlight) unlightCurrent?.();
+    unlightCurrent = unlight;
+    glowing.classList.add("speaking");
+    window.clearTimeout(glowTimer);
+    glowTimer = window.setTimeout(unlight, ms);
+  };
+  return (tap) => {
+    if (!tap) return;
+    if (tap.kind === "muted") wiggleMuteButton();
+    const spoken = tap.kind === "speak" && speak(tap.speech, { onStart: () => light(MAX_GLOW_MS), onEnd: unlight });
+    light(spoken ? MAX_GLOW_MS : GLOW_MS);
+  };
+}

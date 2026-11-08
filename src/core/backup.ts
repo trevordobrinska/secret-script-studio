@@ -4,6 +4,8 @@ import {
   INK_COLORS,
   MY_SCRIPT_SCHEMA_VERSION,
   STROKE_WIDTHS,
+  canHaveSound,
+  cleanSound,
   isGlyphSlot,
   type Glyph,
   type GlyphSlot,
@@ -121,18 +123,21 @@ function readMyScript(record: unknown): MyScript {
   const read: Partial<Record<GlyphSlot, Glyph>> = {};
   for (const [slot, glyph] of Object.entries(glyphs)) {
     check(isGlyphSlot(slot));
-    read[slot] = readGlyph(glyph);
+    read[slot] = readGlyph(slot, glyph);
   }
   return { id, name, ink: ink as string, strokeWidth: strokeWidth as number, createdAt, updatedAt, glyphs: read };
 }
 
-function readGlyph(glyph: unknown): Glyph {
+function readGlyph(slot: GlyphSlot, glyph: unknown): Glyph {
   check(isObject(glyph) && isTime(glyph.updatedAt) && Array.isArray(glyph.strokes) && glyph.strokes.length > 0);
   const strokes = glyph.strokes.map((stroke: unknown) => {
     check(Array.isArray(stroke) && stroke.length > 0);
     return stroke.map(readPoint);
   });
-  return { strokes, updatedAt: glyph.updatedAt };
+  // A Sound is optional (files from before Sounds have none) and cleaned as when saved.
+  check(glyph.sound === undefined || typeof glyph.sound === "string");
+  const sound = canHaveSound(slot) ? cleanSound(glyph.sound as string | undefined) : undefined;
+  return sound ? { strokes, sound, updatedAt: glyph.updatedAt } : { strokes, updatedAt: glyph.updatedAt };
 }
 
 function readPoint(point: unknown): Point {

@@ -4,7 +4,8 @@ import type { WorldCharacter, WorldNumeral, WorldScript } from "./library/worldS
 import { pronounce, type WorldCharacterTap } from "./library/pronunciation";
 import { SETTINGS_SCHEMA_VERSION, type SettingsRecord, type StudioStorage } from "./studioStorage";
 import { createMyScriptBook, type MyScriptCommands } from "./myScriptBook";
-import type { GlyphSlot } from "./myScript";
+import { canHaveSound, type GlyphSlot } from "./myScript";
+import { glyphSpeech, type GlyphTap } from "./glyphSound";
 import { createNumberExplorer, type NumberExplorerCommands } from "./numberExplorer";
 import { createWriting, type WritingCommands } from "./writing";
 import { createDiary, type DiaryCommands } from "./diary";
@@ -72,6 +73,8 @@ export type { CipherKeyEntry, PrintLayout, PrintOptions } from "./printing";
 export type { WorldCharacter, WorldNumeral, WorldScript } from "./library/worldScript";
 export type { Speech, WorldCharacterTap } from "./library/pronunciation";
 export { primaryLanguage } from "./library/pronunciation";
+export type { GlyphTap } from "./glyphSound";
+export { SOUND_MAX_LENGTH, canHaveSound } from "./myScript";
 
 /** The Settings as the screens see them. */
 export interface SettingsView {
@@ -122,6 +125,15 @@ export interface StudioCore
     entry: WorldCharacter | WorldNumeral,
     voiceLangs: readonly string[],
   ): WorldCharacterTap | undefined;
+  /**
+   * What tapping one of his Glyphs does: the English voice says its Sound,
+   * or its plain letter or digit when it has none. `trying` is the Sound
+   * box's text not saved yet (the canvas's "try it" 🔊): when given, it's
+   * said instead of the saved Sound (blank means the plain letter). The
+   * slot needn't be drawn yet. While muted it says nothing. Undefined for
+   * an unknown My Script, or space and punctuation (they have no Sound).
+   */
+  glyphTap(scriptId: string, slot: GlyphSlot, trying?: string): GlyphTap | undefined;
   /** Turns the sounds off (true) or on (false). Remembered across reloads. */
   setMuted(muted: boolean): void;
   /** Resolves once every save started so far has finished (or failed and been logged). */
@@ -218,6 +230,12 @@ export function createStudioCore({ storage, clock }: StudioCoreDeps): StudioCore
       if (!script || !own) return undefined;
       if (settings.muted) return { kind: "muted" };
       return { kind: "speak", speech: pronounce(script, own, voiceLangs) };
+    },
+    glyphTap(scriptId, slot, trying) {
+      const script = myScriptBook.commands.myScript(scriptId);
+      if (!script || !canHaveSound(slot)) return undefined;
+      if (settings.muted) return { kind: "muted" };
+      return { kind: "speak", speech: glyphSpeech(slot, trying ?? script.glyphs[slot]?.sound) };
     },
     setMuted(muted) {
       settings = { ...settings, muted };

@@ -336,6 +336,38 @@
   gap: 18px;
   width: 180px;
 }
+/* The canvas, with the Sound box right under it for letters and digits. */
+.ms-drawing {
+  --sound-row: 0px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.ms-stage.has-sound .ms-drawing {
+  --sound-row: 84px;
+}
+.ms-stage.has-sound .ms-canvas {
+  width: min(calc(100vh - var(--bar) - 32px - var(--sound-row)), calc(100vw - 280px));
+}
+.ms-sound {
+  display: flex;
+  gap: 12px;
+  height: 72px;
+}
+.ms-sound-input {
+  flex: 1;
+  min-width: 0;
+  font-size: 26px;
+}
+.ms-sound-try {
+  padding: 0 20px;
+  transition: transform 80ms ease-out, box-shadow 200ms ease-out, border-color 200ms ease-out;
+}
+/* Trying the Sound: the 🔊 glows gently while it speaks, like a Library card. */
+.ms-sound-try.speaking {
+  border-color: #6fae86;
+  box-shadow: 0 0 0 4px #cfe9d8, 0 0 18px 6px #cfe9d8;
+}
 .ms-save {
   background: #9fd8a3;
 }
@@ -347,8 +379,9 @@
     flex-direction: column;
     justify-content: flex-start;
   }
-  .ms-canvas {
-    width: min(calc(100vw - 32px), calc(100vh - var(--bar) - 140px));
+  .ms-canvas,
+  .ms-stage.has-sound .ms-canvas {
+    width: min(calc(100vw - 32px), calc(100vh - var(--bar) - 140px - var(--sound-row)));
   }
   .ms-tools {
     flex-direction: row;

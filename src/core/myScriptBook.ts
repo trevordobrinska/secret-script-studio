@@ -5,6 +5,9 @@ import {
   MY_SCRIPT_SCHEMA_VERSION,
   NAME_MAX_LENGTH,
   STROKE_WIDTHS,
+  canHaveSound,
+  cleanSound,
+  type Glyph,
   type GlyphSlot,
   type MyScript,
   type MyScriptRecord,
@@ -41,10 +44,14 @@ export interface MyScriptCommands {
   createMyScript(details: NewMyScript): CreateMyScriptResult;
   /**
    * Saves the strokes he drew for one slot (points normalized to the
-   * canvas square, 0–1). Saving a slot that already has a Glyph redraws it.
-   * Points are clamped into the square; strokes with no points are dropped.
+   * canvas square, 0–1), with its Sound. Saving a slot that already has a
+   * Glyph redraws it, Sound and all. Points are clamped into the square;
+   * strokes with no points are dropped. The Sound is cleaned (cleanSound:
+   * trimmed, cut to SOUND_MAX_LENGTH); blank or left out means no Sound,
+   * and it's ignored for space and punctuation. A Sound with no strokes
+   * is still "empty": a Sound belongs to a drawn Glyph.
    */
-  saveGlyph(scriptId: string, slot: GlyphSlot, strokes: readonly Stroke[]): SaveGlyphResult;
+  saveGlyph(scriptId: string, slot: GlyphSlot, strokes: readonly Stroke[], sound?: string): SaveGlyphResult;
   /** Gives a My Script a new name (trimmed, must not be blank, cut to NAME_MAX_LENGTH). Its Glyphs stay. */
   renameMyScript(id: string, name: string): RenameMyScriptResult;
   /**
@@ -109,13 +116,15 @@ export function createMyScriptBook({ clock, save, remove }: MyScriptBookDeps) {
       put(script);
       return { ok: true, script };
     },
-    saveGlyph(scriptId, slot, strokes) {
+    saveGlyph(scriptId, slot, strokes, sound) {
       const script = scripts.get(scriptId);
       if (!script) return "noScript";
       const kept = strokes.filter((s) => s.length > 0).map((s) => s.map(clampPoint));
       if (kept.length === 0) return "empty";
       const now = clock.now();
-      put({ ...script, updatedAt: now, glyphs: { ...script.glyphs, [slot]: { strokes: kept, updatedAt: now } } });
+      const keptSound = canHaveSound(slot) ? cleanSound(sound) : undefined;
+      const glyph: Glyph = keptSound ? { strokes: kept, sound: keptSound, updatedAt: now } : { strokes: kept, updatedAt: now };
+      put({ ...script, updatedAt: now, glyphs: { ...script.glyphs, [slot]: glyph } });
       return "saved";
     },
     renameMyScript(id, name) {

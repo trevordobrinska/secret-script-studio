@@ -1,8 +1,10 @@
 import "./myScripts.css";
 import { slotLabel, type Point } from "../core/myScript";
-import type { Screen } from "../core/studioCore";
+import { SOUND_MAX_LENGTH, canHaveSound, type Screen } from "../core/studioCore";
 import { fitCanvas, paintGuides, paintStrokes } from "../render/glyphRenderer";
 import { playSave, playTap } from "../sound/sound";
+import { stopSpeaking } from "../sound/speech";
+import { tapToHear } from "../sound/tapToHear";
 import { el, type RenderScreen } from "./screen";
 
 /**
@@ -30,6 +32,16 @@ export const glyphCanvasScreen: RenderScreen<Extract<Screen, { name: "glyphCanva
 
   const stage = el("div", "ms-stage");
   const canvas = el("canvas", "ms-canvas");
+  // Letters and digits get a "How does it sound?" box right under the canvas,
+  // with a 🔊 to try what's typed. It saves with the drawing.
+  const soundBox = canHaveSound(screen.slot) ? soundRow(script.glyphs[screen.slot]?.sound) : undefined;
+  if (soundBox) {
+    const hear = tapToHear(soundBox.tryIt);
+    soundBox.tryIt.addEventListener("click", () => hear(core.glyphTap(script.id, screen.slot, soundBox.input.value)));
+  }
+  const drawing = el("div", "ms-drawing");
+  drawing.append(canvas);
+  if (soundBox) drawing.append(soundBox.row);
   const tools = el("div", "ms-tools");
   const undo = toolButton("Undo", "ms-undo");
   const clear = toolButton("Clear", "ms-clear");
@@ -37,7 +49,8 @@ export const glyphCanvasScreen: RenderScreen<Extract<Screen, { name: "glyphCanva
   const save = toolButton("Save", "ms-save");
   const back = toolButton("Back", "ms-back");
   tools.append(undo, clear, saveNext, save, back);
-  stage.append(canvas, tools);
+  stage.classList.toggle("has-sound", soundBox !== undefined);
+  stage.append(drawing, tools);
   root.append(stage);
 
   let ctx: CanvasRenderingContext2D | undefined;
@@ -98,7 +111,7 @@ export const glyphCanvasScreen: RenderScreen<Extract<Screen, { name: "glyphCanva
     refreshTools();
     requestPaint();
   });
-  // Clear needs a second tap, so a whole Glyph isn't lost by accident.
+  // Clear needs a second tap, so a whole Glyph isn't lost by accident. It clears the drawing only, not the Sound.
   clear.addEventListener("click", () => {
     if (!clear.classList.contains("confirming")) {
       clear.classList.add("confirming");
@@ -110,7 +123,7 @@ export const glyphCanvasScreen: RenderScreen<Extract<Screen, { name: "glyphCanva
     requestPaint();
   });
   const saveGlyph = (): boolean => {
-    if (core.saveGlyph(script.id, screen.slot, strokes) !== "saved") return false;
+    if (core.saveGlyph(script.id, screen.slot, strokes, soundBox?.input.value) !== "saved") return false;
     playSave();
     return true;
   };
@@ -136,8 +149,27 @@ export const glyphCanvasScreen: RenderScreen<Extract<Screen, { name: "glyphCanva
   return () => {
     observer.disconnect();
     if (frame) cancelAnimationFrame(frame);
+    stopSpeaking();
   };
 };
+
+/** The "How does it sound?" box (starting with the Glyph's saved Sound) and its "try it" 🔊. */
+function soundRow(saved: string | undefined): { row: HTMLElement; input: HTMLInputElement; tryIt: HTMLButtonElement } {
+  const row = el("div", "ms-sound");
+  const input = el("input", "ms-name ms-sound-input");
+  input.type = "text";
+  input.maxLength = SOUND_MAX_LENGTH;
+  input.placeholder = "How does it sound?";
+  input.autocomplete = "off";
+  input.spellcheck = false;
+  input.setAttribute("aria-label", "How does it sound?");
+  input.value = saved ?? "";
+  const tryIt = el("button", "ms-button ms-sound-try", "🔊");
+  tryIt.type = "button";
+  tryIt.setAttribute("aria-label", "Try the Sound");
+  row.append(input, tryIt);
+  return { row, input, tryIt };
+}
 
 function toolButton(text: string, className: string): HTMLButtonElement {
   const b = el("button", `ms-button ms-tool ${className}`, text);

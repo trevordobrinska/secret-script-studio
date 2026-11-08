@@ -49,9 +49,32 @@ export interface Point {
 /** One finger stroke: its points in order. Its width comes from the My Script. */
 export type Stroke = readonly Point[];
 
-/** The shape he drew for one Glyph slot. */
+/** The longest Sound a Glyph can have (longer ones are cut to this). */
+export const SOUND_MAX_LENGTH = 12;
+
+/** Whether a slot can have a Sound: letters and digits can; space and punctuation are pauses. */
+export function canHaveSound(slot: GlyphSlot): boolean {
+  return !(MARKS as readonly string[]).includes(slot);
+}
+
+/**
+ * A Sound as kept: trimmed and cut to SOUND_MAX_LENGTH characters (never
+ * splitting an emoji). Undefined when it's blank, which means no Sound.
+ */
+export function cleanSound(sound: string | undefined): string | undefined {
+  const cut = Array.from(sound?.trim() ?? "").slice(0, SOUND_MAX_LENGTH).join("").trimEnd();
+  return cut === "" ? undefined : cut;
+}
+
+/** The shape he drew for one Glyph slot, and how it sounds. */
 export interface Glyph {
   readonly strokes: readonly Stroke[];
+  /**
+   * How it's said out loud, like "kla" (letters and digits only). Absent
+   * when it has none, never "": then it's read as its plain letter.
+   * Optional, so My Scripts saved before Sounds load unchanged.
+   */
+  readonly sound?: string;
   /** When it was last drawn, in ms since 1970 (like `Date.now()`). */
   readonly updatedAt: number;
 }

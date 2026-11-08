@@ -4,6 +4,7 @@ import type { NumberColumn, NumberExplorerView } from "../core/numberExplorer";
 import { glyphImage } from "../render/glyphRenderer";
 import { playTap } from "../sound/sound";
 import { digitCountControl } from "./digitCountControl";
+import { placeColor, stacksRow } from "./numberStacks";
 import { el, type RenderScreen } from "./screen";
 import { SECTION_NAMES } from "./sectionNames";
 
@@ -27,7 +28,8 @@ export const numberExplorerScreen: RenderScreen<{ name: "numberExplorer" }> = (r
   const plus = bigButton("+", "Count up");
   controls.append(minus, plus);
   const digitCount = digitCountControl(context, () => draw());
-  root.append(picker, digitCount.row, digits, controls, digitCount.keypad);
+  const stacks = stacksRow();
+  root.append(picker, digitCount.row, digits, stacks.element, controls, digitCount.keypad);
 
   minus.addEventListener("click", () => {
     if (core.countDown()) playTap();
@@ -77,8 +79,11 @@ export const numberExplorerScreen: RenderScreen<{ name: "numberExplorer" }> = (r
 
   function drawDigits(view: NumberExplorerView): void {
     const n = view.columns.length;
-    const size = Math.max(40, Math.min(MAX_DIGIT, Math.floor((digits.clientWidth - 16 * (n + 1)) / n)));
+    const byWidth = Math.floor((digits.clientWidth - 16 * (n + 1)) / n);
+    const byHeight = digits.clientHeight - 40; // room for the label under each digit
+    const size = Math.max(40, Math.min(MAX_DIGIT, byWidth, byHeight));
     digits.replaceChildren(...view.columns.map((column) => digitCell(view, column, size)));
+    stacks.draw(view, size);
   }
 
   function digitCell(view: NumberExplorerView, column: NumberColumn, size: number): HTMLElement {
@@ -87,6 +92,7 @@ export const numberExplorerScreen: RenderScreen<{ name: "numberExplorer" }> = (r
     const cell = el("button", `ne-digit${missing ? " missing" : ""}${column.leading ? " leading" : ""}`);
     cell.type = "button";
     cell.disabled = !missing || !script;
+    cell.style.setProperty("--place", placeColor(column.place));
     const frame = el("span", "ne-window");
     frame.style.width = frame.style.height = `${size}px`;
     const face = digitFace(script, column, size);

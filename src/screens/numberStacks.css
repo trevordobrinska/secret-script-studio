@@ -1,0 +1,106 @@
+/* The Stacks under the number (numberStacks.ts). Each pile and its digit share --place. Classes prefixed ne-. */
+
+/* One pile per digit, lined up under it (same gap and centering as .ne-digits). */
+.ne-stacks {
+  flex: 1.3 1 0;
+  min-height: 0;
+  width: 100%;
+  max-width: 1200px;
+  box-sizing: border-box;
+  padding: 0 var(--gap);
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+}
+.ne-pile {
+  position: relative;
+  flex: none;
+  height: 100%;
+}
+.ne-item {
+  position: absolute;
+  display: block;
+}
+.ne-st-ghost {
+  pointer-events: none;
+}
+
+/* Keep each digit right above its pile when there's spare height (portrait). */
+.ne-digits {
+  align-items: flex-end;
+  padding-bottom: 12px;
+}
+
+/* Color-match each digit to its pile. */
+.ne-digit .ne-window {
+  border-color: var(--place, var(--line));
+  border-width: 5px;
+}
+.ne-digit.missing .ne-window {
+  border-width: 4px;
+  border-color: var(--place, var(--soft-ink));
+}
+.ne-digit .ne-label {
+  color: var(--place, var(--soft-ink));
+  font-weight: bold;
+}
+
+/* Snapping: short and gentle (320ms, keep in step with SNAP_MS). */
+.ne-st-combine-in {
+  animation: ne-st-combine-in 320ms cubic-bezier(0.3, 1.4, 0.5, 1) both;
+}
+.ne-st-combine-out {
+  animation: ne-st-combine-out 320ms ease-in forwards;
+}
+.ne-st-split-in {
+  animation: ne-st-split-in 320ms cubic-bezier(0.3, 1.4, 0.5, 1) both;
+}
+.ne-st-split-out {
+  animation: ne-st-split-out 320ms ease-in forwards;
+}
+.ne-st-pop-in {
+  animation: ne-st-pop-in 200ms cubic-bezier(0.3, 1.4, 0.5, 1) both;
+}
+.ne-st-pop-out {
+  animation: ne-st-pop-out 200ms ease-in forwards;
+}
+/* + : the full pile squeezes together and slides left into the next column... */
+@keyframes ne-st-combine-out {
+  from { transform: none; opacity: 1; }
+  to { transform: translateX(-60px) scale(0.4); opacity: 0; }
+}
+/* ...where it lands as one new item. */
+@keyframes ne-st-combine-in {
+  0% { transform: translateX(60px) scale(0.4); opacity: 0; }
+  40% { opacity: 1; }
+  100% { transform: none; }
+}
+/* − : one item breaks off and slides right into the next column... */
+@keyframes ne-st-split-out {
+  from { transform: none; opacity: 1; }
+  to { transform: translateX(60px) scale(0.6); opacity: 0; }
+}
+/* ...where its pieces spring out as a full pile. */
+@keyframes ne-st-split-in {
+  0% { transform: translateX(-60px) scale(0.5); opacity: 0; }
+  40% { opacity: 1; }
+  100% { transform: none; }
+}
+@keyframes ne-st-pop-in {
+  from { transform: scale(0.3); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+@keyframes ne-st-pop-out {
+  from { transform: none; opacity: 1; }
+  to { transform: scale(0.3); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ne-st-combine-in,
+  .ne-st-split-in,
+  .ne-st-pop-in {
+    animation: none;
+  }
+  .ne-st-ghost {
+    display: none;
+  }
+}

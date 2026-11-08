@@ -48,8 +48,15 @@ export type Screen =
   /** The name nudge for a brand-new My Script: "start with the letters of your name". */
   | { readonly name: "nameNudge"; readonly scriptId: string }
   /** The Write screen: writing a Message in a My Script with its Glyph keyboard (the draft is in the core). */
-  | { readonly name: "write"; readonly scriptId: string };
+  | { readonly name: "write"; readonly scriptId: string }
+  /**
+   * The Share screen: a big QR code for the Message `text` written in a My
+   * Script. Open it from the Write screen's draft or from a saved Message;
+   * Back goes to `returnTo` (without it, the Write screen).
+   */
+  | { readonly name: "share"; readonly scriptId: string; readonly text: string; readonly returnTo?: Screen };
 
+export type { SharedMessage } from "./sharing";
 export type { WorldCharacter, WorldNumeral, WorldScript } from "./library/worldScript";
 
 /** The Settings as the screens see them. */

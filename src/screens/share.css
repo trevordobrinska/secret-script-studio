@@ -1,0 +1,63 @@
+/* The Share screen: one big QR code, a hint and Back underneath. */
+
+.sh-body {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0 var(--gap);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  container-type: size;
+}
+
+/* As big as fits: a square limited by the height left and the width. */
+.sh-qr {
+  width: min(100cqw, 100cqh);
+  height: min(100cqw, 100cqh);
+  background: #fff;
+  border-radius: 12px;
+}
+.sh-qr svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  shape-rendering: crispEdges;
+}
+
+.sh-footer {
+  flex: none;
+  width: 100%;
+  max-width: 1000px;
+  box-sizing: border-box;
+  padding: var(--gap) calc(var(--gap) * 2) calc(var(--gap) * 1.5);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap);
+}
+.sh-hint {
+  margin: 0;
+  font-size: 24px;
+  color: var(--soft-ink);
+}
+
+.sh-note {
+  max-width: 640px;
+  padding: 28px 36px;
+  border: 3px solid var(--line);
+  border-radius: 20px;
+  background: var(--card);
+  text-align: center;
+}
+.sh-note-big {
+  margin: 0;
+  font-size: 30px;
+  font-weight: bold;
+}
+.sh-note-small {
+  margin: 14px 0 0;
+  font-size: 24px;
+  color: var(--soft-ink);
+}

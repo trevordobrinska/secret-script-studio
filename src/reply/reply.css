@@ -1,0 +1,107 @@
+/*
+ * Reply mode (Dad's phone): one calm column that scrolls, unlike the
+ * tablet's fixed screens. Classes are prefixed rp-.
+ */
+
+#screen[data-screen="reply"] {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.rp-page {
+  width: 100%;
+  max-width: 720px;
+  box-sizing: border-box;
+  padding: 24px 18px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.rp-title {
+  margin: 0;
+  font-size: 28px;
+  text-align: center;
+}
+.rp-subtitle {
+  margin: 0;
+  font-size: 18px;
+  color: var(--soft-ink);
+  text-align: center;
+}
+.rp-heading {
+  margin: 18px 0 0;
+  font-size: 22px;
+}
+
+.rp-card {
+  padding: 14px 16px;
+  border: 3px solid var(--line);
+  border-radius: 18px;
+  background: var(--card);
+}
+.rp-note {
+  min-height: 60px;
+}
+.rp-reply {
+  min-height: 60px;
+}
+.rp-empty {
+  margin: 0;
+  font-size: 18px;
+  color: var(--soft-ink);
+}
+
+.rp-button {
+  align-self: center;
+  min-height: 52px;
+  padding: 0 24px;
+  border: 3px solid var(--ink);
+  border-radius: 16px;
+  background: var(--card);
+  box-shadow: 0 3px 0 var(--ink);
+  font-size: 20px;
+  font-weight: bold;
+  transition: transform 80ms ease-out, box-shadow 80ms ease-out;
+}
+.rp-button:active {
+  transform: translateY(3px);
+  box-shadow: 0 0 0 var(--ink);
+}
+
+.rp-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 14px;
+  border: 3px solid var(--ink);
+  border-radius: 14px;
+  background: #fff;
+  font: inherit;
+  font-size: 20px; /* 16px+ stops phones zooming in on focus */
+  color: var(--ink);
+  resize: vertical;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.rp-small {
+  margin: 0;
+  font-size: 15px;
+  color: var(--soft-ink);
+}
+
+/* Ticket 08 puts the Print buttons here. */
+.rp-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+.rp-actions:empty {
+  display: none;
+}
+
+.rp-couldnt {
+  margin: auto 0;
+  gap: 18px;
+}

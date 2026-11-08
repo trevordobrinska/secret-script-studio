@@ -9,6 +9,7 @@ import { glyphGridScreen } from "./glyphGridScreen";
 import { glyphCanvasScreen } from "./glyphCanvasScreen";
 import { writeScreen } from "./writeScreen";
 import { nameNudgeScreen } from "./nameNudgeScreen";
+import { shareScreen } from "./shareScreen";
 import type { RenderScreen, ScreenContext } from "./screen";
 
 /**
@@ -27,6 +28,7 @@ const SCREENS: { [N in Screen["name"]]: RenderScreen<Extract<Screen, { name: N }
   glyphCanvas: glyphCanvasScreen,
   write: writeScreen,
   nameNudge: nameNudgeScreen,
+  share: shareScreen,
 };
 
 /**

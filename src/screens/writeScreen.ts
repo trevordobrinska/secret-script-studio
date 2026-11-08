@@ -1,3 +1,4 @@
+import "./myScripts.css";
 import "./write.css";
 import { TYPEABLE_SLOTS } from "../core/messageLayout";
 import { slotLabel, type GlyphSlot } from "../core/myScript";
@@ -14,7 +15,8 @@ const KEY_GLYPH = 44;
  * each), and below it a keyboard of his own Glyphs with space and
  * backspace. The keyboard is built once and never moves; only the Message
  * redraws as he types. Tapping a Missing Glyph opens the canvas for it and
- * comes back here. (Saving the Message is ticket 06.)
+ * comes back here. Share (top bar) shows the draft as a QR code.
+ * (Saving the Message is ticket 06.)
  */
 export const writeScreen: RenderScreen<{ name: "write"; scriptId: string }> = (root, screen, { core, go }) => {
   const script = core.myScript(screen.scriptId);
@@ -24,7 +26,18 @@ export const writeScreen: RenderScreen<{ name: "write"; scriptId: string }> = (r
   }
   const scriptId = script.id;
 
-  root.append(el("h1", "screen-title", script.name));
+  root.append(el("h1", "screen-title wr-title", script.name));
+
+  // Top-bar buttons, left of the mute button. Ticket 06 can add Save here.
+  const barActions = el("div", "wr-bar-actions");
+  const share = el("button", "ms-button wr-share", "Share");
+  share.type = "button";
+  share.addEventListener("click", () => {
+    playTap();
+    go({ name: "share", scriptId, text: core.draft(scriptId), returnTo: { name: "write", scriptId } });
+  });
+  barActions.append(share);
+  root.append(barActions);
 
   const message = el("div", "wr-message");
   const keyboard = el("div", "wr-keyboard");
@@ -32,6 +45,7 @@ export const writeScreen: RenderScreen<{ name: "write"; scriptId: string }> = (r
 
   function drawMessage(): void {
     const draft = core.draft(scriptId);
+    share.disabled = draft.trim() === "";
     if (draft === "") {
       message.replaceChildren(el("p", "wr-hint", "Tap the keys to write in " + script!.name + "."));
       return;

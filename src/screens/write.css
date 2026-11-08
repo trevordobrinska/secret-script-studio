@@ -83,3 +83,25 @@
     gap: 6px;
   }
 }
+
+/* The Write screen's Share button sits in the top bar, left of the mute button. */
+.wr-bar-actions {
+  position: absolute;
+  top: calc(var(--gap) + env(safe-area-inset-top));
+  right: calc(var(--gap) * 2 + 72px + env(safe-area-inset-right));
+  height: 72px;
+  display: flex;
+  gap: 12px;
+}
+.wr-share {
+  background: var(--my-scripts);
+}
+/* Keep the Write screen's title clear of the buttons on both sides of the bar. */
+.wr-title {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0 300px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}

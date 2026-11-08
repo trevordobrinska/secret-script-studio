@@ -1,6 +1,7 @@
 import { playTap } from "../sound/sound";
 import type { Screen, StudioCore } from "../core/studioCore";
 import { homeScreen } from "./homeScreen";
+import { libraryScreen, worldScriptScreen } from "./libraryScreens";
 import { placeholderScreen } from "./placeholderScreen";
 import type { RenderScreen, ScreenContext } from "./screen";
 
@@ -12,7 +13,8 @@ import type { RenderScreen, ScreenContext } from "./screen";
 const SCREENS: { [N in Screen["name"]]: RenderScreen<Extract<Screen, { name: N }>> } = {
   home: homeScreen,
   myScripts: placeholderScreen,
-  library: placeholderScreen,
+  library: libraryScreen,
+  worldScript: worldScriptScreen,
   numberExplorer: placeholderScreen,
 };
 

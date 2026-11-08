@@ -27,9 +27,22 @@ export type Screen =
   /** Making a new My Script: name, ink and stroke width. */
   | { readonly name: "newMyScript" }
   /** A My Script's grid of Glyph slots. */
-  | { readonly name: "glyphGrid"; readonly scriptId: string }
+  | {
+      readonly name: "glyphGrid";
+      readonly scriptId: string;
+      /** The name nudge's letters (suggestedLetters), offered first. */
+      readonly startWith?: readonly GlyphSlot[];
+    }
   /** The Glyph canvas, drawing one slot of a My Script. */
-  | { readonly name: "glyphCanvas"; readonly scriptId: string; readonly slot: GlyphSlot };
+  | {
+      readonly name: "glyphCanvas";
+      readonly scriptId: string;
+      readonly slot: GlyphSlot;
+      /** The name nudge's letters: "Save + next" offers these first. */
+      readonly startWith?: readonly GlyphSlot[];
+    }
+  /** The name nudge for a brand-new My Script: "start with the letters of your name". */
+  | { readonly name: "nameNudge"; readonly scriptId: string };
 
 export type { WorldCharacter, WorldNumeral, WorldScript } from "./library/worldScript";
 

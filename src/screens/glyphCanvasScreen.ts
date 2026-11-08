@@ -1,6 +1,7 @@
 import "./myScripts.css";
 import { slotLabel, type GlyphSlot, type Point } from "../core/myScript";
 import { fitCanvas, paintGuides, paintStrokes } from "../render/glyphRenderer";
+import { playSave, playTap } from "../sound/sound";
 import { el, type RenderScreen } from "./screen";
 
 /**
@@ -9,7 +10,12 @@ import { el, type RenderScreen } from "./screen";
  * Monsters: one finger at a time, every coalesced sample, and the whole
  * drawing repainted (rAF-throttled). Points are kept normalized (0–1).
  */
-export const glyphCanvasScreen: RenderScreen<{ name: "glyphCanvas"; scriptId: string; slot: GlyphSlot }> = (
+export const glyphCanvasScreen: RenderScreen<{
+  name: "glyphCanvas";
+  scriptId: string;
+  slot: GlyphSlot;
+  startWith?: readonly GlyphSlot[];
+}> = (
   root,
   screen,
   { core, go },
@@ -19,7 +25,8 @@ export const glyphCanvasScreen: RenderScreen<{ name: "glyphCanvas"; scriptId: st
     root.append(el("p", "placeholder", "This My Script isn't here."));
     return;
   }
-  const backToGrid = () => go({ name: "glyphGrid", scriptId: script.id });
+  const { startWith } = screen;
+  const backToGrid = () => go({ name: "glyphGrid", scriptId: script.id, startWith });
 
   // Redrawing starts from the Glyph he has, so he can undo or add to it.
   const strokes: Point[][] = (script.glyphs[screen.slot]?.strokes ?? []).map((s) => [...s]);
@@ -33,9 +40,10 @@ export const glyphCanvasScreen: RenderScreen<{ name: "glyphCanvas"; scriptId: st
   const tools = el("div", "ms-tools");
   const undo = toolButton("Undo", "ms-undo");
   const clear = toolButton("Clear", "ms-clear");
+  const saveNext = toolButton("Save + next", "ms-save ms-save-next");
   const save = toolButton("Save", "ms-save");
   const back = toolButton("Back", "ms-back");
-  tools.append(undo, clear, save, back);
+  tools.append(undo, clear, saveNext, save, back);
   stage.append(canvas, tools);
   root.append(stage);
 
@@ -55,7 +63,7 @@ export const glyphCanvasScreen: RenderScreen<{ name: "glyphCanvas"; scriptId: st
     frame ||= requestAnimationFrame(paint);
   }
   function refreshTools(): void {
-    undo.disabled = clear.disabled = save.disabled = strokes.length === 0;
+    undo.disabled = clear.disabled = save.disabled = saveNext.disabled = strokes.length === 0;
     clear.classList.remove("confirming");
     clear.textContent = "Clear";
   }
@@ -108,10 +116,25 @@ export const glyphCanvasScreen: RenderScreen<{ name: "glyphCanvas"; scriptId: st
     refreshTools();
     requestPaint();
   });
+  const saveGlyph = (): boolean => {
+    if (core.saveGlyph(script.id, screen.slot, strokes) !== "saved") return false;
+    playSave();
+    return true;
+  };
   save.addEventListener("click", () => {
-    if (core.saveGlyph(script.id, screen.slot, strokes) === "saved") backToGrid();
+    if (saveGlyph()) backToGrid();
   });
-  back.addEventListener("click", backToGrid);
+  // "Next empty one": his name's letters first, then grid order; the grid once all are drawn.
+  saveNext.addEventListener("click", () => {
+    if (!saveGlyph()) return;
+    const next = core.nextMissingSlot(script.id, screen.slot, startWith);
+    if (next) go({ name: "glyphCanvas", scriptId: script.id, slot: next, startWith });
+    else backToGrid();
+  });
+  back.addEventListener("click", () => {
+    playTap();
+    backToGrid();
+  });
 
   const observer = new ResizeObserver(resize);
   observer.observe(canvas);

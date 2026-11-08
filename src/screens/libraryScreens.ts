@@ -1,4 +1,5 @@
 import type { StudioCore, WorldCharacter, WorldNumeral } from "../core/studioCore";
+import { wiggleMuteButton } from "../sound/muteButton";
 import { speak, stopSpeaking, voiceLangs } from "../sound/speech";
 import { el, type RenderScreen } from "./screen";
 import { SECTION_NAMES } from "./sectionNames";
@@ -68,7 +69,10 @@ export const worldScriptScreen: RenderScreen<{ name: "worldScript"; scriptId: st
 /** How long a card glows when nothing is spoken (no speech synthesis on this device). */
 const GLOW_MS = 600;
 
-/** A World Character card: a button that says it aloud (the core decides what), glowing while it speaks. */
+/**
+ * A World Character card: a button that says it aloud (the core decides what), glowing while it speaks.
+ * While muted it glows briefly and wiggles the mute button instead.
+ */
 function worldCard(core: StudioCore, scriptId: string, entry: WorldCharacter | WorldNumeral, parts: HTMLElement[]): HTMLButtonElement {
   const card = el("button", "world-card");
   card.type = "button";
@@ -80,7 +84,8 @@ function worldCard(core: StudioCore, scriptId: string, entry: WorldCharacter | W
     if (!tap) return;
     window.clearTimeout(glowTimer);
     glow(true);
-    const spoken = speak(tap.speech, { onStart: () => glow(true), onEnd: () => glow(false) });
+    if (tap.kind === "muted") wiggleMuteButton();
+    const spoken = tap.kind === "speak" && speak(tap.speech, { onStart: () => glow(true), onEnd: () => glow(false) });
     if (!spoken) glowTimer = window.setTimeout(() => glow(false), GLOW_MS);
   });
   return card;

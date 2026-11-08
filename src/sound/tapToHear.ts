@@ -9,8 +9,10 @@ import { speak } from "./speech";
 
 /** How long the glow lasts when nothing is spoken (muted, or no speech synthesis on this device). */
 const GLOW_MS = 600;
-/** The longest a glow lasts while speaking, in case the voice never says it's finished (some browsers drop `end` after a cut-off). */
+/** The longest a short glow lasts while speaking, in case the voice never says it's finished (some browsers drop `end` after a cut-off). */
 const MAX_GLOW_MS = 4000;
+/** A generous time per character at SPEECH_RATE, for the safety timeout of longer speech. */
+const MS_PER_CHAR = 150;
 
 /** Turns off whatever is glowing now, if anything: only one thing glows at a time. */
 let unlightCurrent: (() => void) | undefined;
@@ -39,7 +41,9 @@ export function tapToHear(glowing: HTMLElement): (tap: GlyphTap | WorldCharacter
   return (tap) => {
     if (!tap) return;
     if (tap.kind === "muted") wiggleMuteButton();
-    const spoken = tap.kind === "speak" && speak(tap.speech, { onStart: () => light(MAX_GLOW_MS), onEnd: unlight });
-    light(spoken ? MAX_GLOW_MS : GLOW_MS);
+    // A whole Message (Read it to me) takes longer to say than one name, so its safety timeout grows with it.
+    const maxGlow = tap.kind === "speak" ? Math.max(MAX_GLOW_MS, tap.speech.text.length * MS_PER_CHAR) : GLOW_MS;
+    const spoken = tap.kind === "speak" && speak(tap.speech, { onStart: () => light(maxGlow), onEnd: unlight });
+    light(spoken ? maxGlow : GLOW_MS);
   };
 }

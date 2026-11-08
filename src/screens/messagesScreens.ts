@@ -5,6 +5,7 @@ import { messageView } from "../render/messageView";
 import { playTap } from "../sound/sound";
 import { openPrintChoice } from "./printChoice";
 import { el, type RenderScreen } from "./screen";
+import { readItToMeButton } from "./readItToMeButton";
 import { secretToggle } from "./secretToggle";
 
 /** How many cells of a Message its card previews. */
@@ -73,7 +74,8 @@ export const messagesScreen: RenderScreen<{ name: "messages"; scriptId: string }
 /**
  * Re-reading one saved Message, big, in his current Glyphs. Missing
  * Glyphs can be tapped to draw them (and he comes back here). Edit puts
- * it on the Write screen; Share shows it as a QR code; Delete asks
+ * it on the Write screen; Read it to me says it in his Sounds; Share
+ * shows it as a QR code; Delete asks
  * first, in place.
  */
 export const messageScreen: RenderScreen<{ name: "message"; messageId: string }> = (root, screen, { core, go }) => {
@@ -91,6 +93,8 @@ export const messageScreen: RenderScreen<{ name: "message"; messageId: string }>
   root.append(actions, box);
 
   let asking = false;
+  // Made once, so a Read it to me that's speaking keeps its glow when the row redraws.
+  const readAloud = readItToMeButton(() => core.readItToMe(message!.text, script!.glyphs));
 
   function drawMessage(): void {
     box.replaceChildren(
@@ -153,7 +157,7 @@ export const messageScreen: RenderScreen<{ name: "message"; messageId: string }>
       asking = true;
       drawActions();
     });
-    actions.replaceChildren(all, secretToggle(core, drawMessage), edit, share, print, remove);
+    actions.replaceChildren(all, secretToggle(core, drawMessage), readAloud, edit, share, print, remove);
   }
 
   drawActions();

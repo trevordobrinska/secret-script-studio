@@ -33,6 +33,14 @@
   background: var(--ink);
   color: var(--card);
 }
+/* Read it to me glows gently while it speaks, like a Library card. */
+.msg-read-aloud {
+  transition: transform 80ms ease-out, box-shadow 200ms ease-out, border-color 200ms ease-out;
+}
+.msg-read-aloud.speaking {
+  border-color: #6fae86;
+  box-shadow: 0 0 0 4px #cfe9d8, 0 0 18px 6px #cfe9d8;
+}
 .msg-ask {
   margin: 0;
   font-size: 22px;

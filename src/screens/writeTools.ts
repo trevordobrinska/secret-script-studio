@@ -3,12 +3,13 @@ import type { Screen, StudioCore } from "../core/studioCore";
 import { playTap } from "../sound/sound";
 import { el } from "./screen";
 import "./myScripts.css";
+import { readItToMeButton } from "./readItToMeButton";
 import { secretToggle } from "./secretToggle";
 
 /**
- * The Write screen's tool row: My Messages (the diary), secret mode, New
- * Message and Save. Every button is always there, so nothing moves; New
- * and Save are greyed out when there is nothing to clear or save. New
+ * The Write screen's tool row: My Messages (the diary), secret mode, Read
+ * it to me, New Message and Save. Every button is always there, so nothing moves; New
+ * and Save (and Read it to me) are greyed out when there is nothing to clear, save or read. New
  * asks for a second tap before it throws away unsaved writing.
  * `redraw` redraws the Message; it calls `update()` back to refresh the row.
  */
@@ -42,10 +43,15 @@ export function writeTools(
     playTap();
     if (core.saveMessage(scriptId).ok) go({ name: "messages", scriptId });
   });
-  row.append(diary, secretToggle(core, redraw), fresh, save);
+  const readAloud = readItToMeButton(() => {
+    const script = core.myScript(scriptId);
+    return script && core.readItToMe(core.draft(scriptId), script.glyphs);
+  });
+  row.append(diary, secretToggle(core, redraw), readAloud, fresh, save);
 
   function update(): void {
     const draft = core.draft(scriptId);
+    readAloud.disabled = draft.trim() === "";
     const editing = core.editingMessage(scriptId) !== undefined;
     if (draft.trim() === "") askingNew = false;
     fresh.textContent = askingNew ? "Clear it?" : "New";

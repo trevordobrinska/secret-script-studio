@@ -5,7 +5,8 @@ import { pronounce, type WorldCharacterTap } from "./library/pronunciation";
 import { SETTINGS_SCHEMA_VERSION, type SettingsRecord, type StudioStorage } from "./studioStorage";
 import { createMyScriptBook, type MyScriptCommands } from "./myScriptBook";
 import { canHaveSound, type GlyphSlot } from "./myScript";
-import { glyphSpeech, type GlyphTap } from "./glyphSound";
+import { glyphSpeech, messageSpeech, type GlyphTap } from "./glyphSound";
+import type { GlyphSet } from "./messageLayout";
 import { createNumberExplorer, type NumberExplorerCommands } from "./numberExplorer";
 import { createWriting, type WritingCommands } from "./writing";
 import { createDiary, type DiaryCommands } from "./diary";
@@ -134,6 +135,16 @@ export interface StudioCore
    * an unknown My Script, or space and punctuation (they have no Sound).
    */
   glyphTap(scriptId: string, slot: GlyphSlot, trying?: string): GlyphTap | undefined;
+  /**
+   * What Read it to me does for Message `text` written in `glyphs` (a My
+   * Script's `glyphs`, or a SharedMessage's): the English voice says the
+   * whole Message in one go, each word's Sounds glued into one spoken
+   * word, with a pause at each space and punctuation mark. A letter or
+   * digit with no Sound, or a Missing Glyph, adds its plain lowercase
+   * letter or digit. While muted it says nothing. Undefined when the
+   * Message has nothing to say (empty, or only spaces).
+   */
+  readItToMe(text: string, glyphs: GlyphSet): GlyphTap | undefined;
   /** Turns the sounds off (true) or on (false). Remembered across reloads. */
   setMuted(muted: boolean): void;
   /** Resolves once every save started so far has finished (or failed and been logged). */
@@ -236,6 +247,12 @@ export function createStudioCore({ storage, clock }: StudioCoreDeps): StudioCore
       if (!script || !canHaveSound(slot)) return undefined;
       if (settings.muted) return { kind: "muted" };
       return { kind: "speak", speech: glyphSpeech(slot, trying ?? script.glyphs[slot]?.sound) };
+    },
+    readItToMe(text, glyphs) {
+      const speech = messageSpeech(text, glyphs);
+      if (!speech) return undefined;
+      if (settings.muted) return { kind: "muted" };
+      return { kind: "speak", speech };
     },
     setMuted(muted) {
       settings = { ...settings, muted };

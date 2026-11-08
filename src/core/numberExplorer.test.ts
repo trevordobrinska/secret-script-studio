@@ -111,6 +111,30 @@ describe("counting in the digits of his My Script", () => {
     expect(reopened.numberExplorer().script?.id).toBe(first.id);
   });
 
+  it("renaming counts as using a My Script", async () => {
+    const clock = fakeClock();
+    const { studio, script: first } = await studioWithMyScript({ clock });
+    clock.advance(60_000);
+    makeMyScript(studio, "Moon Marks");
+    clock.advance(60_000);
+    studio.renameMyScript(first.id, "Star Runes");
+    studio.open({ name: "numberExplorer" });
+    expect(studio.numberExplorer().script?.id).toBe(first.id);
+  });
+
+  it("if the chosen My Script is deleted, it counts in his most recently used one instead", async () => {
+    const clock = fakeClock();
+    const { studio, script: first } = await studioWithMyScript({ clock });
+    clock.advance(60_000);
+    const second = makeMyScript(studio, "Moon Marks");
+    studio.open({ name: "numberExplorer" });
+    countTo(studio, 3);
+    studio.chooseNumberScript(first.id);
+    studio.deleteMyScript(first.id);
+    expect(studio.numberExplorer().script?.id).toBe(second.id);
+    expect(studio.numberExplorer().number).toBe(3);
+  });
+
   it("with no My Scripts yet, it still counts, every digit a Missing Glyph", async () => {
     const studio = await loadedStudio();
     studio.open({ name: "numberExplorer" });

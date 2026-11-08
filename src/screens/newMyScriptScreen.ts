@@ -68,7 +68,8 @@ export const newMyScriptScreen: RenderScreen<{ name: "newMyScript" }> = (root, _
   form.addEventListener("submit", (event) => {
     event.preventDefault();
     const result = core.createMyScript({ name: name.value, ink, strokeWidth });
-    if (result.ok) go({ name: "glyphGrid", scriptId: result.script.id });
+    // A brand-new My Script nudges "start with the letters of your name".
+    if (result.ok) go({ name: "nameNudge", scriptId: result.script.id });
     else name.focus();
   });
 

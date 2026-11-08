@@ -27,6 +27,9 @@ export type CreateMyScriptResult =
 /** "saved", or why the Glyph wasn't: no such My Script, or nothing was drawn. */
 export type SaveGlyphResult = "saved" | "noScript" | "empty";
 
+/** "renamed", or why not: no such My Script, or the new name is blank. */
+export type RenameMyScriptResult = "renamed" | "noScript" | "needsName";
+
 /** The My Scripts part of the Studio core's interface. */
 export interface MyScriptCommands {
   /** Every My Script, oldest first. */
@@ -41,18 +44,41 @@ export interface MyScriptCommands {
    * Points are clamped into the square; strokes with no points are dropped.
    */
   saveGlyph(scriptId: string, slot: GlyphSlot, strokes: readonly Stroke[]): SaveGlyphResult;
+  /** Gives a My Script a new name (trimmed, must not be blank). Its Glyphs stay. */
+  renameMyScript(id: string, name: string): RenameMyScriptResult;
+  /**
+   * Deletes a My Script, its Glyphs and its Messages, for good. (The
+   * screen asks him to confirm first.)
+   */
+  deleteMyScript(id: string): "deleted" | "noScript";
+  /**
+   * The name nudge: the letter slots to draw first for his name (or any
+   * word): its unique letters in order, capitals, ignoring non-letters.
+   */
+  suggestedLetters(word: string): readonly GlyphSlot[];
   /** The slots with no Glyph yet, in grid order (empty for an unknown id). */
   missingSlots(scriptId: string): readonly GlyphSlot[];
+  /** The slots that have a Glyph, in grid order (for previews; empty for an unknown id). */
+  drawnSlots(scriptId: string): readonly GlyphSlot[];
+  /**
+   * "Next empty one" after he saves `after`: the first Missing Glyph among
+   * `first` (e.g. his name's suggestedLetters), otherwise the next Missing
+   * Glyph after `after` in grid order, going round to the start. Undefined
+   * once every slot is drawn.
+   */
+  nextMissingSlot(scriptId: string, after: GlyphSlot, first?: readonly GlyphSlot[]): GlyphSlot | undefined;
 }
 
 interface MyScriptBookDeps {
   clock: Clock;
   /** Queue a write to storage (the core's `saved()` waits for it). */
   save(record: MyScriptRecord): void;
+  /** A My Script was deleted: the core removes it (and its Messages) from storage. */
+  remove(scriptId: string): void;
 }
 
 /** The core's My Scripts rules. Not exported from the core: tests go through StudioCore. */
-export function createMyScriptBook({ clock, save }: MyScriptBookDeps) {
+export function createMyScriptBook({ clock, save, remove }: MyScriptBookDeps) {
   const scripts = new Map<string, MyScript>();
 
   function put(script: MyScript): void {
@@ -91,9 +117,39 @@ export function createMyScriptBook({ clock, save }: MyScriptBookDeps) {
       put({ ...script, updatedAt: now, glyphs: { ...script.glyphs, [slot]: { strokes: kept, updatedAt: now } } });
       return "saved";
     },
+    renameMyScript(id, name) {
+      const script = scripts.get(id);
+      if (!script) return "noScript";
+      const trimmed = name.trim();
+      if (!trimmed) return "needsName";
+      put({ ...script, name: trimmed, updatedAt: clock.now() });
+      return "renamed";
+    },
+    deleteMyScript(id) {
+      if (!scripts.delete(id)) return "noScript";
+      remove(id);
+      return "deleted";
+    },
+    suggestedLetters(word) {
+      // NFD splits "ë" into "e" plus a combining mark, which the A–Z filter drops.
+      const letters = word.normalize("NFD").toUpperCase().match(/[A-Z]/g) ?? [];
+      return [...new Set(letters)] as GlyphSlot[];
+    },
     missingSlots(scriptId) {
       const script = scripts.get(scriptId);
       return script ? GLYPH_SLOTS.filter((slot) => !script.glyphs[slot]) : [];
+    },
+    drawnSlots(scriptId) {
+      const script = scripts.get(scriptId);
+      return script ? GLYPH_SLOTS.filter((slot) => script.glyphs[slot]) : [];
+    },
+    nextMissingSlot(scriptId, after, first = []) {
+      const script = scripts.get(scriptId);
+      if (!script) return undefined;
+      const isMissing = (slot: GlyphSlot) => slot !== after && !script.glyphs[slot];
+      const start = GLYPH_SLOTS.indexOf(after) + 1;
+      const roundFromAfter = [...GLYPH_SLOTS.slice(start), ...GLYPH_SLOTS.slice(0, start)];
+      return first.find(isMissing) ?? roundFromAfter.find(isMissing);
     },
   };
 

@@ -28,13 +28,27 @@ export type Screen =
   /** Making a new My Script: name, ink and stroke width. */
   | { readonly name: "newMyScript" }
   /** A My Script's grid of Glyph slots. */
-  | { readonly name: "glyphGrid"; readonly scriptId: string }
-  /**
-   * The Glyph canvas, drawing one slot of a My Script. Save and Back go to
-   * `returnTo` if given (e.g. the Number Explorer, after tapping a Missing
-   * digit), otherwise to the My Script's Glyph grid.
-   */
-  | { readonly name: "glyphCanvas"; readonly scriptId: string; readonly slot: GlyphSlot; readonly returnTo?: Screen };
+  | {
+      readonly name: "glyphGrid";
+      readonly scriptId: string;
+      /** The name nudge's letters (suggestedLetters), offered first. */
+      readonly startWith?: readonly GlyphSlot[];
+    }
+  /** The Glyph canvas, drawing one slot of a My Script. */
+  | {
+      readonly name: "glyphCanvas";
+      readonly scriptId: string;
+      readonly slot: GlyphSlot;
+      /** The name nudge's letters: "Save + next" offers these first. */
+      readonly startWith?: readonly GlyphSlot[];
+      /**
+       * Where Save and Back go, if not the My Script's Glyph grid (e.g. the
+       * Number Explorer, after tapping a Missing digit).
+       */
+      readonly returnTo?: Screen;
+    }
+  /** The name nudge for a brand-new My Script: "start with the letters of your name". */
+  | { readonly name: "nameNudge"; readonly scriptId: string };
 
 export type { WorldCharacter, WorldNumeral, WorldScript } from "./library/worldScript";
 
@@ -90,6 +104,7 @@ export function createStudioCore({ storage, clock }: StudioCoreDeps): StudioCore
         .then(() => storage.saveMyScript(record))
         .catch((error) => console.warn("Couldn't save a My Script.", error));
     },
+    remove: (scriptId) => myScriptDeleted(scriptId),
   });
 
   const numberExplorer = createNumberExplorer({ clock, myScripts: myScriptBook.commands.myScripts });
@@ -129,6 +144,17 @@ export function createStudioCore({ storage, clock }: StudioCoreDeps): StudioCore
     },
     saved: () => pending,
   };
+
+  /**
+   * A My Script was deleted: its Messages go with it. Ticket 06 (Messages)
+   * also drops that script's Messages from the core's memory here.
+   */
+  function myScriptDeleted(scriptId: string): void {
+    pending = pending
+      .then(() => storage.deleteMyScript(scriptId))
+      .then(() => storage.deleteMessagesOfMyScript(scriptId))
+      .catch((error) => console.warn("Couldn't delete a My Script.", error));
+  }
 
   function saveSettings(): void {
     const record: SettingsRecord = { schemaVersion: SETTINGS_SCHEMA_VERSION, ...settings };

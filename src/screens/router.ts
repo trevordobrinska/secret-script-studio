@@ -7,6 +7,7 @@ import { newMyScriptScreen } from "./newMyScriptScreen";
 import { glyphGridScreen } from "./glyphGridScreen";
 import { glyphCanvasScreen } from "./glyphCanvasScreen";
 import { numberExplorerScreen } from "./numberExplorerScreen";
+import { nameNudgeScreen } from "./nameNudgeScreen";
 import type { RenderScreen, ScreenContext } from "./screen";
 
 /**
@@ -23,6 +24,7 @@ const SCREENS: { [N in Screen["name"]]: RenderScreen<Extract<Screen, { name: N }
   newMyScript: newMyScriptScreen,
   glyphGrid: glyphGridScreen,
   glyphCanvas: glyphCanvasScreen,
+  nameNudge: nameNudgeScreen,
 };
 
 /**

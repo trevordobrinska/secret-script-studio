@@ -48,6 +48,113 @@
 .ms-new {
   background: var(--my-scripts);
 }
+/* "+ New My Script" stays in this spot above the list, which scrolls under it. */
+.ms-list-top {
+  width: 100%;
+  max-width: 720px;
+  box-sizing: border-box;
+  padding: 0 calc(var(--gap) * 2);
+  display: flex;
+  flex-direction: column;
+}
+.ms-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px;
+  border: 2px solid var(--line);
+  border-radius: 24px;
+  background: var(--card);
+  min-height: 96px;
+}
+.ms-card .ms-script {
+  flex: 1;
+  min-width: 0;
+  flex-wrap: wrap;
+  padding: 10px 20px;
+  row-gap: 8px;
+}
+.ms-script-name {
+  overflow-wrap: anywhere;
+}
+.ms-preview {
+  flex-basis: 100%;
+  display: flex;
+  gap: 6px;
+  min-height: 44px;
+  align-items: center;
+}
+.ms-preview-empty {
+  font-size: 18px;
+  font-weight: normal;
+  color: var(--soft-ink);
+}
+.ms-card-actions {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.ms-small {
+  min-height: 56px;
+  min-width: 128px;
+  padding: 0 16px;
+  font-size: 20px;
+}
+.ms-danger {
+  background: #f2c6a0;
+}
+.ms-go-small {
+  background: var(--my-scripts);
+}
+.ms-card-form {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.ms-card-form .ms-name {
+  flex: 1;
+  min-width: 0;
+}
+.ms-ask {
+  flex: 1;
+  margin: 0;
+  padding: 0 8px;
+  font-size: 24px;
+}
+
+/* The name nudge. */
+.ms-nudge-text {
+  margin: 12px 0;
+  font-size: 30px;
+  font-weight: bold;
+  text-align: center;
+}
+.ms-nudge-letters {
+  min-height: 64px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.ms-nudge-letter {
+  width: 56px;
+  height: 56px;
+  display: grid;
+  place-items: center;
+  border: 3px dashed var(--line);
+  border-radius: 10px;
+  font-size: 26px;
+  color: var(--soft-ink);
+}
+.ms-actions {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+.ms-actions .ms-go {
+  margin-top: 0;
+}
 .ms-hint {
   margin: 24px 0 0;
   font-size: 28px;
@@ -135,6 +242,25 @@
   align-content: start;
   gap: 14px;
   overflow-y: auto;
+}
+/* The grid's scrolling area: the name's letters (if any) above the full grid. */
+.ms-grid-scroller {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  max-width: 1200px;
+  overflow-y: auto;
+}
+.ms-grid-scroller .ms-grid {
+  flex: none;
+  overflow: visible;
+}
+.ms-start-with {
+  padding: var(--gap) calc(var(--gap) * 2) 0;
+}
+.ms-start-with .ms-grid {
+  padding: 8px 0 var(--gap);
+  border-bottom: 2px solid var(--line);
 }
 .ms-slot {
   display: flex;

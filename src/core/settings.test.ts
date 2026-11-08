@@ -21,6 +21,7 @@ describe("Settings", () => {
 
   it("fall back to the defaults, without an error, if storage can't be read", async () => {
     const broken: StudioStorage = {
+      ...inMemoryStudioStorage(),
       loadSettings: () => Promise.reject(new Error("storage is unavailable")),
       saveSettings: () => Promise.reject(new Error("storage is unavailable")),
       listMyScripts: () => Promise.reject(new Error("storage is unavailable")),

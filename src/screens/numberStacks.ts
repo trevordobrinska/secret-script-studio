@@ -1,5 +1,5 @@
 import "./numberStacks.css";
-import type { NumberColumn, NumberExplorerView } from "../core/numberExplorer";
+import { NUMBER_MAX, type NumberColumn, type NumberExplorerView } from "../core/numberExplorer";
 import { el } from "./screen";
 
 /**
@@ -151,12 +151,13 @@ interface PileLayout {
 }
 
 /**
- * Where each item of a pile goes, with at most `maxScale` pixels per block. The grid is laid out for the most items the
- * column can ever hold (Digit Count − 1), so items never move or resize while
- * he counts; they fill it from the top, left to right.
+ * Where each item of a pile goes, with at most `maxScale` pixels per block.
+ * The grid is laid out for the most items the column can ever hold below
+ * NUMBER_MAX (Digit Count − 1, or fewer in the leftmost columns), so items
+ * never move or resize while he counts; they fill it from the top, left to right.
  */
 function pileLayout(base: number, place: number, width: number, height: number, maxScale: number): PileLayout {
-  const capacity = base - 1;
+  const capacity = Math.max(1, Math.min(base - 1, Math.floor(NUMBER_MAX / base ** place)));
   const shape = itemShape(base, place);
   let best = { scale: 0, across: 1, rows: 1 };
   for (let across = 1; across <= capacity; across++) {
@@ -228,11 +229,12 @@ function paintItem(ctx: CanvasRenderingContext2D, base: number, place: number, x
     ctx.fillStyle = placeColor(place - 1);
     ctx.fillRect(ix, iy, iw, ih);
     const step = upright ? ih / base : iw / base;
-    if (step >= 2) {
+    if (step >= 1.2) {
       ctx.fillStyle = color;
       for (let i = 1; i < base; i++) {
-        if (upright) ctx.fillRect(ix, iy + i * step - 0.5, iw, 1);
-        else ctx.fillRect(ix + i * step - 0.5, iy, 1, ih);
+        const line = step >= 2 ? 1 : 0.5;
+        if (upright) ctx.fillRect(ix, iy + i * step - line / 2, iw, line);
+        else ctx.fillRect(ix + i * step - line / 2, iy, line, ih);
       }
     }
     return;

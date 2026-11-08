@@ -25,6 +25,12 @@
   pointer-events: none;
 }
 
+/* Keep each digit right above its pile when there's spare height (portrait). */
+.ne-digits {
+  align-items: flex-end;
+  padding-bottom: 12px;
+}
+
 /* Color-match each digit to its pile. */
 .ne-digit .ne-window {
   border-color: var(--place, var(--line));

@@ -3,6 +3,7 @@ import { DIGIT_SLOTS, slotLabel, type MyScript } from "../core/myScript";
 import type { NumberColumn, NumberExplorerView } from "../core/numberExplorer";
 import { glyphImage } from "../render/glyphRenderer";
 import { playTap } from "../sound/sound";
+import { digitCountControl } from "./digitCountControl";
 import { placeColor, stacksRow } from "./numberStacks";
 import { el, type RenderScreen } from "./screen";
 import { SECTION_NAMES } from "./sectionNames";
@@ -16,7 +17,8 @@ const MAX_DIGIT = 180;
  * − / + buttons. Changed digits roll like an odometer. Everything sits in
  * fixed rows so nothing moves while he counts.
  */
-export const numberExplorerScreen: RenderScreen<{ name: "numberExplorer" }> = (root, _screen, { core, go }) => {
+export const numberExplorerScreen: RenderScreen<{ name: "numberExplorer" }> = (root, _screen, context) => {
+  const { core, go } = context;
   root.append(el("h1", "screen-title", SECTION_NAMES.numberExplorer));
 
   const picker = el("div", "ne-picker");
@@ -25,8 +27,9 @@ export const numberExplorerScreen: RenderScreen<{ name: "numberExplorer" }> = (r
   const minus = bigButton("−", "Count down");
   const plus = bigButton("+", "Count up");
   controls.append(minus, plus);
+  const digitCount = digitCountControl(context, () => draw());
   const stacks = stacksRow();
-  root.append(picker, digits, stacks.element, controls);
+  root.append(picker, digitCount.row, digits, stacks.element, controls, digitCount.keypad);
 
   minus.addEventListener("click", () => {
     if (core.countDown()) playTap();
@@ -40,6 +43,7 @@ export const numberExplorerScreen: RenderScreen<{ name: "numberExplorer" }> = (r
   function draw(): void {
     const view = core.numberExplorer();
     drawPicker(view);
+    digitCount.draw(view);
     drawDigits(view);
     minus.disabled = !view.canCountDown;
     plus.disabled = !view.canCountUp;

@@ -98,6 +98,21 @@ describe("Tapping a World Character to hear it", () => {
     expect(asNumeral?.kind === "speak" && asNumeral.speech.text).toBe("10");
   });
 
+  it("glows and wiggles the mute button instead of speaking while muted", () => {
+    const studio = newStudio();
+    studio.setMuted(true);
+    const tap = studio.worldCharacterTap("greek", character(studio, "greek", "Λ λ"), EDGE_VOICES);
+    expect(tap).toEqual({ kind: "muted" });
+  });
+
+  it("speaks again once the sound is back on", () => {
+    const studio = newStudio();
+    studio.setMuted(true);
+    studio.setMuted(false);
+    const tap = studio.worldCharacterTap("greek", character(studio, "greek", "Λ λ"), EDGE_VOICES);
+    expect(tap?.kind).toBe("speak");
+  });
+
   it("does nothing for an unknown World Script, or a character that isn't on its page", () => {
     const studio = newStudio();
     const lambda = character(studio, "greek", "Λ λ");

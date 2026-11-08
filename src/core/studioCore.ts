@@ -113,6 +113,7 @@ export interface StudioCore
   /**
    * What tapping one of a World Script's characters or numerals does, given
    * the languages of the device's voices (the speech adapter lists them).
+   * While muted it says nothing: the card glows and the mute button wiggles.
    * Undefined for an unknown script, or an entry that isn't on its page.
    */
   worldCharacterTap(
@@ -212,6 +213,7 @@ export function createStudioCore({ storage, clock }: StudioCoreDeps): StudioCore
         "value" in entry ? script?.numerals : script?.characters;
       const own = entries?.find((e) => e.text === entry.text);
       if (!script || !own) return undefined;
+      if (settings.muted) return { kind: "muted" };
       return { kind: "speak", speech: pronounce(script, own, voiceLangs) };
     },
     setMuted(muted) {

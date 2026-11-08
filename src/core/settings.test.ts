@@ -23,6 +23,8 @@ describe("Settings", () => {
     const broken: StudioStorage = {
       loadSettings: () => Promise.reject(new Error("storage is unavailable")),
       saveSettings: () => Promise.reject(new Error("storage is unavailable")),
+      listMyScripts: () => Promise.reject(new Error("storage is unavailable")),
+      saveMyScript: () => Promise.reject(new Error("storage is unavailable")),
     };
     const studio = await loadedStudio({ storage: broken });
     expect(studio.settings()).toEqual({ muted: false, numberHintSeen: false });

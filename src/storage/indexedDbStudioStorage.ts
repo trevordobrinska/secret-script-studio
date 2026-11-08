@@ -1,11 +1,14 @@
+import type { MyScriptRecord } from "../core/myScript";
 import type { SettingsRecord, StudioStorage } from "../core/studioStorage";
 
 /** Prefixed with the app's name: every Arcade game shares one browser origin. */
 const DB_NAME = "secret-script-studio";
 /** Bump (and extend `upgrade`) when adding object stores or indexes. */
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 const SETTINGS = "settings";
+/** Added in DB_VERSION 2 (ticket 03). */
+const MY_SCRIPTS = "myScripts";
 /** The single key the Settings record is kept under in the settings store. */
 const SETTINGS_KEY = "settings";
 
@@ -37,6 +40,10 @@ export function indexedDbStudioStorage(): StudioStorage {
     saveSettings: async (settings) => {
       await run(SETTINGS, "readwrite", (s) => void s.put(settings, SETTINGS_KEY));
     },
+    listMyScripts: async () => (await run<MyScriptRecord[]>(MY_SCRIPTS, "readonly", (s) => s.getAll())) ?? [],
+    saveMyScript: async (script) => {
+      await run(MY_SCRIPTS, "readwrite", (s) => void s.put(script));
+    },
   };
 }
 
@@ -53,6 +60,8 @@ function open(): Promise<IDBDatabase> {
 function upgrade(db: IDBDatabase): void {
   // Out-of-line keys: one record under SETTINGS_KEY.
   if (!db.objectStoreNames.contains(SETTINGS)) db.createObjectStore(SETTINGS);
+  // One record per My Script (with all its Glyphs), keyed by its id.
+  if (!db.objectStoreNames.contains(MY_SCRIPTS)) db.createObjectStore(MY_SCRIPTS, { keyPath: "id" });
 }
 
 function done(tx: IDBTransaction): Promise<void> {

@@ -1,5 +1,7 @@
 import type { Clock } from "./deps";
 import type { SettingsRecord, StudioStorage } from "./studioStorage";
+import { createMyScriptBook, type MyScriptCommands } from "./myScriptBook";
+import type { GlyphSlot } from "./myScript";
 
 /** Everything the Studio core needs from the outside world. */
 export interface StudioCoreDeps {
@@ -16,7 +18,15 @@ const HOME_TILES: readonly Section[] = ["myScripts", "library", "numberExplorer"
  * Which screen is showing. A tagged union: later tickets add screens, some
  * carrying details, e.g. `{ name: "glyphCanvas"; scriptId; slot }`.
  */
-export type Screen = { readonly name: "home" } | { readonly name: Section };
+export type Screen =
+  | { readonly name: "home" }
+  | { readonly name: Section }
+  /** Making a new My Script: name, ink and stroke width. */
+  | { readonly name: "newMyScript" }
+  /** A My Script's grid of Glyph slots. */
+  | { readonly name: "glyphGrid"; readonly scriptId: string }
+  /** The Glyph canvas, drawing one slot of a My Script. */
+  | { readonly name: "glyphCanvas"; readonly scriptId: string; readonly slot: GlyphSlot };
 
 /** The Settings as the screens see them. */
 export interface SettingsView {
@@ -30,7 +40,7 @@ const DEFAULT_SETTINGS: SettingsView = { muted: false, numberHintSeen: false };
  * The Studio core: every rule of the app, with no DOM. Screens read its
  * views and call its commands. Commands return results and never throw.
  */
-export interface StudioCore {
+export interface StudioCore extends MyScriptCommands {
   /** The screen that is showing now. The app opens on home. */
   screen(): Screen;
   /** The home screen's tiles, in their fixed order. */
@@ -45,13 +55,29 @@ export interface StudioCore {
    */
   load(): Promise<void>;
   settings(): SettingsView;
+  /** Settles once everything changed so far is saved. Rejects if saving failed. */
+  saved(): Promise<void>;
 }
 
-export function createStudioCore({ storage }: StudioCoreDeps): StudioCore {
+export function createStudioCore({ storage, clock }: StudioCoreDeps): StudioCore {
   let current: Screen = { name: "home" };
   let settings: SettingsView = DEFAULT_SETTINGS;
 
+  // Commands change the core at once and save in the background, one write
+  // after another; one failing doesn't stop the next. `saved()` waits for them.
+  let saving: Promise<void> = Promise.resolve();
+  function store(change: () => Promise<void>): void {
+    saving = saving.catch(() => {}).then(change);
+  }
+
+  const myScriptBook = createMyScriptBook({
+    clock,
+    save: (record) => store(() => storage.saveMyScript(record)),
+  });
+
   return {
+    ...myScriptBook.commands,
+    saved: () => saving,
     screen: () => current,
     homeTiles: () => HOME_TILES,
     open(screen) {
@@ -66,6 +92,11 @@ export function createStudioCore({ storage }: StudioCoreDeps): StudioCore {
         if (saved) settings = settingsFrom(saved);
       } catch (error) {
         console.warn("Couldn't read the saved Settings; using the defaults.", error);
+      }
+      try {
+        myScriptBook.loaded(await storage.listMyScripts());
+      } catch (error) {
+        console.warn("Couldn't read the saved My Scripts.", error);
       }
     },
     settings: () => settings,

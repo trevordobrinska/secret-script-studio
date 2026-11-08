@@ -1,3 +1,5 @@
+import type { MyScriptRecord } from "./myScript";
+
 /**
  * The storage the Studio core depends on. It is async because the app's
  * real storage is IndexedDB (`src/storage/indexedDbStudioStorage.ts`,
@@ -10,6 +12,10 @@ export interface StudioStorage {
   /** The saved Settings, or undefined on a fresh tablet. */
   loadSettings(): Promise<SettingsRecord | undefined>;
   saveSettings(settings: SettingsRecord): Promise<void>;
+  /** Every saved My Script (any order). */
+  listMyScripts(): Promise<MyScriptRecord[]>;
+  /** Saves a My Script with its Glyphs, replacing any with the same id. */
+  saveMyScript(script: MyScriptRecord): Promise<void>;
 }
 
 /** Bump when the Settings record's shape changes. */
@@ -26,12 +32,19 @@ export interface SettingsRecord {
 /** Storage that lives only in memory. Share one between two cores to "reload the app". */
 export function inMemoryStudioStorage(): StudioStorage {
   let settings: SettingsRecord | undefined;
+  const myScripts = new Map<string, MyScriptRecord>();
   return {
     async loadSettings() {
       return settings && structuredClone(settings);
     },
     async saveSettings(s) {
       settings = structuredClone(s);
+    },
+    async listMyScripts() {
+      return [...myScripts.values()].map((r) => structuredClone(r));
+    },
+    async saveMyScript(script) {
+      myScripts.set(script.id, structuredClone(script));
     },
   };
 }

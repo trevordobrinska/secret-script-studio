@@ -75,6 +75,9 @@ describe("the Library", () => {
         ...["greek", "cyrillic", "hangul", "hebrew", "arabic", "devanagari", "georgian", "armenian"],
         ...["hiragana", "katakana", "elder-futhark", "ogham", "thai", "ethiopic", "cherokee", "tifinagh"],
         ...["roman", "mayan", "babylonian", "chinese-numerals", "eastern-arabic"],
+        // Library V1.1 writing systems (ticket 04)
+        ...["glagolitic", "coptic", "gothic", "phoenician", "younger-futhark", "canadian-syllabics"],
+        ...["tibetan", "bengali", "tamil", "linear-b", "egyptian-hieroglyphs"],
       ].sort(),
     );
     expect(ids.join(" ")).not.toMatch(/enchant|galactic/i);
@@ -104,6 +107,18 @@ describe("the Library", () => {
     babylonian: /^\p{Script=Cuneiform}+$/u,
     "chinese-numerals": /^\p{Script=Han}+$/u,
     "eastern-arabic": /^[٠-٩]+$/u,
+    // Library V1.1 writing systems (ticket 04)
+    glagolitic: /^[\p{Script=Glagolitic}\s]+$/u,
+    coptic: /^[\p{Script=Coptic}\s]+$/u,
+    gothic: /^[\p{Script=Gothic}\s]+$/u,
+    phoenician: /^[\p{Script=Phoenician}\s]+$/u,
+    "younger-futhark": /^[\p{Script=Runic}\s]+$/u,
+    "canadian-syllabics": /^[\p{Script=Canadian_Aboriginal}\s]+$/u,
+    tibetan: /^[\p{Script=Tibetan}\s]+$/u,
+    bengali: /^[\p{Script=Bengali}\s]+$/u,
+    tamil: /^[\p{Script=Tamil}\s]+$/u,
+    "linear-b": /^[\p{Script=Linear_B}\s]+$/u,
+    "egyptian-hieroglyphs": /^[\p{Script=Egyptian_Hieroglyphs}\s]+$/u,
   };
 
   it("writes every character and numeral in its own script's letters", () => {
@@ -141,6 +156,18 @@ describe("the Library", () => {
     expect(numeral("ethiopic", "፲")).toBe(10);
     expect(numeral("hebrew", "י")).toBe(10);
     expect(numeral("hebrew", "ת")).toBe(400);
+    expect(numeral("bengali", "৭")).toBe(7);
+    expect(numeral("tamil", "௪")).toBe(4);
+  });
+
+  it("speaks Bengali, Tamil and Tibetan in their own languages, and the old scripts in English", () => {
+    const studio = newStudio();
+    expect(studio.worldScript("bengali")?.voice).toBe("bn");
+    expect(studio.worldScript("tamil")?.voice).toBe("ta");
+    expect(studio.worldScript("tibetan")?.voice).toBe("bo");
+    for (const id of ["glagolitic", "coptic", "gothic", "phoenician", "younger-futhark", "canadian-syllabics", "linear-b", "egyptian-hieroglyphs"]) {
+      expect(studio.worldScript(id)?.voice, id).toBeUndefined();
+    }
   });
 
   it("marks Hebrew and Arabic as written right to left, and the rest left to right", () => {

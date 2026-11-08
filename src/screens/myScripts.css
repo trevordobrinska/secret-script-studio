@@ -296,6 +296,32 @@
   border: 3px dashed var(--line);
   border-radius: 10px;
 }
+/* A drawn Glyph's cell carries a 🔊 in its top-right corner; the cell glows while it speaks. */
+.ms-slot-wrap {
+  position: relative;
+  display: flex;
+}
+.ms-slot-wrap > .ms-slot {
+  flex: 1;
+  transition: box-shadow 200ms ease-out, border-color 200ms ease-out;
+}
+.ms-slot.speaking {
+  border-color: #6fae86;
+  box-shadow: 0 0 0 4px #cfe9d8, 0 0 18px 6px #cfe9d8;
+}
+.ms-slot-hear {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 2px solid var(--line);
+  border-radius: 50%;
+  background: #fff;
+  font-size: 18px;
+  line-height: 1;
+}
 .ms-slot-label {
   font-size: 18px;
   color: var(--soft-ink);

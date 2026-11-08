@@ -7,6 +7,7 @@ import type { GlyphSlot } from "./myScript";
 import { createNumberExplorer, type NumberExplorerCommands } from "./numberExplorer";
 import { createWriting, type WritingCommands } from "./writing";
 import { createDiary, type DiaryCommands } from "./diary";
+import { backupFileName, backupText, parseBackup, type BackupCommands } from "./backup";
 import { createSharing, type SharingCommands } from "./sharing";
 
 /** Everything the Studio core needs from the outside world. */
@@ -82,6 +83,7 @@ export interface StudioCore
     WritingCommands,
     DiaryCommands,
     NumberExplorerCommands,
+    BackupCommands,
     SharingCommands {
   /** The screen that is showing now. The app opens on home. */
   screen(): Screen;
@@ -196,6 +198,19 @@ export function createStudioCore({ storage, clock }: StudioCoreDeps): StudioCore
       saveSettings();
     },
     saved: () => pending,
+    makeBackup() {
+      const contents = { myScripts: myScriptBook.commands.myScripts(), messages: diary.all(), settings };
+      return { fileName: backupFileName(clock.now()), text: backupText(contents) };
+    },
+    restoreBackup(text) {
+      const contents = parseBackup(text);
+      if (!contents) return { ok: false, reason: "unreadable" };
+      myScriptBook.restored(contents.myScripts);
+      diary.restored(contents.messages);
+      settings = contents.settings;
+      saveSettings();
+      return { ok: true, myScripts: contents.myScripts.length, messages: contents.messages.length };
+    },
   };
 
   /** A My Script was deleted: its Messages (and its draft) go with it. */

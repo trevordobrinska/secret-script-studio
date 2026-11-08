@@ -162,6 +162,10 @@ export function createMyScriptBook({ clock, save, remove }: MyScriptBookDeps) {
         if (script && !scripts.has(script.id)) scripts.set(script.id, script);
       }
     },
+    /** Restore: each My Script is added, or replaces the one with the same id, and is saved. */
+    restored(restoredScripts: readonly MyScript[]): void {
+      for (const script of restoredScripts) put(script);
+    },
   };
 }
 

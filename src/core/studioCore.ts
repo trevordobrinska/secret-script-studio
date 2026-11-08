@@ -7,6 +7,7 @@ import type { GlyphSlot } from "./myScript";
 import { createNumberExplorer, type NumberExplorerCommands } from "./numberExplorer";
 import { createWriting, type WritingCommands } from "./writing";
 import { createDiary, type DiaryCommands } from "./diary";
+import { backupFileName, backupText, parseBackup, type BackupCommands } from "./backup";
 
 /** Everything the Studio core needs from the outside world. */
 export interface StudioCoreDeps {
@@ -69,7 +70,7 @@ const DEFAULT_SETTINGS: SettingsView = { muted: false, numberHintSeen: false };
  * The Studio core: every rule of the app, with no DOM. Screens read its
  * views and call its commands. Commands return results and never throw.
  */
-export interface StudioCore extends MyScriptCommands, WritingCommands, DiaryCommands, NumberExplorerCommands {
+export interface StudioCore extends MyScriptCommands, WritingCommands, DiaryCommands, NumberExplorerCommands, BackupCommands {
   /** The screen that is showing now. The app opens on home. */
   screen(): Screen;
   /** The home screen's tiles, in their fixed order. */
@@ -181,6 +182,19 @@ export function createStudioCore({ storage, clock }: StudioCoreDeps): StudioCore
       saveSettings();
     },
     saved: () => pending,
+    makeBackup() {
+      const contents = { myScripts: myScriptBook.commands.myScripts(), messages: diary.all(), settings };
+      return { fileName: backupFileName(clock.now()), text: backupText(contents) };
+    },
+    restoreBackup(text) {
+      const contents = parseBackup(text);
+      if (!contents) return { ok: false, reason: "unreadable" };
+      myScriptBook.restored(contents.myScripts);
+      diary.restored(contents.messages);
+      settings = contents.settings;
+      saveSettings();
+      return { ok: true, myScripts: contents.myScripts.length, messages: contents.messages.length };
+    },
   };
 
   /** A My Script was deleted: its Messages (and its draft) go with it. */

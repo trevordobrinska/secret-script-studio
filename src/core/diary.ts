@@ -110,6 +110,14 @@ export function createDiary({ clock, myScript, writing, save, remove }: DiaryDep
         messages.set(message.id, message);
       }
     },
+    /** Every Message of every My Script, oldest first (for Backup). */
+    all(): readonly Message[] {
+      return [...messages.values()].sort((a, b) => a.createdAt - b.createdAt || a.id.localeCompare(b.id));
+    },
+    /** Restore: each Message is added, or replaces the one with the same id, and is saved. */
+    restored(restoredMessages: readonly Message[]): void {
+      for (const message of restoredMessages) put(message);
+    },
     /** A My Script was deleted: forget its Messages and its draft (storage is handled by the core). */
     myScriptDeleted(scriptId: string): void {
       for (const [id, message] of messages) if (message.scriptId === scriptId) messages.delete(id);

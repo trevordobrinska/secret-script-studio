@@ -2,11 +2,11 @@ import { playTap } from "../sound/sound";
 import type { Screen, StudioCore } from "../core/studioCore";
 import { homeScreen } from "./homeScreen";
 import { libraryScreen, worldScriptScreen } from "./libraryScreens";
-import { placeholderScreen } from "./placeholderScreen";
 import { myScriptsScreen } from "./myScriptsScreen";
 import { newMyScriptScreen } from "./newMyScriptScreen";
 import { glyphGridScreen } from "./glyphGridScreen";
 import { glyphCanvasScreen } from "./glyphCanvasScreen";
+import { numberExplorerScreen } from "./numberExplorerScreen";
 import { writeScreen } from "./writeScreen";
 import { nameNudgeScreen } from "./nameNudgeScreen";
 import { messageScreen, messagesScreen } from "./messagesScreens";
@@ -22,7 +22,7 @@ const SCREENS: { [N in Screen["name"]]: RenderScreen<Extract<Screen, { name: N }
   myScripts: myScriptsScreen,
   library: libraryScreen,
   worldScript: worldScriptScreen,
-  numberExplorer: placeholderScreen,
+  numberExplorer: numberExplorerScreen,
   newMyScript: newMyScriptScreen,
   glyphGrid: glyphGridScreen,
   glyphCanvas: glyphCanvasScreen,

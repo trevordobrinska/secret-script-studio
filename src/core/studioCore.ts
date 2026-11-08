@@ -4,6 +4,7 @@ import type { WorldScript } from "./library/worldScript";
 import { SETTINGS_SCHEMA_VERSION, type SettingsRecord, type StudioStorage } from "./studioStorage";
 import { createMyScriptBook, type MyScriptCommands } from "./myScriptBook";
 import type { GlyphSlot } from "./myScript";
+import { createNumberExplorer, type NumberExplorerCommands } from "./numberExplorer";
 import { createWriting, type WritingCommands } from "./writing";
 import { createDiary, type DiaryCommands } from "./diary";
 
@@ -42,7 +43,7 @@ export type Screen =
       readonly slot: GlyphSlot;
       /** The name nudge's letters: "Save + next" offers these first. */
       readonly startWith?: readonly GlyphSlot[];
-      /** Where Save and Back go (e.g. the Write screen); without it, the Glyph grid. */
+      /** Where Save and Back go (e.g. the Write screen or the Number Explorer); without it, the Glyph grid. */
       readonly returnTo?: Screen;
     }
   /** The name nudge for a brand-new My Script: "start with the letters of your name". */
@@ -68,7 +69,7 @@ const DEFAULT_SETTINGS: SettingsView = { muted: false, numberHintSeen: false };
  * The Studio core: every rule of the app, with no DOM. Screens read its
  * views and call its commands. Commands return results and never throw.
  */
-export interface StudioCore extends MyScriptCommands, WritingCommands, DiaryCommands {
+export interface StudioCore extends MyScriptCommands, WritingCommands, DiaryCommands, NumberExplorerCommands {
   /** The screen that is showing now. The app opens on home. */
   screen(): Screen;
   /** The home screen's tiles, in their fixed order. */
@@ -129,13 +130,26 @@ export function createStudioCore({ storage, clock }: StudioCoreDeps): StudioCore
     },
   });
 
+  const numberExplorer = createNumberExplorer({
+    clock,
+    myScripts: myScriptBook.commands.myScripts,
+    hintSeen: () => settings.numberHintSeen,
+    markHintSeen: () => {
+      settings = { ...settings, numberHintSeen: true };
+      saveSettings();
+    },
+  });
+
   return {
     ...myScriptBook.commands,
     ...writing,
     ...diary.commands,
+    ...numberExplorer.commands,
     screen: () => current,
     homeTiles: () => HOME_TILES,
     open(screen) {
+      // Coming in from home is a fresh start; coming back from the Glyph canvas keeps his place.
+      if (screen.name === "numberExplorer" && current.name === "home") numberExplorer.start();
       current = screen;
     },
     goHome() {

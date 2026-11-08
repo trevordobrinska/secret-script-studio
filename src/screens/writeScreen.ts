@@ -5,6 +5,7 @@ import { glyphImage } from "../render/glyphRenderer";
 import { messageView } from "../render/messageView";
 import { playKey, playTap } from "../sound/sound";
 import { el, type RenderScreen } from "./screen";
+import { writeTools } from "./writeTools";
 
 const MESSAGE_CELL = 64;
 const KEY_GLYPH = 44;
@@ -14,7 +15,8 @@ const KEY_GLYPH = 44;
  * each), and below it a keyboard of his own Glyphs with space and
  * backspace. The keyboard is built once and never moves; only the Message
  * redraws as he types. Tapping a Missing Glyph opens the canvas for it and
- * comes back here. (Saving the Message is ticket 06.)
+ * comes back here. A row of tools above the Message (writeTools) has the
+ * diary, secret mode, New Message and Save.
  */
 export const writeScreen: RenderScreen<{ name: "write"; scriptId: string }> = (root, screen, { core, go }) => {
   const script = core.myScript(screen.scriptId);
@@ -26,11 +28,13 @@ export const writeScreen: RenderScreen<{ name: "write"; scriptId: string }> = (r
 
   root.append(el("h1", "screen-title", script.name));
 
+  const tools = writeTools(core, scriptId, go, () => drawMessage());
   const message = el("div", "wr-message");
   const keyboard = el("div", "wr-keyboard");
-  root.append(message, keyboard);
+  root.append(tools.row, message, keyboard);
 
   function drawMessage(): void {
+    tools.update();
     const draft = core.draft(scriptId);
     if (draft === "") {
       message.replaceChildren(el("p", "wr-hint", "Tap the keys to write in " + script!.name + "."));
@@ -38,6 +42,7 @@ export const writeScreen: RenderScreen<{ name: "write"; scriptId: string }> = (r
     }
     const view = messageView(core.messageLayout(scriptId, draft), script!, {
       cellSize: MESSAGE_CELL,
+      plainLetters: !core.secretMode(),
       onMissingGlyph: (slot) => {
         playTap();
         go({ name: "glyphCanvas", scriptId, slot, returnTo: { name: "write", scriptId } });

@@ -9,6 +9,7 @@ import { glyphCanvasScreen } from "./glyphCanvasScreen";
 import { numberExplorerScreen } from "./numberExplorerScreen";
 import { writeScreen } from "./writeScreen";
 import { nameNudgeScreen } from "./nameNudgeScreen";
+import { messageScreen, messagesScreen } from "./messagesScreens";
 import type { RenderScreen, ScreenContext } from "./screen";
 
 /**
@@ -27,6 +28,8 @@ const SCREENS: { [N in Screen["name"]]: RenderScreen<Extract<Screen, { name: N }
   glyphCanvas: glyphCanvasScreen,
   write: writeScreen,
   nameNudge: nameNudgeScreen,
+  messages: messagesScreen,
+  message: messageScreen,
 };
 
 /**

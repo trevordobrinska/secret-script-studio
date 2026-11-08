@@ -52,9 +52,9 @@ function cipherKeyPage(layout: PrintLayout): HTMLElement {
     const glyph = div("pr-key-glyph");
     glyph.append(glyphSvg(entry.glyph.strokes, layout));
     const label = div(`pr-key-label${entry.label.length > 2 ? " pr-key-word" : ""}`, `= ${entry.label}`);
-    if (entry.sound) {
+    if (entry.glyph.sound) {
       const words = div("pr-key-words");
-      words.append(label, div("pr-key-sound", `says "${entry.sound}"`));
+      words.append(label, div("pr-key-sound", `says "${entry.glyph.sound}"`));
       row.append(glyph, words);
     } else {
       row.append(glyph, label);

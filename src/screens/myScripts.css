@@ -362,23 +362,26 @@
   gap: 18px;
   width: 180px;
 }
-/* The canvas, with the Sound box right under it for letters and digits. */
+/*
+ * The canvas, with the Sound box right under it. Space and punctuation
+ * keep the box's room (hidden), so the canvas and buttons never move.
+ */
 .ms-drawing {
-  --sound-row: 0px;
+  --sound-row: 84px; /* the Sound box's height plus the gap */
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
-.ms-stage.has-sound .ms-drawing {
-  --sound-row: 84px;
-}
-.ms-stage.has-sound .ms-canvas {
+.ms-drawing .ms-canvas {
   width: min(calc(100vh - var(--bar) - 32px - var(--sound-row)), calc(100vw - 280px));
 }
 .ms-sound {
   display: flex;
   gap: 12px;
   height: 72px;
+}
+.ms-sound.no-sound {
+  visibility: hidden;
 }
 .ms-sound-input {
   flex: 1;
@@ -405,8 +408,7 @@
     flex-direction: column;
     justify-content: flex-start;
   }
-  .ms-canvas,
-  .ms-stage.has-sound .ms-canvas {
+  .ms-drawing .ms-canvas {
     width: min(calc(100vw - 32px), calc(100vh - var(--bar) - 140px - var(--sound-row)));
   }
   .ms-tools {

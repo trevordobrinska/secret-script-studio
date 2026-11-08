@@ -28,9 +28,8 @@ export interface CipherKeyEntry {
   readonly slot: GlyphSlot;
   /** The plain letter, digit or mark, as the kid sees it: "A", "7", "12", "space", "?". */
   readonly label: string;
+  /** The Glyph; its Sound, if any, is printed small under the letter. */
   readonly glyph: Glyph;
-  /** The Glyph's Sound, printed small under the letter. Absent when it has none. */
-  readonly sound?: string;
 }
 
 export type PrintLayoutResult =
@@ -89,7 +88,6 @@ function printout(
 function cipherKeyOf(glyphs: GlyphSet): CipherKeyEntry[] {
   return GLYPH_SLOTS.flatMap((slot) => {
     const glyph = glyphs[slot];
-    if (!glyph) return [];
-    return [{ slot, label: slotLabel(slot), glyph, ...(glyph.sound ? { sound: glyph.sound } : {}) }];
+    return glyph ? [{ slot, label: slotLabel(slot), glyph }] : [];
   });
 }

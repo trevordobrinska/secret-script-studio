@@ -3,6 +3,7 @@ import "./messages.css";
 import type { Message } from "../core/message";
 import { messageView } from "../render/messageView";
 import { playTap } from "../sound/sound";
+import { stopSpeaking } from "../sound/speech";
 import { openPrintChoice } from "./printChoice";
 import { el, type RenderScreen } from "./screen";
 import { readItToMeButton } from "./readItToMeButton";
@@ -75,8 +76,7 @@ export const messagesScreen: RenderScreen<{ name: "messages"; scriptId: string }
  * Re-reading one saved Message, big, in his current Glyphs. Missing
  * Glyphs can be tapped to draw them (and he comes back here). Edit puts
  * it on the Write screen; Read it to me says it in his Sounds; Share
- * shows it as a QR code; Delete asks
- * first, in place.
+ * shows it as a QR code; Delete asks first, in place.
  */
 export const messageScreen: RenderScreen<{ name: "message"; messageId: string }> = (root, screen, { core, go }) => {
   const message = core.message(screen.messageId);
@@ -162,6 +162,7 @@ export const messageScreen: RenderScreen<{ name: "message"; messageId: string }>
 
   drawActions();
   drawMessage();
+  return stopSpeaking;
 };
 
 function button(text: string, className: string): HTMLButtonElement {

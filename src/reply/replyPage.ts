@@ -47,7 +47,7 @@ function replyPage(core: StudioCore, shared: SharedMessage): HTMLElement {
   });
   drawMessage();
   const messageActions = el("div", "rp-actions");
-  messageActions.append(reveal, phoneButton(readItToMeButton(() => core.readItToMe(shared.text, shared.glyphs))));
+  messageActions.append(reveal, readItToMeButton(() => core.readItToMe(shared.text, shared.glyphs), "rp-button"));
   page.append(messageCard, messageActions);
 
   // Dad's reply, laid out live in the shared Glyphs.
@@ -70,7 +70,7 @@ function replyPage(core: StudioCore, shared: SharedMessage): HTMLElement {
   input.addEventListener("input", drawReply);
   drawReply();
   // Read Dad's reply aloud in the shared Sounds, as it is when he taps.
-  const readReply = phoneButton(readItToMeButton(() => core.readItToMe(input.value, shared.glyphs)));
+  const readReply = readItToMeButton(() => core.readItToMe(input.value, shared.glyphs), "rp-button");
   const updateReadReply = () => (readReply.disabled = input.value.trim() === "");
   input.addEventListener("input", updateReadReply);
   updateReadReply();
@@ -109,12 +109,6 @@ function replyPage(core: StudioCore, shared: SharedMessage): HTMLElement {
   }
 
   return page;
-}
-
-/** Gives a Studio button the reply page's look, keeping its other classes (such as its glow). */
-function phoneButton(button: HTMLButtonElement): HTMLButtonElement {
-  button.classList.replace("ms-button", "rp-button");
-  return button;
 }
 
 function couldntOpenPage(): HTMLElement {

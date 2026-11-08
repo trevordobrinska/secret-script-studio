@@ -5,6 +5,7 @@ import { slotLabel, type GlyphSlot } from "../core/myScript";
 import { glyphImage } from "../render/glyphRenderer";
 import { messageView } from "../render/messageView";
 import { playKey, playTap } from "../sound/sound";
+import { stopSpeaking } from "../sound/speech";
 import { openPrintChoice } from "./printChoice";
 import { el, type RenderScreen } from "./screen";
 import { writeTools } from "./writeTools";
@@ -105,4 +106,5 @@ export const writeScreen: RenderScreen<{ name: "write"; scriptId: string }> = (r
   }
 
   drawMessage();
+  return stopSpeaking;
 };

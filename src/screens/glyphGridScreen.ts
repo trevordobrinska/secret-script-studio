@@ -3,6 +3,7 @@ import { GLYPH_SLOTS, slotLabel, type GlyphSlot, type MyScript } from "../core/m
 import { glyphImage } from "../render/glyphRenderer";
 import type { StudioCore } from "../core/studioCore";
 import { playTap } from "../sound/sound";
+import { stopSpeaking } from "../sound/speech";
 import { tapToHear } from "../sound/tapToHear";
 import { el, type RenderScreen } from "./screen";
 
@@ -57,6 +58,7 @@ export const glyphGridScreen: RenderScreen<{ name: "glyphGrid"; scriptId: string
   for (const slot of GLYPH_SLOTS) grid.append(slotCell(core, script, slot, open));
   scroller.append(grid);
   root.append(scroller);
+  return stopSpeaking;
 };
 
 /**

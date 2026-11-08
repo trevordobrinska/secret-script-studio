@@ -8,9 +8,10 @@ import { secretToggle } from "./secretToggle";
 
 /**
  * The Write screen's tool row: My Messages (the diary), secret mode, Read
- * it to me, New Message and Save. Every button is always there, so nothing moves; New
- * and Save (and Read it to me) are greyed out when there is nothing to clear, save or read. New
- * asks for a second tap before it throws away unsaved writing.
+ * it to me, New Message and Save. Every button is always there, so
+ * nothing moves; Read it to me, New and Save are greyed out when there is
+ * nothing to read, clear or save. New asks for a second tap before it
+ * throws away unsaved writing.
  * `redraw` redraws the Message; it calls `update()` back to refresh the row.
  */
 export function writeTools(

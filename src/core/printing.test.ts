@@ -125,16 +125,16 @@ describe("printing from the Reply page (a shared Message)", () => {
 describe("Sounds on the printed Cipher Key", () => {
   const stroke = [[{ x: 0.2, y: 0.2 }, { x: 0.8, y: 0.8 }]];
 
-  it("an entry carries its Glyph's Sound, and one without a Sound has none", async () => {
+  it("an entry's Glyph carries its Sound, and one without a Sound has none", async () => {
     const { studio, script } = await studioWithMyScript();
     studio.saveGlyph(script.id, "A", stroke, "kla");
     studio.saveGlyph(script.id, "B", stroke);
     const print = studio.printLayout(script.id, "AB", { cipherKey: true });
     if (!print.ok) throw new Error(print.reason);
     const [a, b] = print.layout.cipherKey!;
-    expect(a).toMatchObject({ label: "A", sound: "kla" });
+    expect(a).toMatchObject({ label: "A", glyph: { sound: "kla" } });
     expect(b.label).toBe("B");
-    expect(b).not.toHaveProperty("sound");
+    expect(b.glyph).not.toHaveProperty("sound");
   });
 
   it("a shared Message's Glyphs print their Sounds, and those without print as today", async () => {
@@ -149,8 +149,8 @@ describe("Sounds on the printed Cipher Key", () => {
     const print = dad.sharedPrintLayout(opened.message, "AB", { cipherKey: true });
     if (!print.ok) throw new Error(print.reason);
     const [a, b] = print.layout.cipherKey!;
-    expect(a).toMatchObject({ label: "A", sound: "kla" });
+    expect(a).toMatchObject({ label: "A", glyph: { sound: "kla" } });
     expect(b.label).toBe("B");
-    expect(b).not.toHaveProperty("sound");
+    expect(b.glyph).not.toHaveProperty("sound");
   });
 });

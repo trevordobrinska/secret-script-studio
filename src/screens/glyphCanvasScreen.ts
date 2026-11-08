@@ -33,15 +33,15 @@ export const glyphCanvasScreen: RenderScreen<Extract<Screen, { name: "glyphCanva
   const stage = el("div", "ms-stage");
   const canvas = el("canvas", "ms-canvas");
   // Letters and digits get a "How does it sound?" box right under the canvas,
-  // with a 🔊 to try what's typed. It saves with the drawing.
+  // with a 🔊 to try what's typed. It saves with the drawing. Space and
+  // punctuation keep its room, empty, so nothing moves between slots.
   const soundBox = canHaveSound(screen.slot) ? soundRow(script.glyphs[screen.slot]?.sound) : undefined;
   if (soundBox) {
     const hear = tapToHear(soundBox.tryIt);
     soundBox.tryIt.addEventListener("click", () => hear(core.glyphTap(script.id, screen.slot, soundBox.input.value)));
   }
   const drawing = el("div", "ms-drawing");
-  drawing.append(canvas);
-  if (soundBox) drawing.append(soundBox.row);
+  drawing.append(canvas, soundBox?.row ?? el("div", "ms-sound no-sound"));
   const tools = el("div", "ms-tools");
   const undo = toolButton("Undo", "ms-undo");
   const clear = toolButton("Clear", "ms-clear");
@@ -49,7 +49,6 @@ export const glyphCanvasScreen: RenderScreen<Extract<Screen, { name: "glyphCanva
   const save = toolButton("Save", "ms-save");
   const back = toolButton("Back", "ms-back");
   tools.append(undo, clear, saveNext, save, back);
-  stage.classList.toggle("has-sound", soundBox !== undefined);
   stage.append(drawing, tools);
   root.append(stage);
 

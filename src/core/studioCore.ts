@@ -5,6 +5,7 @@ import { SETTINGS_SCHEMA_VERSION, type SettingsRecord, type StudioStorage } from
 import { createMyScriptBook, type MyScriptCommands } from "./myScriptBook";
 import type { GlyphSlot } from "./myScript";
 import { createWriting, type WritingCommands } from "./writing";
+import { createDiary, type DiaryCommands } from "./diary";
 
 /** Everything the Studio core needs from the outside world. */
 export interface StudioCoreDeps {
@@ -63,7 +64,7 @@ const DEFAULT_SETTINGS: SettingsView = { muted: false, numberHintSeen: false };
  * The Studio core: every rule of the app, with no DOM. Screens read its
  * views and call its commands. Commands return results and never throw.
  */
-export interface StudioCore extends MyScriptCommands, WritingCommands {
+export interface StudioCore extends MyScriptCommands, WritingCommands, DiaryCommands {
   /** The screen that is showing now. The app opens on home. */
   screen(): Screen;
   /** The home screen's tiles, in their fixed order. */
@@ -108,9 +109,26 @@ export function createStudioCore({ storage, clock }: StudioCoreDeps): StudioCore
 
   const writing = createWriting({ myScript: myScriptBook.commands.myScript });
 
+  const diary = createDiary({
+    clock,
+    myScript: myScriptBook.commands.myScript,
+    writing,
+    save: (record) => {
+      pending = pending
+        .then(() => storage.saveMessage(record))
+        .catch((error) => console.warn("Couldn't save a Message.", error));
+    },
+    remove: (id) => {
+      pending = pending
+        .then(() => storage.deleteMessage(id))
+        .catch((error) => console.warn("Couldn't delete a Message.", error));
+    },
+  });
+
   return {
     ...myScriptBook.commands,
     ...writing,
+    ...diary.commands,
     screen: () => current,
     homeTiles: () => HOME_TILES,
     open(screen) {
@@ -131,6 +149,11 @@ export function createStudioCore({ storage, clock }: StudioCoreDeps): StudioCore
       } catch (error) {
         console.warn("Couldn't read the saved My Scripts.", error);
       }
+      try {
+        diary.loaded(await storage.listMessages());
+      } catch (error) {
+        console.warn("Couldn't read the saved Messages.", error);
+      }
     },
     settings: () => settings,
     library: () => LIBRARY,
@@ -142,11 +165,9 @@ export function createStudioCore({ storage, clock }: StudioCoreDeps): StudioCore
     saved: () => pending,
   };
 
-  /**
-   * A My Script was deleted: its Messages go with it. Ticket 06 (Messages)
-   * also drops that script's Messages from the core's memory here.
-   */
+  /** A My Script was deleted: its Messages (and its draft) go with it. */
   function myScriptDeleted(scriptId: string): void {
+    diary.myScriptDeleted(scriptId);
     pending = pending
       .then(() => storage.deleteMyScript(scriptId))
       .then(() => storage.deleteMessagesOfMyScript(scriptId))

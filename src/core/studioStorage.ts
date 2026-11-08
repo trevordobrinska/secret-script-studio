@@ -1,3 +1,4 @@
+import type { MessageRecord } from "./message";
 import type { MyScriptRecord } from "./myScript";
 
 /**
@@ -18,11 +19,14 @@ export interface StudioStorage {
   saveMyScript(script: MyScriptRecord): Promise<void>;
   /** Deletes a saved My Script (and its Glyphs). No error if it isn't there. */
   deleteMyScript(id: string): Promise<void>;
-  /**
-   * Deletes every saved Message of one My Script (called when the My Script
-   * is deleted). No-op until ticket 06 adds the Messages store.
-   */
+  /** Deletes every saved Message of one My Script (called when the My Script is deleted). */
   deleteMessagesOfMyScript(scriptId: string): Promise<void>;
+  /** Every saved Message of every My Script (any order). */
+  listMessages(): Promise<MessageRecord[]>;
+  /** Saves a Message, replacing any with the same id. */
+  saveMessage(message: MessageRecord): Promise<void>;
+  /** Deletes one saved Message. No error if it isn't there. */
+  deleteMessage(id: string): Promise<void>;
 }
 
 /** Bump when the Settings record's shape changes. */
@@ -40,6 +44,7 @@ export interface SettingsRecord {
 export function inMemoryStudioStorage(): StudioStorage {
   let settings: SettingsRecord | undefined;
   const myScripts = new Map<string, MyScriptRecord>();
+  const messages = new Map<string, MessageRecord>();
   return {
     async loadSettings() {
       return settings && structuredClone(settings);
@@ -56,8 +61,17 @@ export function inMemoryStudioStorage(): StudioStorage {
     async deleteMyScript(id) {
       myScripts.delete(id);
     },
-    async deleteMessagesOfMyScript(_scriptId) {
-      // Ticket 06: delete this My Script's Messages here.
+    async deleteMessagesOfMyScript(scriptId) {
+      for (const [id, message] of messages) if (message.scriptId === scriptId) messages.delete(id);
+    },
+    async listMessages() {
+      return [...messages.values()].map((r) => structuredClone(r));
+    },
+    async saveMessage(message) {
+      messages.set(message.id, structuredClone(message));
+    },
+    async deleteMessage(id) {
+      messages.delete(id);
     },
   };
 }

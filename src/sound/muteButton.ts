@@ -16,4 +16,6 @@ export function startMuteButton(core: StudioCore, button: HTMLButtonElement): vo
     playTap(); // only heard when sound was just turned on
   });
   show();
+  // Restore (backupPanel.ts) can change the muted setting.
+  window.addEventListener("studio-settings-changed", show);
 }

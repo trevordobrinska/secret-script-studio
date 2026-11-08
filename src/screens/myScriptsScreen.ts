@@ -4,6 +4,7 @@ import { glyphImage } from "../render/glyphRenderer";
 import { playTap } from "../sound/sound";
 import { el, type RenderScreen } from "./screen";
 import { SECTION_NAMES } from "./sectionNames";
+import { backupPanel } from "./backupPanel";
 
 /** How many of a My Script's Glyphs its card previews. */
 const PREVIEW_GLYPHS = 6;
@@ -29,12 +30,15 @@ export const myScriptsScreen: RenderScreen<{ name: "myScripts" }> = (root, _scre
   top.append(make);
   const list = el("div", "ms-list");
   root.append(top, list);
+  // Backup/Restore sit at the very end of the list: reachable, but out of the way.
+  const backup = backupPanel(core, () => draw());
 
   function draw(): void {
     const scripts = core.myScripts();
     list.replaceChildren(
       ...(scripts.length === 0 ? [el("p", "ms-hint", "Invent your own writing system!")] : []),
       ...scripts.map(card),
+      backup,
     );
     list.querySelector<HTMLInputElement>(".ms-rename-input")?.focus();
   }

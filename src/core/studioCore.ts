@@ -29,8 +29,12 @@ export type Screen =
   | { readonly name: "newMyScript" }
   /** A My Script's grid of Glyph slots. */
   | { readonly name: "glyphGrid"; readonly scriptId: string }
-  /** The Glyph canvas, drawing one slot of a My Script. */
-  | { readonly name: "glyphCanvas"; readonly scriptId: string; readonly slot: GlyphSlot };
+  /**
+   * The Glyph canvas, drawing one slot of a My Script. Save and Back go to
+   * `returnTo` if given (e.g. the Number Explorer, after tapping a Missing
+   * digit), otherwise to the My Script's Glyph grid.
+   */
+  | { readonly name: "glyphCanvas"; readonly scriptId: string; readonly slot: GlyphSlot; readonly returnTo?: Screen };
 
 export type { WorldCharacter, WorldNumeral, WorldScript } from "./library/worldScript";
 

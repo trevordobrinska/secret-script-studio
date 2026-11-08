@@ -1,4 +1,6 @@
 import type { Clock } from "./deps";
+import { LIBRARY } from "./library/catalog";
+import type { WorldScript } from "./library/worldScript";
 import type { SettingsRecord, StudioStorage } from "./studioStorage";
 
 /** Everything the Studio core needs from the outside world. */
@@ -16,7 +18,12 @@ const HOME_TILES: readonly Section[] = ["myScripts", "library", "numberExplorer"
  * Which screen is showing. A tagged union: later tickets add screens, some
  * carrying details, e.g. `{ name: "glyphCanvas"; scriptId; slot }`.
  */
-export type Screen = { readonly name: "home" } | { readonly name: Section };
+export type Screen =
+  | { readonly name: "home" }
+  | { readonly name: Section }
+  | { readonly name: "worldScript"; readonly scriptId: string };
+
+export type { WorldCharacter, WorldNumeral, WorldScript } from "./library/worldScript";
 
 /** The Settings as the screens see them. */
 export interface SettingsView {
@@ -45,6 +52,10 @@ export interface StudioCore {
    */
   load(): Promise<void>;
   settings(): SettingsView;
+  /** The Library's World Scripts, in list order. Read-only. */
+  library(): readonly WorldScript[];
+  /** One World Script by id, or undefined if there is none. */
+  worldScript(id: string): WorldScript | undefined;
 }
 
 export function createStudioCore({ storage }: StudioCoreDeps): StudioCore {
@@ -69,6 +80,8 @@ export function createStudioCore({ storage }: StudioCoreDeps): StudioCore {
       }
     },
     settings: () => settings,
+    library: () => LIBRARY,
+    worldScript: (id) => LIBRARY.find((script) => script.id === id),
   };
 }
 

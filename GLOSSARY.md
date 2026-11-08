@@ -6,6 +6,12 @@ _Avoid_: font, cipher, alphabet, code
 **World Script**: a real writing system or numeral system (Greek, Hangul, Mayan numerals…) in the Library. He can look at it but not change it.
 _Avoid_: alphabet, language, built-in script
 
+**World Character**: one entry on a World Script's page: a letter, syllable or numeral shown big with its name and sound. Tapping it says it aloud.
+_Avoid_: Glyph, letter (it may be a syllable or numeral)
+
+**About**: the short description of a World Script: where it's used today, where it came from, and one fun fact.
+_Avoid_: blurb, history, info
+
 **Glyph**: the shape he drew for one letter (A–Z), digit (0–9), space or punctuation mark in a My Script. A My Script with only a few Glyphs still works.
 _Avoid_: character, symbol, icon, letter (when meaning the drawing)
 

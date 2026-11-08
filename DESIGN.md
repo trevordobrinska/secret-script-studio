@@ -50,6 +50,12 @@ Three big tiles, always in the same place: **My Scripts**, **Library**, **Number
 - **Content:** as many free, font-based scripts as possible. Bundle free fonts (e.g. Noto, OFL) for any the tablet lacks. Starter list: Greek, Cyrillic, Hangul, Hebrew, Arabic, Devanagari, Georgian, Armenian, hiragana and katakana, Elder Futhark runes, Ogham, Thai, Ethiopic, Cherokee, Tifinagh. Numeral systems: Roman, Mayan, Babylonian, Chinese, Eastern Arabic, Devanagari.
 - **The enchanting-table alphabet is skipped.** He can make it as a My Script if he wants.
 
+### Library V1.1 (grilled 2026-11-07)
+- **About:** every World Script (numeral systems too) gets 2–3 short sentences under its title, written for a 10-year-old: where it's used today, roughly how old it is and where it came from, and one fun fact. Claude drafts them and Dad skims them for accuracy and tone.
+- **Tap to hear:** tapping a World Character says its **name** aloud using the device's built-in voices (no recorded clips). It uses a voice for the script's own language when the tablet has one (Greek says "λάμδα"); otherwise an English voice says just the name ("lambda"), never the sound text. Numerals work the same: a writing system's numerals are said in its language, and numeral-only systems (Roman, Mayan, Babylonian…) say their value in English ("nineteen"). Speech runs a little slow (about 0.8×, to be tuned by ear). The card glows gently while it speaks.
+- **Mute silences everything**, the voice included. A tap while muted still glows the card, and the mute button gives one soft wiggle (no words), so he can tell the sound is off rather than broken.
+- **More World Scripts:** writing systems Glagolitic, Coptic, Gothic, Phoenician, Younger Futhark, Canadian syllabics (Inuktitut), Tibetan, Bengali, Tamil, Linear B and Egyptian hieroglyphs (the one-sound signs only); numeral systems Kaktovik (base 20, invented by Alaskan middle-schoolers), Egyptian, Attic Greek and Chinese rod numerals. Mongolian is skipped: it's written top to bottom, which the page layout doesn't do. Their fonts join the bundled-font work and wait on the tablet test like the rest.
+
 ## Data
 - My Scripts and Messages live in IndexedDB on his tablet, under the `secret-script-studio` name.
 - **Backup/Restore** file buttons that anyone can use, like Doodle Monsters. Hand-drawn Glyphs are hours of work, so backup matters even more here.
@@ -64,6 +70,7 @@ Three big tiles, always in the same place: **My Scripts**, **Library**, **Number
 - [ ] Finger drawing is smooth on a small Glyph canvas
 - [ ] Printing works (or not), which decides whether printing goes through the PC
 - [ ] Which Library scripts render with built-in fonts, and which need bundled fonts
+- [ ] Which Library languages the tablet's built-in voices can speak, and whether 0.8× speed sounds right
 - [ ] My phone camera opens the on-screen QR code
 
 ## Out of scope

@@ -10,6 +10,7 @@
 - [x] Numeral systems: Roman, Mayan, Babylonian, Chinese, Eastern Arabic, Devanagari
 - [ ] Free fonts (e.g. Noto, OFL) bundled, subset where practical, only for scripts ticket 15 found missing; license credits recorded
 - [x] The Library content check (ticket 12) passes for all entries
+- [ ] Also covers the Library V1.1 scripts (`.scratch/library-v1.1/` tickets 04 and 05); Kaktovik may need SVG-drawn digits if no free font exists
 - [ ] Re-check on the tablet that nothing renders as empty boxes
 - [x] Enchanting-table alphabet is **not** included
 

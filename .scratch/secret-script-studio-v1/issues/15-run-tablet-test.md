@@ -16,4 +16,5 @@
 - [ ] Printing works or doesn't (if not, printing goes through the PC via the QR link)
 - [ ] List of World Scripts and numeral systems that render as empty boxes (these need bundled fonts in ticket 16)
 - [ ] Dad's phone camera opens the on-screen QR code
+- [ ] Which Library languages the tablet's built-in voices speak (tap letters in Greek, Cyrillic, Hangul, Hebrew, Arabic, Hindi, Japanese, Thai, Amharic, Bengali, Tamil, Chinese), and whether 0.8× speed sounds right (Library V1.1, `.scratch/library-v1.1/`)
 - [ ] Results added under `## Comments` below; update DESIGN.md if anything changes a decision

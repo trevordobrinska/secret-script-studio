@@ -75,6 +75,7 @@ describe("the Library", () => {
         ...["greek", "cyrillic", "hangul", "hebrew", "arabic", "devanagari", "georgian", "armenian"],
         ...["hiragana", "katakana", "elder-futhark", "ogham", "thai", "ethiopic", "cherokee", "tifinagh"],
         ...["roman", "mayan", "babylonian", "chinese-numerals", "eastern-arabic"],
+        ...["kaktovik", "egyptian-numerals", "attic-greek", "rod-numerals"],
       ].sort(),
     );
     expect(ids.join(" ")).not.toMatch(/enchant|galactic/i);
@@ -104,6 +105,10 @@ describe("the Library", () => {
     babylonian: /^\p{Script=Cuneiform}+$/u,
     "chinese-numerals": /^\p{Script=Han}+$/u,
     "eastern-arabic": /^[٠-٩]+$/u,
+    kaktovik: /^[\u{1D2C0}-\u{1D2D3}]$/u,
+    "egyptian-numerals": /^\p{Script=Egyptian_Hieroglyphs}$/u,
+    "attic-greek": /^\p{Script=Greek}$/u,
+    "rod-numerals": /^[\u{1D360}-\u{1D371}]$/u,
   };
 
   it("writes every character and numeral in its own script's letters", () => {
@@ -141,6 +146,15 @@ describe("the Library", () => {
     expect(numeral("ethiopic", "፲")).toBe(10);
     expect(numeral("hebrew", "י")).toBe(10);
     expect(numeral("hebrew", "ת")).toBe(400);
+    expect(numeral("kaktovik", "\u{1D2C0}")).toBe(0);
+    expect(numeral("kaktovik", "\u{1D2D3}")).toBe(19);
+    expect(numeral("egyptian-numerals", "\u{133E4}")).toBe(1);
+    expect(numeral("egyptian-numerals", "\u{13068}")).toBe(1000000);
+    expect(numeral("attic-greek", "Δ")).toBe(10);
+    expect(numeral("attic-greek", "\u{10144}")).toBe(50);
+    expect(numeral("attic-greek", "\u{10147}")).toBe(50000);
+    expect(numeral("rod-numerals", "\u{1D360}")).toBe(1);
+    expect(numeral("rod-numerals", "\u{1D371}")).toBe(90);
   });
 
   it("marks Hebrew and Arabic as written right to left, and the rest left to right", () => {

@@ -1,7 +1,7 @@
 import type { Clock } from "./deps";
 import { LIBRARY } from "./library/catalog";
 import type { WorldScript } from "./library/worldScript";
-import type { SettingsRecord, StudioStorage } from "./studioStorage";
+import { SETTINGS_SCHEMA_VERSION, type SettingsRecord, type StudioStorage } from "./studioStorage";
 
 /** Everything the Studio core needs from the outside world. */
 export interface StudioCoreDeps {
@@ -56,11 +56,16 @@ export interface StudioCore {
   library(): readonly WorldScript[];
   /** One World Script by id, or undefined if there is none. */
   worldScript(id: string): WorldScript | undefined;
+  /** Turns the sounds off (true) or on (false). Remembered across reloads. */
+  setMuted(muted: boolean): void;
+  /** Resolves once every save started so far has finished (or failed and been logged). */
+  saved(): Promise<void>;
 }
 
 export function createStudioCore({ storage }: StudioCoreDeps): StudioCore {
   let current: Screen = { name: "home" };
   let settings: SettingsView = DEFAULT_SETTINGS;
+  let pending: Promise<void> = Promise.resolve();
 
   return {
     screen: () => current,
@@ -82,7 +87,19 @@ export function createStudioCore({ storage }: StudioCoreDeps): StudioCore {
     settings: () => settings,
     library: () => LIBRARY,
     worldScript: (id) => LIBRARY.find((script) => script.id === id),
+    setMuted(muted) {
+      settings = { ...settings, muted };
+      saveSettings();
+    },
+    saved: () => pending,
   };
+
+  function saveSettings(): void {
+    const record: SettingsRecord = { schemaVersion: SETTINGS_SCHEMA_VERSION, ...settings };
+    pending = pending
+      .then(() => storage.saveSettings(record))
+      .catch((error) => console.warn("Couldn't save the Settings.", error));
+  }
 }
 
 function settingsFrom(record: SettingsRecord): SettingsView {

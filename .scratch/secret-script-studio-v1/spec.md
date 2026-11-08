@@ -1,6 +1,6 @@
 # Spec: Secret Script Studio V1 (MVP)
 
-Status: ready-for-agent
+Status: ready-for-human
 
 Sources: `DESIGN.md` (decisions, grilled 2026-11-07) and `GLOSSARY.md` (vocabulary). Where this spec and DESIGN.md disagree, DESIGN.md wins: flag it, don't silently pick.
 

@@ -14,9 +14,7 @@ Calm by default: no timers, scores, fail states, randomness or gates. He doesn't
 - **Tests:** Vitest for the rules: rendering a Message with Missing Glyphs, digit conversion for Digit Counts 2–16, Stack counts, packing and unpacking the share link, and saving and loading My Scripts. Feel gets playtested by eye.
 
 ## The Arcade (suite-wide, its own project)
-- One home page, `Projects\arcade\` → repo `trevordobrinska.github.io`, with one big tile per game. Each game stays its own project and repo and links in at its own path.
-- **One shared menu** for both kids, with no per-kid setup. Approve the domain once in the Parent Dashboard.
-- **Suite rule:** every game shares one browser origin and so one storage area. **Each game prefixes its saved data with its own name** (e.g. IndexedDB database `secret-script-studio`). Doodle Monsters already does (database `doodle-monsters`).
+Secret Script Studio is one Game in the Dobrinska Arcade. The Arcade's design is in `Projects\arcade\DESIGN.md`, and the rules every Game follows are in `Projects\arcade\SUITE-RULES.md`. Those files are the source of truth for anything suite-wide. In short: the tablets install **only the Arcade**, this app never asks to be installed itself, and its Home screen has a house button back to the Arcade (`/`).
 
 ## Home screen
 Three big tiles, always in the same place: **My Scripts**, **Library**, **Number Explorer**. Everything is one tap from home.
@@ -74,7 +72,7 @@ His idea: give his own Glyphs sounds, so his My Scripts can be *spoken*, not jus
 ## Test on his tablet (when the model is known)
 - [ ] Find out the tablet model and browser
 - [ ] The Arcade and this app load in his Kids profile
-- [ ] Add-to-home-screen works and opens fullscreen
+- [ ] The installed Arcade opens this app fullscreen, and the house button and Back return to the Arcade (this app itself is never installed)
 - [ ] Saved data survives closing the app, rebooting and a few days
 - [ ] Downloading a backup file and the Restore file picker both work
 - [ ] Finger drawing is smooth on a small Glyph canvas

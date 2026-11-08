@@ -1,6 +1,6 @@
 # Spec: Library V1.1 (About, tap to hear, more World Scripts)
 
-Status: ready-for-agent
+Status: resolved
 
 Sources: `DESIGN.md` ("Library V1.1", grilled 2026-11-07) and `GLOSSARY.md` (World Script, World Character, About). Where this spec and DESIGN.md disagree, DESIGN.md wins: flag it, don't silently pick.
 

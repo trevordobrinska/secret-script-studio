@@ -1,6 +1,6 @@
 # Spec: Sounds for My Script Glyphs
 
-Status: ready-for-agent
+Status: resolved
 
 Sources: `DESIGN.md` ("Sounds", grilled 2026-11-08) and `GLOSSARY.md` (Sound, Glyph, My Script, Message, Missing Glyph, Cipher Key). Where this spec and DESIGN.md disagree, DESIGN.md wins: flag it, don't silently pick.
 

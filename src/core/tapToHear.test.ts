@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { newStudio } from "./testing";
-import type { StudioCore, WorldCharacter, WorldNumeral } from "./studioCore";
+import { primaryLanguage, type StudioCore, type WorldCharacter, type WorldNumeral } from "./studioCore";
 
 /** The voice languages a typical Windows Edge has, with Greek but no Runic, Korean or Japanese. */
 const EDGE_VOICES = ["en-US", "en-GB", "el-GR", "de-DE"];
@@ -28,6 +28,20 @@ describe("Tapping a World Character to hear it", () => {
     const studio = newStudio();
     const tap = studio.worldCharacterTap("greek", character(studio, "greek", "Λ λ"), ["el"]);
     expect(tap?.kind === "speak" && tap.speech.lang).toBe("el");
+  });
+
+  it("matches voices reported with underscores and odd case, as some Android tablets do", () => {
+    const studio = newStudio();
+    const greek = studio.worldCharacterTap("greek", character(studio, "greek", "Λ λ"), ["EL_gr"]);
+    const chinese = studio.worldCharacterTap("chinese-numerals", studio.worldScript("chinese-numerals")!.numerals[0]!, [
+      "zh_Hant_TW",
+    ]);
+    expect(greek?.kind === "speak" && greek.speech.lang).toBe("el");
+    expect(chinese?.kind === "speak" && chinese.speech.lang).toBe("zh");
+  });
+
+  it("knows a voice's language from its tag's first part, however the tag is written", () => {
+    expect(["el-GR", "EL_gr", "zh_Hant_TW", "zh-Hant-TW", "ja"].map(primaryLanguage)).toEqual(["el", "el", "zh", "zh", "ja"]);
   });
 
   it("says the letter's name in English when the tablet has no voice for its language, never its sound", () => {

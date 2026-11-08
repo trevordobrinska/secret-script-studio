@@ -6,7 +6,7 @@
  * speaks. Call `startSpeech()` once in main.ts. Everything is a silent
  * no-op where speech synthesis is missing.
  */
-import type { Speech } from "../core/studioCore";
+import { primaryLanguage, type Speech } from "../core/studioCore";
 
 let voices: readonly SpeechSynthesisVoice[] = [];
 /** Held so Chromium doesn't garbage-collect it mid-word (and drop its `end` event). */
@@ -76,12 +76,12 @@ export function stopSpeaking(): void {
 
 /** A voice for `lang`: an exact match first; for English en-US, then any en; otherwise any of the same language. */
 function voiceFor(lang: string): SpeechSynthesisVoice | undefined {
-  const tag = (voice: SpeechSynthesisVoice) => voice.lang.replace("_", "-").toLowerCase();
-  const primary = lang.split("-")[0]!.toLowerCase();
+  const tag = (voice: SpeechSynthesisVoice) => voice.lang.replace(/_/g, "-").toLowerCase();
+  const primary = primaryLanguage(lang);
   const wanted = lang.toLowerCase();
   return (
     voices.find((voice) => tag(voice) === wanted) ??
     (primary === "en" ? voices.find((voice) => tag(voice) === "en-us") : undefined) ??
-    voices.find((voice) => tag(voice).split("-")[0] === primary)
+    voices.find((voice) => primaryLanguage(voice.lang) === primary)
   );
 }

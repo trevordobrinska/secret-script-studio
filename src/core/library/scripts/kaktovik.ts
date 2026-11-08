@@ -9,7 +9,7 @@ const kaktovik: WorldScript = {
   name: "Kaktovik numerals",
   kind: "numerals",
   about:
-    "Kaktovik numerals were invented in 1994 by middle-school students in Kaktovik, a small village in Alaska. Their Iñupiaq language counts in twenties, so they made 20 digits that look like the counting: little strokes for ones, and marks on top for fives. Their numbers caught on, and in 2022 they were added to Unicode, the alphabet every computer uses!",
+    "Kaktovik numerals were invented in 1994 by middle-school students in Kaktovik, a small village in Alaska. Their Iñupiaq language counts in twenties, so they made 20 digits that look like the counting: little strokes for ones, and marks on top for fives. Their numbers caught on, and in 2022 they were added to Unicode, the big list of letters and symbols every computer knows!",
   characters: [],
   numerals: [
     { text: "\u{1D2C0}", value: 0 },

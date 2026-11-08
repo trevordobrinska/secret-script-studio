@@ -8,12 +8,14 @@ let wired: HTMLButtonElement | undefined;
 /** Wires the shared `#mute-button` (index.html) to the core's muted setting. */
 export function startMuteButton(core: StudioCore, button: HTMLButtonElement): void {
   wired = button;
+  let wasMuted = false;
   const show = () => {
     const muted = core.settings().muted;
     button.classList.toggle("muted", muted);
     button.setAttribute("aria-pressed", String(muted));
     button.setAttribute("aria-label", muted ? "Sound off" : "Sound on");
-    if (muted) stopSpeaking(); // mute cuts off a letter mid-word
+    if (muted && !wasMuted) stopSpeaking(); // turning mute on cuts off a letter mid-word
+    wasMuted = muted;
   };
   button.addEventListener("click", () => {
     core.setMuted(!core.settings().muted);

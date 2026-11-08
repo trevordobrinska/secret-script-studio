@@ -71,6 +71,7 @@ export type { ScriptLook } from "./myScript";
 export type { CipherKeyEntry, PrintLayout, PrintOptions } from "./printing";
 export type { WorldCharacter, WorldNumeral, WorldScript } from "./library/worldScript";
 export type { Speech, WorldCharacterTap } from "./library/pronunciation";
+export { primaryLanguage } from "./library/pronunciation";
 
 /** The Settings as the screens see them. */
 export interface SettingsView {
@@ -169,6 +170,8 @@ export function createStudioCore({ storage, clock }: StudioCoreDeps): StudioCore
     },
   });
 
+  const worldScript = (id: string) => LIBRARY.find((script) => script.id === id);
+
   return {
     ...myScriptBook.commands,
     ...writing,
@@ -206,9 +209,9 @@ export function createStudioCore({ storage, clock }: StudioCoreDeps): StudioCore
     },
     settings: () => settings,
     library: () => LIBRARY,
-    worldScript: (id) => LIBRARY.find((script) => script.id === id),
+    worldScript,
     worldCharacterTap(scriptId, entry, voiceLangs) {
-      const script = LIBRARY.find((s) => s.id === scriptId);
+      const script = worldScript(scriptId);
       const entries: readonly (WorldCharacter | WorldNumeral)[] | undefined =
         "value" in entry ? script?.numerals : script?.characters;
       const own = entries?.find((e) => e.text === entry.text);

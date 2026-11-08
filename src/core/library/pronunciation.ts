@@ -37,10 +37,17 @@ export function pronounce(
   return { text, lang: "en", rate: SPEECH_RATE };
 }
 
-/** Matches on the primary subtag, so "el" matches "el-GR" (and "EL_gr", as some Android voices report it). */
+/** Matches on the primary subtag, so "el" matches "el-GR". */
 function sameLanguage(a: string, b: string): boolean {
-  const primary = (tag: string) => tag.split(/[-_]/)[0]!.toLowerCase();
-  return primary(a) === primary(b);
+  return primaryLanguage(a) === primaryLanguage(b);
+}
+
+/**
+ * A language tag's primary subtag, lowercased: "el-GR" → "el", and
+ * "EL_gr" or "zh_Hant_TW" (as some Android voices report them) → "el", "zh".
+ */
+export function primaryLanguage(tag: string): string {
+  return tag.split(/[-_]/)[0]!.toLowerCase();
 }
 
 /** "Λ λ" → "Λ": a voice reads one form, not both. */

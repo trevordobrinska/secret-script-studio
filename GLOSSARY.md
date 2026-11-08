@@ -15,6 +15,9 @@ _Avoid_: blurb, history, info
 **Glyph**: the shape he drew for one letter (A–Z), digit (0–9), space or punctuation mark in a My Script. A My Script with only a few Glyphs still works.
 _Avoid_: character, symbol, icon, letter (when meaning the drawing)
 
+**Sound**: the few letters he types to say how one of his Glyphs is said out loud, like "kla". The tablet reads it aloud. A Glyph without a Sound is read as the plain letter it stands for.
+_Avoid_: name, pronunciation, recording, audio
+
 **Missing Glyph**: a letter in a Message that has no Glyph yet in that My Script. It shows as an empty dotted box.
 _Avoid_: blank, placeholder, unknown letter
 

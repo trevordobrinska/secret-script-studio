@@ -37,6 +37,16 @@ Three big tiles, always in the same place: **My Scripts**, **Library**, **Number
 - **Replying:** the page opened from that link lets me type a reply that renders in *his* Glyphs. I hand him my phone or print it. **Scanning a QR code back into his tablet waits for V2** (it needs camera code).
 - **Printing:** a Message page plus an optional, **separate** Cipher Key page, so he can hand over the Message and keep the key. If printing is blocked on the tablet, he prints from the PC by opening the QR link.
 
+### Sounds (grilled 2026-11-08)
+His idea: give his own Glyphs sounds, so his My Scripts can be *spoken*, not just written.
+- **A Sound is typed, not recorded.** On the Glyph drawing screen there's a "How does it sound?" box (about 12 characters) with a 🔊 button to try it. It saves with **Save** / **Save & next**, along with the drawing. He can type a Sound before drawing anything. There's one field only, with no separate "name". Recording his voice was passed over: it needs the microphone, which is untested in Amazon Kids.
+- **Letters and digits** can have a Sound; space and punctuation can't (they're pauses). The Number Explorer stays silent for now.
+- **The voice:** always the device's English voice, at the same 0.8× as tap to hear, with the same glow and the same mute rules (silent, plus one wiggle). There's no voice picker. A made-up spelling read oddly by an English voice is part of the fun.
+- **No Sound yet:** the English voice says the letter it stands for ("bee"). Nothing is ever silent or blocked.
+- **The Glyph grid:** tapping a cell still opens the canvas. Each drawn Glyph's cell gets a small 🔊 corner button that speaks it and glows the cell.
+- **Read it to me:** a button that says a whole Message in his Sounds. Each word's Sounds are glued into one spoken word ("kla" + "zo" → "klazo"), with a pause at each space and punctuation mark. Glyphs without a Sound and Missing Glyphs say their English letter. Secret mode changes nothing. It sits on the Write screen and on a saved Message, and Dad's reply page has it too.
+- **Sounds go where Glyphs go:** Backup/Restore includes them. The share link carries the Sounds of the Glyphs it uses, which needs a new link format version, and old `m1.` links must keep opening. The printed Cipher Key shows each Glyph's Sound under its letter.
+
 ## Number Explorer
 - Uses the digits of the My Script he's chosen (his most recent by default).
 - **Digit Count** control, labeled **"How many digits?"**: a row of his own digit Glyphs, tap to add or remove one, from 2 to 16. "Base N" appears only as a small caption. It always opens on **10**, and nothing is locked. The first time, a one-line hint says "Try fewer digits!"

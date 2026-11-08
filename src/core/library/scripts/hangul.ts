@@ -8,6 +8,8 @@ const hangul: WorldScript = {
   id: "hangul",
   name: "Hangul (Korean)",
   kind: "writing",
+  about:
+    "Hangul is how people write Korean in South Korea and North Korea. King Sejong and his scholars invented it on purpose in 1443, so that everyone could learn to read, not just rich people. Some letters are drawn in the shape your mouth and tongue make when you say them!",
   characters: [
     { text: "ㄱ", name: "giyeok", sound: "G or K" },
     { text: "ㄴ", name: "nieun", sound: "N" },

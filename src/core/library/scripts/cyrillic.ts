@@ -5,6 +5,8 @@ const cyrillic: WorldScript = {
   id: "cyrillic",
   name: "Cyrillic (Russian)",
   kind: "writing",
+  about:
+    "Cyrillic is used to write Russian, Ukrainian, Bulgarian, Serbian and many more languages. It was made in Bulgaria about 1,100 years ago, and lots of its letters were borrowed from Greek. It is named after a monk called Saint Cyril.",
   characters: [
     { text: "А а", name: "a", sound: "A" },
     { text: "Б б", name: "be", sound: "B" },

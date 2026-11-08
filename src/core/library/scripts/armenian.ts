@@ -8,6 +8,8 @@ const armenian: WorldScript = {
   id: "armenian",
   name: "Armenian",
   kind: "writing",
+  about:
+    "Armenian is used in Armenia and by Armenian families all over the world. A monk named Mesrop Mashtots invented it about 1,600 years ago. He made it on purpose so Armenians could write their own language, and it has hardly changed since!",
   characters: [
     { text: "Ա ա", name: "ayb", sound: "AH" },
     { text: "Բ բ", name: "ben", sound: "B" },

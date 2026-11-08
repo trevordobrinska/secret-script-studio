@@ -5,6 +5,8 @@ const hiragana: WorldScript = {
   id: "hiragana",
   name: "Hiragana (Japanese)",
   kind: "writing",
+  about:
+    "Hiragana is used every day in Japan. It is about 1,100 years old and was made by writing Chinese characters faster and rounder until they became simple shapes. Japanese mixes three kinds of writing in one sentence: hiragana, katakana and Chinese characters called kanji.",
   characters: [
     { text: "あ", name: "a", sound: "AH" },
     { text: "い", name: "i", sound: "EE" },

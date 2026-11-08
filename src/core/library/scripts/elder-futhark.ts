@@ -5,6 +5,8 @@ const elderFuthark: WorldScript = {
   id: "elder-futhark",
   name: "Elder Futhark runes",
   kind: "writing",
+  about:
+    "Elder Futhark is the oldest set of runes, and nobody writes everyday things with it now. Germanic peoples in northern Europe carved it into wood, stone and metal almost 2,000 years ago. It is called \"futhark\" after its first six runes, F U TH A R K, the same way \"alphabet\" comes from alpha and beta!",
   characters: [
     { text: "ᚠ", name: "fehu", sound: "F" },
     { text: "ᚢ", name: "uruz", sound: "OO" },

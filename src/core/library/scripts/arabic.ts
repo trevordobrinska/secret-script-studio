@@ -8,6 +8,8 @@ const arabic: WorldScript = {
   id: "arabic",
   name: "Arabic",
   kind: "writing",
+  about:
+    "Arabic script is used across the Middle East and North Africa, and also to write Persian and Urdu. It is about 1,500 years old and grew out of an older script from the desert city of Petra. The letters join up like handwriting, and many letters change shape depending on where they are in a word!",
   direction: "rtl",
   characters: [
     { text: "ا", name: "alif", sound: "A (as in father)" },

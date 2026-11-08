@@ -9,6 +9,8 @@ const devanagari: WorldScript = {
   id: "devanagari",
   name: "Devanagari (Hindi)",
   kind: "writing",
+  about:
+    "Devanagari is used to write Hindi, Marathi and Nepali in India and Nepal, and the ancient language Sanskrit. It is more than 1,000 years old and grew out of an older Indian script called Brahmi. Most letters hang from a line drawn along the top, like laundry on a clothesline!",
   characters: [
     { text: "अ", name: "a", sound: "UH (as in sun)" },
     { text: "आ", name: "aa", sound: "AH (as in father)" },

@@ -8,6 +8,8 @@ const ogham: WorldScript = {
   id: "ogham",
   name: "Ogham",
   kind: "writing",
+  about:
+    "Ogham is an old Irish alphabet that people now use mostly for decoration. It was carved about 1,600 years ago in Ireland and parts of Britain, along the edges of tall standing stones. The letters are just straight notches and lines, and you read them from the bottom of the stone up!",
   characters: [
     { text: "ᚁ", name: "beith (birch)", sound: "B" },
     { text: "ᚂ", name: "luis", sound: "L" },

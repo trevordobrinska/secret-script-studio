@@ -105,6 +105,14 @@
   color: var(--ink);
 }
 
+/* The About: calm body text under the title, kept to a readable line length. */
+.world-about {
+  max-width: 46em;
+  margin: 0 0 var(--gap);
+  font-size: 22px;
+  line-height: 1.45;
+}
+
 .world-note {
   margin: 0 0 var(--gap);
   font-size: 22px;

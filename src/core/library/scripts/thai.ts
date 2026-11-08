@@ -9,6 +9,8 @@ const thai: WorldScript = {
   id: "thai",
   name: "Thai",
   kind: "writing",
+  about:
+    "Thai is how people write in Thailand. It is about 700 years old and grew out of the older Khmer script from Cambodia. Thai has 44 consonant letters, and it doesn't put spaces between words!",
   characters: [
     { text: "ก", name: "ko kai (chicken)", sound: "G (between G and K)" },
     { text: "ข", name: "kho khai (egg)", sound: "K" },

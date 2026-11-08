@@ -23,6 +23,16 @@ describe("the Library", () => {
     }
   });
 
+  it("gives every World Script an About", () => {
+    for (const script of newStudio().library()) {
+      expect(script.about?.trim(), script.id).toBeTruthy();
+    }
+  });
+
+  it("tells where Greek comes from in its About", () => {
+    expect(newStudio().worldScript("greek")?.about).toMatch(/Greece/);
+  });
+
   it("gives every writing system at least one character, each with a name and sound", () => {
     for (const script of newStudio().library()) {
       if (script.kind !== "writing") continue;

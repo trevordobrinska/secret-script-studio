@@ -22,6 +22,8 @@ export interface WorldScript {
   readonly id: string;
   readonly name: string;
   readonly kind: "writing" | "numerals";
+  /** 2–3 kid-level sentences: where it's used today, how old it is and where it came from, one fun fact. */
+  readonly about: string;
   /** "rtl" for scripts written right to left (Hebrew, Arabic); absent means left to right. */
   readonly direction?: "rtl";
   readonly characters: readonly WorldCharacter[];

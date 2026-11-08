@@ -9,6 +9,8 @@ const hebrew: WorldScript = {
   id: "hebrew",
   name: "Hebrew",
   kind: "writing",
+  about:
+    "Hebrew is used in Israel and in Jewish prayer books all over the world. These letters are more than 2,000 years old and grew out of an older script called Aramaic. Hebrew is written right to left, and the vowels are usually left out, or shown as tiny dots under the letters.",
   direction: "rtl",
   characters: [
     { text: "א", name: "alef", sound: "no sound (holds a vowel)" },

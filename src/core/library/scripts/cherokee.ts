@@ -8,6 +8,8 @@ const cherokee: WorldScript = {
   id: "cherokee",
   name: "Cherokee",
   kind: "writing",
+  about:
+    "Cherokee is used by the Cherokee people in Oklahoma and North Carolina. A Cherokee man named Sequoyah invented it by himself, finishing it in 1821, even though he couldn't read any language before. Each symbol is a syllable, and within a few years thousands of Cherokee people learned to read with it!",
   characters: [
     { text: "Ꭰ", name: "a", sound: "AH" },
     { text: "Ꭱ", name: "e", sound: "AY" },

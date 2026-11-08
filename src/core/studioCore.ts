@@ -4,6 +4,7 @@ import type { WorldScript } from "./library/worldScript";
 import { SETTINGS_SCHEMA_VERSION, type SettingsRecord, type StudioStorage } from "./studioStorage";
 import { createMyScriptBook, type MyScriptCommands } from "./myScriptBook";
 import type { GlyphSlot } from "./myScript";
+import { createWriting, type WritingCommands } from "./writing";
 
 /** Everything the Studio core needs from the outside world. */
 export interface StudioCoreDeps {
@@ -28,8 +29,13 @@ export type Screen =
   | { readonly name: "newMyScript" }
   /** A My Script's grid of Glyph slots. */
   | { readonly name: "glyphGrid"; readonly scriptId: string }
-  /** The Glyph canvas, drawing one slot of a My Script. */
-  | { readonly name: "glyphCanvas"; readonly scriptId: string; readonly slot: GlyphSlot };
+  /**
+   * The Glyph canvas, drawing one slot of a My Script. `returnTo` is where
+   * Save and Back go (e.g. the Write screen); without it, the Glyph grid.
+   */
+  | { readonly name: "glyphCanvas"; readonly scriptId: string; readonly slot: GlyphSlot; readonly returnTo?: Screen }
+  /** The Write screen: writing a Message in a My Script with its Glyph keyboard (the draft is in the core). */
+  | { readonly name: "write"; readonly scriptId: string };
 
 export type { WorldCharacter, WorldNumeral, WorldScript } from "./library/worldScript";
 
@@ -45,7 +51,7 @@ const DEFAULT_SETTINGS: SettingsView = { muted: false, numberHintSeen: false };
  * The Studio core: every rule of the app, with no DOM. Screens read its
  * views and call its commands. Commands return results and never throw.
  */
-export interface StudioCore extends MyScriptCommands {
+export interface StudioCore extends MyScriptCommands, WritingCommands {
   /** The screen that is showing now. The app opens on home. */
   screen(): Screen;
   /** The home screen's tiles, in their fixed order. */
@@ -87,8 +93,11 @@ export function createStudioCore({ storage, clock }: StudioCoreDeps): StudioCore
     },
   });
 
+  const writing = createWriting({ myScript: myScriptBook.commands.myScript });
+
   return {
     ...myScriptBook.commands,
+    ...writing,
     screen: () => current,
     homeTiles: () => HOME_TILES,
     open(screen) {

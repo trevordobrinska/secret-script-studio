@@ -1,5 +1,6 @@
 import "./myScripts.css";
-import { slotLabel, type GlyphSlot, type Point } from "../core/myScript";
+import { slotLabel, type Point } from "../core/myScript";
+import type { Screen } from "../core/studioCore";
 import { fitCanvas, paintGuides, paintStrokes } from "../render/glyphRenderer";
 import { el, type RenderScreen } from "./screen";
 
@@ -9,17 +10,14 @@ import { el, type RenderScreen } from "./screen";
  * Monsters: one finger at a time, every coalesced sample, and the whole
  * drawing repainted (rAF-throttled). Points are kept normalized (0–1).
  */
-export const glyphCanvasScreen: RenderScreen<{ name: "glyphCanvas"; scriptId: string; slot: GlyphSlot }> = (
-  root,
-  screen,
-  { core, go },
-) => {
+export const glyphCanvasScreen: RenderScreen<Extract<Screen, { name: "glyphCanvas" }>> = (root, screen, { core, go }) => {
   const script = core.myScript(screen.scriptId);
   if (!script) {
     root.append(el("p", "placeholder", "This My Script isn't here."));
     return;
   }
-  const backToGrid = () => go({ name: "glyphGrid", scriptId: script.id });
+  // Save and Back go where he came from (e.g. the Write screen), else the grid.
+  const goBack = () => go(screen.returnTo ?? { name: "glyphGrid", scriptId: script.id });
 
   // Redrawing starts from the Glyph he has, so he can undo or add to it.
   const strokes: Point[][] = (script.glyphs[screen.slot]?.strokes ?? []).map((s) => [...s]);
@@ -109,9 +107,9 @@ export const glyphCanvasScreen: RenderScreen<{ name: "glyphCanvas"; scriptId: st
     requestPaint();
   });
   save.addEventListener("click", () => {
-    if (core.saveGlyph(script.id, screen.slot, strokes) === "saved") backToGrid();
+    if (core.saveGlyph(script.id, screen.slot, strokes) === "saved") goBack();
   });
-  back.addEventListener("click", backToGrid);
+  back.addEventListener("click", goBack);
 
   const observer = new ResizeObserver(resize);
   observer.observe(canvas);

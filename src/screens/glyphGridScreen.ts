@@ -1,6 +1,7 @@
 import "./myScripts.css";
 import { GLYPH_SLOTS, slotLabel } from "../core/myScript";
 import { glyphImage } from "../render/glyphRenderer";
+import { playTap } from "../sound/sound";
 import { el, type RenderScreen } from "./screen";
 
 const CELL = 72;
@@ -13,6 +14,15 @@ export const glyphGridScreen: RenderScreen<{ name: "glyphGrid"; scriptId: string
     return;
   }
   root.append(el("h1", "screen-title", script.name));
+  const actions = el("div", "ms-grid-actions");
+  const write = el("button", "ms-button ms-write", "Write a Message");
+  write.type = "button";
+  write.addEventListener("click", () => {
+    playTap();
+    go({ name: "write", scriptId: script.id });
+  });
+  actions.append(write);
+  root.append(actions);
   const grid = el("div", "ms-grid");
   for (const slot of GLYPH_SLOTS) {
     const glyph = script.glyphs[slot];

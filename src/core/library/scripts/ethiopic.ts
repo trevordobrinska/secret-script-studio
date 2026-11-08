@@ -10,6 +10,8 @@ const ethiopic: WorldScript = {
   name: "Ethiopic (Ge'ez)",
   kind: "writing",
   voice: "am",
+  about:
+    "Ethiopic, also called Ge'ez, is used to write Amharic and other languages in Ethiopia and Eritrea. It is about 2,000 years old and came from an old script of southern Arabia. Each symbol is a whole syllable, and you change the vowel by adding a little tail, loop or line to the letter!",
   characters: [
     { text: "ሀ", name: "hä", sound: "HUH" },
     { text: "ለ", name: "lä", sound: "LUH" },

@@ -5,6 +5,8 @@ const mayan: WorldScript = {
   id: "mayan",
   name: "Mayan numerals",
   kind: "numerals",
+  about:
+    "Mayan numerals were used by the Maya of Mexico and Central America more than 1,500 years ago. They count in twenties instead of tens, with a dot for one, a bar for five and a shell for zero. The Maya were one of the first peoples in the world to use a zero!",
   characters: [],
   numerals: [
     { text: "\u{1D2E0}", value: 0 },

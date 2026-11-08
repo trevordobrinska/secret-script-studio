@@ -9,6 +9,8 @@ const katakana: WorldScript = {
   name: "Katakana (Japanese)",
   kind: "writing",
   voice: "ja",
+  about:
+    "Katakana is used in Japan for words borrowed from other languages, like \"pizza\" and \"ice cream\", and for sound effects in comics. It is about 1,100 years old, and Buddhist monks made it from small pieces of Chinese characters. Each katakana stands for a whole syllable, like \"ka\" or \"mi\".",
   characters: [
     { text: "ア", name: "a", sound: "AH" },
     { text: "イ", name: "i", sound: "EE" },

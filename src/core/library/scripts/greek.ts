@@ -5,6 +5,8 @@ const greek: WorldScript = {
   name: "Greek",
   kind: "writing",
   voice: "el",
+  about:
+    "Greek is used in Greece and Cyprus today. It is about 2,800 years old, and the ancient Greeks made it by borrowing letters from the Phoenicians and adding vowels. The word \"alphabet\" comes from its first two letters, alpha and beta!",
   characters: [
     { text: "Α α", name: "alpha", sound: "A" },
     { text: "Β β", name: "beta", sound: "B" },

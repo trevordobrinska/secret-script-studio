@@ -33,6 +33,7 @@ export const worldScriptScreen: RenderScreen<{ name: "worldScript"; scriptId: st
   back.type = "button";
   back.addEventListener("click", () => go({ name: "library" }));
   page.append(back);
+  page.append(el("p", "world-about", script.about));
 
   if (script.characters.length > 0) {
     if (script.direction === "rtl") page.append(el("p", "world-note", "Written right to left, so the letters start on the right."));

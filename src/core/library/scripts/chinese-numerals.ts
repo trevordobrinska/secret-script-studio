@@ -6,6 +6,8 @@ const chineseNumerals: WorldScript = {
   name: "Chinese numerals",
   kind: "numerals",
   voice: "zh",
+  about:
+    "Chinese numerals are used in China and Taiwan, and also in Japan and Korea. They are more than 3,000 years old: the oldest ones were carved on turtle shells and bones. One, two and three are just one, two and three lines: 一 二 三.",
   characters: [],
   numerals: [
     { text: "〇", value: 0 },

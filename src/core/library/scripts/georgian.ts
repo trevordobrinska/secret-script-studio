@@ -9,6 +9,8 @@ const georgian: WorldScript = {
   name: "Georgian",
   kind: "writing",
   voice: "ka",
+  about:
+    "Georgian is used in the country of Georgia, between Europe and Asia. It is about 1,500 years old, and its curly letters look like no other alphabet in the world. Georgian has no capital letters: every letter is the same kind, even at the start of a sentence.",
   characters: [
     { text: "ა", name: "ani", sound: "AH" },
     { text: "ბ", name: "bani", sound: "B" },

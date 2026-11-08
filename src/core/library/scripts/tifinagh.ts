@@ -8,6 +8,8 @@ const tifinagh: WorldScript = {
   id: "tifinagh",
   name: "Tifinagh",
   kind: "writing",
+  about:
+    "Tifinagh is used by the Amazigh (Berber) peoples of North Africa, and in Morocco you can see it on signs next to Arabic. Its oldest form is more than 2,000 years old. The Tuareg people of the Sahara Desert still use it, and they have written it left to right, right to left, or even from the bottom up!",
   characters: [
     { text: "ⴰ", name: "ya", sound: "AH" },
     { text: "ⴱ", name: "yab", sound: "B" },

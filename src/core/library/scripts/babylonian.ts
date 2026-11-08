@@ -8,6 +8,8 @@ const babylonian: WorldScript = {
   id: "babylonian",
   name: "Babylonian numerals",
   kind: "numerals",
+  about:
+    "Babylonian numerals are about 4,000 years old, from ancient Iraq. People pressed them into wet clay with the tip of a reed, making little wedge shapes. They counted in sixties, and that's why an hour has 60 minutes and a circle has 360 degrees!",
   characters: [],
   numerals: [
     { text: "\u{12079}", value: 1 },

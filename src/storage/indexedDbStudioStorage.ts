@@ -44,6 +44,12 @@ export function indexedDbStudioStorage(): StudioStorage {
     saveMyScript: async (script) => {
       await run(MY_SCRIPTS, "readwrite", (s) => void s.put(script));
     },
+    deleteMyScript: async (id) => {
+      await run(MY_SCRIPTS, "readwrite", (s) => void s.delete(id));
+    },
+    deleteMessagesOfMyScript: async (_scriptId) => {
+      // Ticket 06: delete this My Script's Messages from the messages store here.
+    },
   };
 }
 

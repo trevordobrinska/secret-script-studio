@@ -85,6 +85,7 @@ export function createStudioCore({ storage, clock }: StudioCoreDeps): StudioCore
         .then(() => storage.saveMyScript(record))
         .catch((error) => console.warn("Couldn't save a My Script.", error));
     },
+    remove: (scriptId) => myScriptDeleted(scriptId),
   });
 
   return {
@@ -119,6 +120,17 @@ export function createStudioCore({ storage, clock }: StudioCoreDeps): StudioCore
     },
     saved: () => pending,
   };
+
+  /**
+   * A My Script was deleted: its Messages go with it. Ticket 06 (Messages)
+   * also drops that script's Messages from the core's memory here.
+   */
+  function myScriptDeleted(scriptId: string): void {
+    pending = pending
+      .then(() => storage.deleteMyScript(scriptId))
+      .then(() => storage.deleteMessagesOfMyScript(scriptId))
+      .catch((error) => console.warn("Couldn't delete a My Script.", error));
+  }
 
   function saveSettings(): void {
     const record: SettingsRecord = { schemaVersion: SETTINGS_SCHEMA_VERSION, ...settings };

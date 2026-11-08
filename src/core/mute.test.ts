@@ -36,6 +36,7 @@ describe("Mute", () => {
 
   it("still works for this visit if storage can't be written", async () => {
     const broken: StudioStorage = {
+      ...inMemoryStudioStorage(),
       loadSettings: async () => undefined,
       saveSettings: () => Promise.reject(new Error("storage is full")),
       listMyScripts: async () => [],

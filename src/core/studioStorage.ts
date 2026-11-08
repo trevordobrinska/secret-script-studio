@@ -16,6 +16,13 @@ export interface StudioStorage {
   listMyScripts(): Promise<MyScriptRecord[]>;
   /** Saves a My Script with its Glyphs, replacing any with the same id. */
   saveMyScript(script: MyScriptRecord): Promise<void>;
+  /** Deletes a saved My Script (and its Glyphs). No error if it isn't there. */
+  deleteMyScript(id: string): Promise<void>;
+  /**
+   * Deletes every saved Message of one My Script (called when the My Script
+   * is deleted). No-op until ticket 06 adds the Messages store.
+   */
+  deleteMessagesOfMyScript(scriptId: string): Promise<void>;
 }
 
 /** Bump when the Settings record's shape changes. */
@@ -45,6 +52,12 @@ export function inMemoryStudioStorage(): StudioStorage {
     },
     async saveMyScript(script) {
       myScripts.set(script.id, structuredClone(script));
+    },
+    async deleteMyScript(id) {
+      myScripts.delete(id);
+    },
+    async deleteMessagesOfMyScript(_scriptId) {
+      // Ticket 06: delete this My Script's Messages here.
     },
   };
 }

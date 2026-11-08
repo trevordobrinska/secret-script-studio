@@ -4,7 +4,7 @@
 
 **Blocked by:** none
 
-**Status:** ready-for-agent
+**Status:** ready-for-human
 
 - [x] `WorldScript.about` (required) added to the data shape
 - [x] Library content check: every World Script has a non-empty About (tested through the core)
@@ -44,3 +44,5 @@ Facts I was least sure of, worth a closer look: Thai "44 consonant letters" (the
 - **Babylonian numerals**: Babylonian numerals are about 4,000 years old, from ancient Iraq. People pressed them into wet clay with the tip of a reed, making little wedge shapes. They counted in sixties, and that's why an hour has 60 minutes and a circle has 360 degrees!
 - **Chinese numerals**: Chinese numerals are used in China and Taiwan, and also in Japan and Korea. They are more than 3,000 years old: the oldest ones were carved on turtle shells and bones. One, two and three are just one, two and three lines: 一 二 三.
 - **Eastern Arabic numerals**: Eastern Arabic numerals are used in Egypt, Iraq, Saudi Arabia and other Arabic-speaking countries. They came from India more than 1,000 years ago, and our own 0 to 9 come from the same family. Arabic words are read right to left, but numbers are still read left to right!
+
+Agent work merged on `library-v1.1` (2026-11-08). Left for Dad: the Edge by-eye check at 1280x800 and 800x1280, and the About skim listed above.

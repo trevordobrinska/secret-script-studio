@@ -4,7 +4,7 @@
 
 **Blocked by:** none
 
-**Status:** ready-for-agent
+**Status:** ready-for-human
 
 - [x] Data: `WorldScript.voice?` (BCP 47 tag) and `WorldCharacter.say?` added; voice tags filled in for the existing scripts per the spec's mapping
 - [x] Core: pronunciation rule (tested): native voice when a matching language is available (primary-subtag match); English fallback says the name, never the sound text; numerals say their text natively or their value in English; numeral-only systems always use English; `say` overrides; first form split off multi-form text; rate 0.8
@@ -20,3 +20,5 @@
 - Flag (spec vs itself): "numeral-only systems always use English" conflicts with the mapping giving Chinese numerals `zh` and Eastern Arabic `ar`. Built it voice-based: those two speak natively when the voice is there; Roman, Mayan and Babylonian have no voice so always say their value in English (matches DESIGN: "Roman, Mayan, Babylonian…").
 - Flag (DESIGN wording): DESIGN says a Greek voice says "λάμδα"; the spec hands the voice the letter itself ("Λ"), trusting the voice to read a lone letter by its name. Worth listening for in the ear check; a `say` fixes any that read badly.
 - Ear check in Edge not done: the agent cannot listen. Left unchecked for Dad.
+
+Agent work merged on `library-v1.1` (2026-11-08), plus code-review fixes: a card glows at most 4 s even if the voice never reports `end`, and language-tag parsing is now one shared helper. Left for Dad: the ear check in Edge. Two decisions are still open: (1) Chinese and Eastern Arabic numerals speak natively because of their voice tags, even though the spec says numeral-only systems always use English; (2) whether the native voice reading the bare letter ("Λ") is good enough, or `say` should carry the letter's name ("λάμδα") as DESIGN.md's example does.

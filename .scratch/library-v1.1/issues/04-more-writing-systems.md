@@ -4,7 +4,7 @@
 
 **Blocked by:** 01 (About for every World Script), 02 (Tap a World Character to hear it)
 
-**Status:** ready-for-agent
+**Status:** resolved
 
 - [x] Glagolitic, Coptic, Gothic, Phoenician, Younger Futhark, Canadian syllabics (Inuktitut), Tibetan (`bo`), Bengali (`bn`, with its digits), Tamil (`ta`, with its digits), Linear B, Egyptian hieroglyphs (one-sound signs only, with kid names like "vulture", "reed", "owl")
 - [x] Syllabaries (Canadian syllabics, Linear B) list their syllables in a sensible order, each with a sound
@@ -48,3 +48,5 @@ Not checked by eye: none of these render on a stock Fire tablet yet; fonts are t
 - **Tamil**: Tamil is used in southern India, Sri Lanka and Singapore by more than 80 million people. It is one of the oldest languages still spoken, with poems more than 2,000 years old, and its letters grew out of the old Indian script Brahmi. Tamil has one letter for both K and G, and one for both P and B: which sound you say depends on where the letter sits in a word!
 - **Linear B**: Linear B was used more than 3,000 years ago on the island of Crete and in mainland Greece, to write the oldest Greek we know. It was scratched on clay tablets, mostly lists of sheep, grain and olive oil, and the tablets lasted because fires burned the palaces and baked them hard! Nobody could read it until 1952, when an architect named Michael Ventris cracked the code.
 - **Egyptian hieroglyphs**: Hieroglyphs were used in ancient Egypt for more than 3,000 years, starting about 5,000 years ago, carved on temples and painted in tombs. There were hundreds of signs, but these 25 each stand for just one sound, a bit like letters. After the old temples closed, nobody could read hieroglyphs for about 1,400 years, until a Frenchman named Champollion cracked them in 1822 using the Rosetta Stone!
+
+Resolved: merged on `library-v1.1` (2026-11-08). The About skim and the flagged facts above are still worth Dad's look.

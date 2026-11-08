@@ -12,7 +12,7 @@ const bengali: WorldScript = {
   kind: "writing",
   voice: "bn",
   about:
-    "Bengali, also called Bangla, is used in Bangladesh and eastern India by more than 200 million people. It is about 1,000 years old and, like Devanagari, grew out of the old Indian script Brahmi, so most letters hang from a line along the top. February 21 is International Mother Language Day all over the world, to remember people in Bangladesh who stood up for their right to speak Bengali!",
+    "Bengali, also called Bangla, is used in Bangladesh and eastern India by more than 200 million people. It is about 1,000 years old and, like Devanagari, grew out of the old Indian script Brahmi, so most letters hang from a line along the top. February 21 is International Mother Language Day all over the world, to remember students in Dhaka who, in 1952, stood up for their right to use Bengali!",
   characters: [
     { text: "অ", name: "o", sound: "AW (as in saw)" },
     { text: "আ", name: "a", sound: "AH (as in father)" },

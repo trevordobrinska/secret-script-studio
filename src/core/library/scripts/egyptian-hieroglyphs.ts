@@ -10,7 +10,7 @@ const egyptianHieroglyphs: WorldScript = {
   name: "Egyptian hieroglyphs",
   kind: "writing",
   about:
-    "Hieroglyphs were used in ancient Egypt for more than 3,000 years, starting about 5,000 years ago, carved on temples and painted in tombs. There were hundreds of signs, but these 25 each stand for just one sound, a bit like letters. After the old temples closed, nobody could read hieroglyphs for about 1,400 years, until a Frenchman named Champollion cracked them in 1822 using the Rosetta Stone!",
+    "Hieroglyphs were used in ancient Egypt for more than 3,000 years, starting about 5,000 years ago, carved on temples and painted in tombs. There were hundreds of signs, but these 25 each stand for just one sound, a bit like letters. The last ones were carved in AD 394, and then nobody could read them for over 1,400 years, until a Frenchman named Champollion cracked them in 1822 with help from the Rosetta Stone!",
   characters: [
     { text: "𓄿", name: "vulture", sound: "AH (a catch in the throat)" },
     { text: "𓇋", name: "reed", sound: "EE (or AH)" },

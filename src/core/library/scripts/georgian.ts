@@ -1,7 +1,8 @@
 import type { WorldScript } from "../worldScript";
 
 /**
- * The modern Georgian alphabet (Mkhedruli, 33 letters, no capitals). "Sharp" letters are said
+ * The modern Georgian alphabet (Mkhedruli, 33 letters; no capitals in ordinary writing, though an all-caps
+ * form, Mtavruli, is used for some headings). "Sharp" letters are said
  * with a little pop in the throat; "with a puff" ones with a breath of air.
  */
 const georgian: WorldScript = {
@@ -10,7 +11,7 @@ const georgian: WorldScript = {
   kind: "writing",
   voice: "ka",
   about:
-    "Georgian is used in the country of Georgia, between Europe and Asia. It is about 1,500 years old, and its curly letters look like no other alphabet in the world. Georgian has no capital letters: every letter is the same kind, even at the start of a sentence.",
+    "Georgian is used in the country of Georgia, between Europe and Asia. Its oldest writing is about 1,600 years old, and its round, curly letters look like no other script in the world. In everyday writing Georgian doesn't use capital letters, so a sentence starts with the same kind of letter as all the rest!",
   characters: [
     { text: "ა", name: "ani", sound: "AH" },
     { text: "ბ", name: "bani", sound: "B" },

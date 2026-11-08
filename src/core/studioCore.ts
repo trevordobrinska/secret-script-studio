@@ -4,6 +4,7 @@ import type { WorldScript } from "./library/worldScript";
 import { SETTINGS_SCHEMA_VERSION, type SettingsRecord, type StudioStorage } from "./studioStorage";
 import { createMyScriptBook, type MyScriptCommands } from "./myScriptBook";
 import type { GlyphSlot } from "./myScript";
+import { createNumberExplorer, type NumberExplorerCommands } from "./numberExplorer";
 
 /** Everything the Studio core needs from the outside world. */
 export interface StudioCoreDeps {
@@ -45,7 +46,7 @@ const DEFAULT_SETTINGS: SettingsView = { muted: false, numberHintSeen: false };
  * The Studio core: every rule of the app, with no DOM. Screens read its
  * views and call its commands. Commands return results and never throw.
  */
-export interface StudioCore extends MyScriptCommands {
+export interface StudioCore extends MyScriptCommands, NumberExplorerCommands {
   /** The screen that is showing now. The app opens on home. */
   screen(): Screen;
   /** The home screen's tiles, in their fixed order. */
@@ -87,11 +88,16 @@ export function createStudioCore({ storage, clock }: StudioCoreDeps): StudioCore
     },
   });
 
+  const numberExplorer = createNumberExplorer({ clock, myScripts: myScriptBook.commands.myScripts });
+
   return {
     ...myScriptBook.commands,
+    ...numberExplorer.commands,
     screen: () => current,
     homeTiles: () => HOME_TILES,
     open(screen) {
+      // Coming in from home is a fresh start; coming back from the Glyph canvas keeps his place.
+      if (screen.name === "numberExplorer" && current.name === "home") numberExplorer.start();
       current = screen;
     },
     goHome() {

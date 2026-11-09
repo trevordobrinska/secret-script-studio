@@ -8,7 +8,7 @@ My 10-year-old son invents his own scripts, then actually *uses* them: writes se
 Calm by default: no timers, scores, fail states, randomness or gates. He doesn't have strong sensory issues, so these are the defaults: soft click sounds (mutable), short gentle animations, and a fixed layout where buttons never move.
 
 ## Platform
-- **Device:** his own tablet, a different one from Doodle Monsters'. Probably a Fire, model **unknown — find out**. Assume Silk (Chromium) in an Amazon Kids profile until proven otherwise.
+- **Device:** his own tablet, a different one from Doodle Monsters'. Tested 2026-11-08: a Fire in an Amazon Kids profile, running **Amazon Kids Browser** (Chromium 138), 601×962 CSS px at ≈1.33× (800×1280, which matches a Fire HD 8; model still to read off the device). His sister's tablet behaved identically.
 - **Stack:** Vite + TypeScript, a plain `<canvas>` for drawing, and Vitest for the rules. Same as Doodle Monsters. Reuse its stroke-capture code (`src/draw/drawing.ts`, where each Stroke is a list of points with a width).
 - **Hosting:** GitHub Pages at `trevordobrinska.github.io/secret-script-studio/`, reached from the **Arcade** (see below).
 - **Tests:** Vitest for the rules: rendering a Message with Missing Glyphs, digit conversion for Digit Counts 2–16, Stack counts, packing and unpacking the share link, and saving and loading My Scripts. Feel gets playtested by eye.
@@ -33,7 +33,7 @@ Three big tiles, always in the same place: **My Scripts**, **Library**, **Number
 - **Saved Messages:** each My Script keeps a list of its Messages (open, re-read, delete). It doubles as a secret diary.
 - **Sending to Dad:** his tablet shows a **QR code**. The link packs the Message *and the Glyphs it uses*, with no server involved. My phone camera opens it and the Message shows decoded.
 - **Replying:** the page opened from that link lets me type a reply that renders in *his* Glyphs. I hand him my phone or print it. **Scanning a QR code back into his tablet waits for V2** (it needs camera code).
-- **Printing:** a Message page plus an optional, **separate** Cipher Key page, so he can hand over the Message and keep the key. If printing is blocked on the tablet, he prints from the PC by opening the QR link.
+- **Printing:** a Message page plus an optional, **separate** Cipher Key page, so he can hand over the Message and keep the key. **Printing is blocked on the tablet** (tablet test, 2026-11-08), so it goes through the PC: Dad opens the QR link there and prints from the reply page. What the tablet's Print button does instead is ticket 18.
 
 ### Sounds (grilled 2026-11-08)
 His idea: give his own Glyphs sounds, so his My Scripts can be *spoken*, not just written.
@@ -66,20 +66,21 @@ His idea: give his own Glyphs sounds, so his My Scripts can be *spoken*, not jus
 
 ## Data
 - My Scripts and Messages live in IndexedDB on his tablet, under the `secret-script-studio` name.
-- **Backup/Restore** file buttons that anyone can use, like Doodle Monsters. Hand-drawn Glyphs are hours of work, so backup matters even more here.
+- **Backup/Restore** file buttons that anyone can use, like Doodle Monsters. Hand-drawn Glyphs are hours of work, so backup matters even more here. **The Restore file picker doesn't open in Amazon Kids Browser** (tablet test, 2026-11-08). Ticket 17 decides the way around it.
 - **Glyph Mines link (later):** because the Arcade shares one storage area, Glyph Mines could read his My Scripts directly. For now, keep the My Script data shape stable and documented, and decide the hookup when Glyph Mines is grilled.
 
-## Test on his tablet (when the model is known)
-- [ ] Find out the tablet model and browser
+## Test on his tablet
+A ticked box means answered. Results are in ticket 15's Comments.
+- [ ] Find out the tablet model and browser (browser: Amazon Kids Browser, Chromium 138; model still to read off the device)
 - [ ] The Arcade and this app load in his Kids profile
 - [ ] The installed Arcade opens this app fullscreen, and the house button and Back return to the Arcade (this app itself is never installed)
 - [ ] Saved data survives closing the app, rebooting and a few days
-- [ ] Downloading a backup file and the Restore file picker both work
-- [ ] Finger drawing is smooth on a small Glyph canvas
-- [ ] Printing works (or not), which decides whether printing goes through the PC
-- [ ] Which Library scripts render with built-in fonts, and which need bundled fonts
+- [x] Downloading a backup file and the Restore file picker both work: **Restore picker fails**; download not reported yet (ticket 17)
+- [x] Finger drawing is smooth on a small Glyph canvas: smooth
+- [x] Printing works (or not), which decides whether printing goes through the PC: **blocked**, so it goes through the PC (ticket 18)
+- [ ] Which Library scripts render with built-in fonts, and which need bundled fonts: of the original 22, only **Mayan numerals** are missing; V1.1 scripts not checked yet (ticket 16)
 - [ ] Which Library languages the tablet's built-in voices can speak, and whether 0.8× speed sounds right
-- [ ] My phone camera opens the on-screen QR code
+- [x] My phone camera opens the on-screen QR code: works
 
 ## Out of scope
 Accounts, a server, online sharing, multiplayer, fonts installable across the system, timers, scores, fail states, syllable blocks (like Hangul), tracing practice, scanning a QR code into the tablet (V2).
